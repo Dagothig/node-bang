@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>Bang!</title>
+        <style>
+            html, body {
+                margin: 0;
+                background: #000;
+            }
+            canvas {
+                width: 100%;
+                height: 100%;
+                transition: box-shadow 1s, opacity 1s;
+                box-shadow: inset 0 0 10em -1em #000;
+                opacity: 0.5;
+                background: #fff;
+            }
+            canvas:focus {
+                box-shadow: inset 0 0 2em -1em #000;
+                opacity: 1;
+            }
+        </style>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/app.js"></script>
+    </head>
+    <body>
+        <canvas tabIndex="0" id="canvas"></canvas>
+    </body>
+</html>
