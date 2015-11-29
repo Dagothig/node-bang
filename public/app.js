@@ -8,72 +8,207 @@ var socket = io(),
 
 var roots = ui.many('body>*'),
     loader = ui.one('#loader'),
+    connectedContainer = ui.one('#connected-container');
 
-    game = ui.one('#game'),
-    gameCanvas = ui.one(game, 'canvas'),
-    lobby = ui.one(game, '.lobby'),
-    usersList = ui.one(game, '.users .list'),
-    messagesList = ui.one(game, '.messages .list'),
-    messageForm = ui.one(game, 'form'),
-    message = ui.one(messageForm, '[name=message]'),
-
-    loginContainer = ui.one('#login-container'),
-    login = ui.one('#login'),
-    formError = ui.one(login, '.form-error'),
-    name = ui.one(login, '[name=name]'),
-    password = ui.one(login, '[name=password]');
+var login = require('./client/login.js')(
+    function onLogin(name, password) {
+        ui.hide(roots);
+        ui.show(loader);
+        socket.emit(msgs.auth, {
+            name: name,
+            password: password
+        });
+    }
+);
+var lobby = require('./client/lobby.js')(
+    function onMessage(message) {
+        socket.emit(msgs.message, {
+            token: user.token,
+            message: message
+        });
+    }
+);
+var game = require('./client/game.js')(
+    function onJoin(joining) {
+        socket.emit(msgs.joining, {
+            token: user.token,
+            joining: joining
+        });
+    }
+);
 
 ui.hide(roots);
 
-login.onsubmit = function() {
+socket.on('connect', function() {});
+socket.on('disconnect', function() {
     ui.hide(roots);
     ui.show(loader);
-    socket.emit(msgs.auth, {
-        name: name.value,
-        password: password.value
-    });
-    return false;
-};
-
-messageForm.onsubmit = function() {
-    socket.emit(msgs.message, {
-        token: user.token,
-        message: message.value
-    });
-    message.value = '';
-    return false;
-};
-
+});
 socket.on(msgs.alert, function(msg) {
     alert(msg);
 });
 socket.on(msgs.auth, function(msg) {
-    formError.innerText = msg ? msg.reason : '';
-    ui.hide(roots);
-    ui.show(loginContainer);
+    if (user) {
+        socket.emit(msgs.auth, {
+            name: user.name,
+            token: user.token
+        });
+    } else {
+        login.formError.innerText = msg ? msg.reason : '';
+        ui.hide(roots);
+        ui.show(login.element);
+    }
 });
 socket.on(msgs.user, function(msg) {
     if (user && !msg) {
         ui.hide(roots);
-        ui.show(loginContainer);
+        ui.show(login.element);
     }
     if (!user && msg) {
         ui.hide(roots);
-        ui.show(game);
+        ui.show(connectedContainer);
     }
     user = msg;
-    console.log(user);
+    lobby.handleUsers(user, users);
 });
 socket.on(msgs.users, function(msg) {
     users = msg;
-    usersList.innerHTML = '';
-    msg.forEach((obj) => usersList.innerHTML = '<div>' + obj.name + '</div>' + messagesList.innerHTML);
+    lobby.handleUsers(user, users);
 });
 socket.on(msgs.message, function(msg) {
-    messagesList.innerHTML = '<div>' + msg.name + ' : ' + msg.message + '</div>' + messagesList.innerHTML;
+    lobby.handleMessage(msg.name, msg.message);
+});
+socket.on(msgs.joining, function(msg) {
+    game.handleJoining(user, msg);
+});
+socket.on(msgs.game, function(msg) {
+    game.handleGame(msg);
 });
 
-},{"./client/ui.js":2,"./shared/messages.js":3}],2:[function(require,module,exports){
+},{"./client/game.js":2,"./client/lobby.js":3,"./client/login.js":4,"./client/ui.js":6,"./shared/messages.js":7}],2:[function(require,module,exports){
+var ui = require('./ui.js'),
+    misc = require('./misc.js');
+
+module.exports = function(onJoin) {
+    var element = ui.one('#game'),
+        pre = ui.one('#pre-game'),
+        preform = ui.one(pre, 'form'),
+        preheader = ui.one(preform, '.form-header'),
+        precount = ui.one(preform, '#player-count'),
+        prejoin = ui.one(preform, '[name=join]');
+
+    prejoin.onchange = function(e) {
+        onJoin(e.target.checked);
+    };
+
+    return {
+        element: element,
+        pre: pre,
+        preform: preform,
+        preheader: preheader,
+        precount: precount,
+        prejoin: prejoin,
+
+        handleJoining: function handleJoining(current, users) {
+            prejoin.checked = !!users.find((user) => misc.isCurrent(current, user));
+            precount.innerText = users.reduce((acc, user) => acc + 1, 0) + " / 4-7";
+        },
+
+        handleGame: function handleGame(game) {
+            if (game) {
+                ui.show(element);
+                ui.hide(pre);
+            } else {
+                ui.hide(element);
+                ui.show(pre);
+            }
+        }
+    };
+}
+
+},{"./misc.js":5,"./ui.js":6}],3:[function(require,module,exports){
+var ui = require('./ui.js'),
+    misc = require('./misc.js');
+
+module.exports = function(onMessage) {
+    var element = ui.one('#lobby'),
+        usersList = ui.one(element, '.users .list'),
+        messagesList = ui.one(element, '.messages .list'),
+        messageForm = ui.one(element, 'form'),
+        message = ui.one(messageForm, '[name=message]');
+
+    messageForm.onsubmit = function() {
+        onMessage(message.value);
+        message.value = '';
+        return false;
+    };
+
+    return {
+        element: element,
+        usersList: usersList,
+        messagesList: messagesList,
+        messageForm: messageForm,
+        message: message,
+
+        handleUsers: function handleUsers(current, users) {
+            usersList.innerHTML = '';
+            if (!users) return;
+
+            function surroundWith(tag, obj) {
+                return '<' + tag + '>' + obj + '</' + tag + '>';
+            }
+            function getTag(user) {
+                var tag = user.name
+                if (misc.isCurrent(current, user)) tag = surroundWith('em', tag);
+                return surroundWith('div', tag);
+            }
+            var html = '';
+            users
+                .sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
+                .forEach((user) => html += getTag(user));
+            usersList.innerHTML = html;
+        },
+        handleMessage: function handleMessage(name, message) {
+            messagesList.innerHTML =
+                '<div>' + name + ' : ' + message + '</div>' +
+                messagesList.innerHTML;
+        }
+    };
+};
+
+},{"./misc.js":5,"./ui.js":6}],4:[function(require,module,exports){
+var ui = require('./ui.js');
+
+module.exports = function(onLogin) {
+    var element = ui.one('#login'),
+        form = ui.one(element, 'form'),
+        formError = ui.one(form, '.form-error'),
+        name = ui.one(form, '[name=name]'),
+        password = ui.one(form, '[name=password]');
+
+    element.onsubmit = function() {
+        onLogin(name.value, password.value);
+        return false;
+    };
+
+    return {
+        element: element,
+        form: form,
+        formError: formError,
+        name: name,
+        password: password
+    };
+};
+
+},{"./ui.js":6}],5:[function(require,module,exports){
+module.exports = {
+    isCurrent: function isCurrent(current, user) {
+        return current &&
+            user.name.toLowerCase() === current.name.toLowerCase();
+    }
+};
+
+},{}],6:[function(require,module,exports){
 function one() {
     if (arguments[0].querySelector) return arguments[0].querySelector(arguments[1]);
     else return document.body.querySelector(arguments[0]);
@@ -103,15 +238,15 @@ module.exports = {
     hide: hide
 };
 
-},{}],3:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 module.exports = {
     alert: 'alert',
     auth: 'auth',
     user: 'user',
     users: 'users',
-    game: 'game',
     message: 'message',
-    play: 'play'
+    joining: 'joining',
+    game: 'game'
 };
 
 },{}]},{},[1]);

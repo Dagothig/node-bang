@@ -11,8 +11,14 @@ module.exports = {
             log('Socket connected');
             socket.emit(msgs.auth);
             socket.on(msgs.auth, function(msg) {
-                console.log(msg);
-                if (msg.name && msg.password && msg.password.length >= 6) {
+                if (msg.token) {
+                    var user = users.findForName(msg.name);
+                    if (user && user.token === msg.token) {
+                        socket.emit(msgs.user, user);
+                    } else {
+                        socket.emit(msgs.user, null);
+                    }
+                } else if (msg.name && msg.password && msg.password.length >= 6) {
                     var user = new User(msg.name, msg.password);
                     var existing = users.findForName(user.name);
                     if (existing) {
@@ -23,12 +29,12 @@ module.exports = {
                         }
                     } else users.push(user);
                     if (user.sockets.indexOf(socket) === -1) user.sockets.push(socket);
-                    listeners.forEach((listener) => listener.onUser(user, socket));
+                    listeners.forEach((listener) => listener.onConnected(user, socket));
                     socket.emit(msgs.user, {
                         name: user.name,
                         token: user.token
                     });
-                    log('User', msg.name, 'at', user.sockets.length, 'socket(s)');
+                    log(msg.name, 'at', user.sockets.length, 'socket(s)');
                 } else {
                     socket.emit(msgs.auth, { reason: strings.authValidation });
                     return;
@@ -40,13 +46,16 @@ module.exports = {
                 if (existing) {
                     var sockets = existing.sockets;
                     sockets.splice(sockets.indexOf(socket), 1);
-                    if (!sockets.length) users.remove(existing);
-                    log('User', existing.name ,'at', sockets.length, 'socket(s)');
+                    if (!sockets.length) {
+                        users.remove(existing);
+                        listeners.forEach((listener) => listener.onDisconnected(existing, socket));
+                    }
+                    log(existing.name ,'at', sockets.length, 'socket(s)');
                 }
             });
         });
     },
-    onUser: function onSocket(listener) {
+    listen: function listen(listener) {
         listeners.push(listener);
     }
 };

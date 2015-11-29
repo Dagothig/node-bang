@@ -6,6 +6,7 @@ var express = require('express'),
     users = require('./server/users.js'),
 
     lobby = require('./server/lobby.js'),
+    game = require('./server/game.js'),
     login = require('./server/login.js');
 
 var app = express(),
@@ -18,6 +19,7 @@ app.get('/', function(req, res) {
 });
 
 login.setup(io, users);
+game.setup(io, users, login);
 lobby.setup(io, users, login);
 
 server.listen(8080, function() {

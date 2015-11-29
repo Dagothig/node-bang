@@ -6,9 +6,26 @@
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
-        <div id="game" class="absolute full-width full-height flex horizontal">
-            <canvas class="root-bg grow-1"></canvas>
-            <div class="lobby flex vertical">
+        <div id="connected-container" class="hidden absolute full-width full-height flex horizontal">
+            <canvas id="game" class="grow-1"></canvas>
+            <div id="pre-game" class="grow-1 flex vertical root-bg">
+                <div class="grow-1"></div>
+                <form class="form-box">
+                    <div class="form-group">
+                        <span class="form-header">New game</span>
+                    </div>
+                    <div class="form-group flex horizontal">
+                        <label class="grow-1">Players</label>
+                        <span id="player-count" class="grow-2 center">0 / 4-7</span>
+                    </div>
+                    <div class="form-group flex horizontal">
+                        <label class="grow-1" for="join">Participate</label>
+                        <input id="join" class="grow-2 center" type="checkbox" name="join" />
+                    </div>
+                </form>
+                <div class="grow-1"></div>
+            </div>
+            <div id="lobby" class="flex vertical">
                 <div class="users grow-1 flex vertical">
                     <div class="title">Users</div>
                     <div class="list flex vertical grow-1"></div>
@@ -24,9 +41,9 @@
                 </form>
             </div>
         </div>
-        <div id="login-container" class="root-bg absolute full-width full-height flex vertical">
+        <div id="login" class="hidden root-bg absolute full-width full-height flex vertical">
             <div class="grow-1"></div>
-            <form id="login">
+            <form class="form-box">
                 <div class="form-group">
                     <span class="form-header">Identification</span>
                 </div>
@@ -47,7 +64,7 @@
             </form>
             <div class="grow-1"></div>
         </div>
-        <div id="loader" class="root-bg absolute full-width full-height flex vertical">
+        <div id="loader" class="hidden root-bg absolute full-width full-height flex vertical">
             <div class="grow-1"></div>
             <div class="element">
                 <div class="background-highlight"></div>

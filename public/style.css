@@ -3,10 +3,6 @@ html, body {
     color: #333;
     font-family: sans-serif;
 }
-#login {
-    width: 400px;
-    margin: 1em auto;
-}
 
 /* === [MISC] === */
 .pass-through {
@@ -90,6 +86,10 @@ html, body {
 }
 
 /* === [FORM] === */
+.form-box {
+    width: 400px;
+    margin: 1rem auto;
+}
 form {
     margin: 0;
     padding: 1rem;
@@ -138,21 +138,37 @@ textarea {
 }
 
 /* === [LOBBY] === */
-.lobby {
+#lobby {
     width: 20rem;
     font-size: 0.8rem;
 }
-.lobby .title {
+#lobby .title {
     padding: 0.5rem;
     font-size: 1rem;
 }
-.lobby .list {
+#lobby .list {
     overflow: auto;
 }
-.lobby .list div {
+#lobby .list div {
     padding: 0 0.5rem;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+}
+#lobby .list .alive {
+    color: #0f0;
+}
+#lobby .list .dead {
+    color: #f00;
+}
+#lobby .list em {
+    font-style: normal;
+    font-weight: 600;
+}
+#lobby .list em::before {
+    content: "[";
+}
+#lobby .list em::after {
+    content: "]";
 }
 
 /* === [LOADER] === */

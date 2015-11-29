@@ -3,7 +3,7 @@ module.exports = {
     auth: 'auth',
     user: 'user',
     users: 'users',
-    game: 'game',
     message: 'message',
-    play: 'play'
+    joining: 'joining',
+    game: 'game'
 };
