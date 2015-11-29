@@ -1,22 +1,24 @@
 var gulp = require('gulp'),
     childProcess = require('child_process'),
     chalk = require('chalk'),
-    node;
+    source = require('vinyl-source-stream'),
+    browserify = require('browserify');
 
-var chalkColor = chalk.cyan;
+var node,
+    chalkColor = chalk.cyan;
 
 gulp.task('server', function() {
     var prefix = '[' + chalkColor('gulp-server') + ']';
     if (node) {
-        console.log(prefix, 'Killing server');
         node.kill();
+        console.log(prefix, 'Server killed');
     }
-    console.log(prefix, 'Attempting to start server...');
     node = childProcess.spawn(
         'node',
         ['server.js'],
         { stdio: 'inherit' }
     );
+    console.log(prefix, 'Server started');
 });
 
 gulp.task('watch-server', function(cb) {
@@ -24,13 +26,38 @@ gulp.task('watch-server', function(cb) {
     console.log(prefix, "Watching server files...");
     return gulp.watch([
             "./server.js",
+            "./shared/*.js",
             "./server/*.js"
         ],
         ['server']
     );
 });
 
-gulp.task('default', ['server', 'watch-server']);
+gulp.task('client', function(cb) {
+    var prefix = '[' + chalkColor('gulp-client') + ']';
+
+    var val = browserify('./client.js')
+        .bundle()
+        .pipe(source('app.js'))
+        .pipe(gulp.dest('./public'));
+
+    console.log(prefix, "Client script bundled");
+    return val;
+});
+
+gulp.task('watch-client', function(cb) {
+    var prefix = '[' + chalkColor('gulp-watch-client') + ']';
+    console.log(prefix, "Watching client files...");
+    return gulp.watch([
+            "./client.js",
+            "./shared/*.js",
+            "./client/*.js",
+        ],
+        ['client']
+    );
+});
+
+gulp.task('default', ['server', 'watch-server', 'client', 'watch-client']);
 
 process.on("exit", function() {
     if (node) node.kill();

@@ -1,0 +1,284 @@
+html, body {
+    margin: 0;
+    color: #333;
+    font-family: sans-serif;
+}
+#game {}
+#login {
+    width: 400px;
+    margin: 1em auto;
+}
+
+/* === [MISC] === */
+.pass-through {
+    pointer-events: none;
+}
+.clickable {
+    pointer-events: all;
+}
+
+.hidden {
+    visibility: hidden;
+}
+.absolute {
+    position: absolute;
+}
+
+.full-width {
+    width: 100%;
+}
+.full-height {
+    height: 100%;
+}
+
+/* === [FLEX] === */
+.flex {
+    display: flex;
+}
+.flex.left {
+    justify-content: flex-start;
+}
+.flex.center {
+    justify-content: flex-center;
+}
+.flex.right {
+    justify-content: flex-end;
+}
+
+.flex.vertical {
+    flex-direction: column;
+}
+.flex.vertical>.grow-1, .flex.vertical>.grow-2 {
+    height: 0;
+}
+
+.flex.horizontal {
+    flex-direction: row;
+}
+.flex.horizontal>.grow-1, .flex.horizontal>.grow-2 {
+    width: 0;
+}
+
+.flex>.grow-1 {
+    flex-grow: 1;
+}
+.flex>.grow-2 {
+    flex-grow: 2;
+}
+
+/* === [LOADER] === */
+#loader {
+    background: #aaa;
+}
+#loader .element {
+    position: relative;
+    margin: auto;
+    border-radius: 100%;
+    animation: loader-rotate 6s infinite linear;
+}
+#loader .pivot, .barrel, .background-highlight {
+    animation: loader-rotate-inverse 6s infinite linear;
+}
+@keyframes loader-rotate {
+  0%{
+    transform: rotate(30deg);
+  }
+  3% {
+    transform: rotate(90deg);
+  }
+  17%{
+    transform: rotate(90deg);
+  }
+  20% {
+    transform: rotate(150deg);
+  }
+  33%{
+    transform: rotate(150deg);
+  }
+  36% {
+    transform: rotate(210deg);
+  }
+  50%{
+    transform: rotate(210deg);
+  }
+  53% {
+    transform: rotate(270deg);
+  }
+  67%{
+    transform: rotate(270deg);
+  }
+  70% {
+    transform: rotate(330deg);
+  }
+  83%{
+    transform: rotate(330deg);
+  }
+  86% {
+    transform: rotate(390deg);
+  }
+  100%{
+    transform: rotate(390deg);
+  }
+}
+@keyframes loader-rotate-inverse {
+  0%{
+    transform: rotate(360deg);
+  }
+  3% {
+    transform: rotate(300deg);
+  }
+  17%{
+    transform: rotate(300deg);
+  }
+  20% {
+    transform: rotate(240deg);
+  }
+  33%{
+    transform: rotate(240deg);
+  }
+  36% {
+    transform: rotate(180deg);
+  }
+  50%{
+    transform: rotate(180deg);
+  }
+  53% {
+    transform: rotate(120deg);
+  }
+  67%{
+    transform: rotate(120deg);
+  }
+  70% {
+    transform: rotate(60deg);
+  }
+  83%{
+    transform: rotate(60deg);
+  }
+  86% {
+    transform: rotate(0deg);
+  }
+  100%{
+    transform: rotate(0deg);
+  }
+}
+#loader .background {
+    position: absolute;
+    background: #778;
+    width: 9.1rem;
+    height: 9.1rem;
+    margin-left: -4.55rem;
+    margin-top: -4.55rem;
+    border-radius: 100%;
+}
+#loader .background-highlight {
+    position: absolute;
+    background: #778;
+    width: 9.5rem;
+    height: 9.5rem;
+    margin-left: -4.75rem;
+    margin-top: -4.75rem;
+    border-radius: 100%;
+    box-shadow:
+        -0.125rem 0.125rem 0rem 0.125rem #bbc inset,
+        0 0 0 0.25rem #556 inset,
+        0 0 4rem 2rem rgba(0, 0, 0, 0.5);
+}
+#loader .pivot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -1.6rem;
+    margin-top: -1.6rem;
+    width: 3.2rem;
+    height: 3.2rem;
+    background: #a75;
+    border-radius: 100%;
+    box-shadow:
+        0 0 0 0.125em #556 inset,
+        0.125rem -0.125rem 0rem 0.125rem #632 inset,
+        -0.125rem 0.125rem 0rem 0.125rem #dba inset;
+}
+#loader .barrel {
+    position: absolute;
+    width: 2.2rem;
+    height: 2.2rem;
+    margin-left: -1.1rem;
+    margin-top: -1.1rem;
+    background: #001;
+    border-radius: 100%;
+    box-shadow:
+        0.1rem -0.1rem 0 0.1rem #bbc inset,
+        0 0 0 0.2rem #556 inset;
+}
+#loader .pos-1 {
+    top: 0rem;
+    left: 3rem;
+}
+#loader .pos-2 {
+    top: 2.60rem;
+    left: 1.5rem;
+}
+#loader .pos-3 {
+    top: 2.60rem;
+    left: -1.5rem;
+}
+#loader .pos-4 {
+    top: 0rem;
+    left: -3rem;
+}
+#loader .pos-5 {
+    top: -2.60rem;
+    left: -1.5rem;
+}
+#loader .pos-6 {
+    top: -2.60rem;
+    left: 1.5rem;
+}
+
+/* === [FORM] === */
+.form-container {
+    background: #aaa;
+}
+form {
+    padding: 1rem;
+    background: #fff;
+    border-radius: 0.5rem;
+}
+form .form-header {
+    font-size: 1.2rem;
+    text-align: center;
+}
+form .form-error {
+    color: #f00;
+}
+form .form-group+.form-group {
+    margin-top: 1rem;
+}
+form .form-group label {
+    text-align: right;
+    align-self: center;
+}
+form .form-group label:after {
+    content: ":";
+    margin: 0 0.25em;
+}
+input {
+    align-self: center;
+    background: #eee;
+    border-radius: 0.5rem;
+    border: none;
+    padding: 0.75rem;
+}
+input:focus {
+    outline: none;
+    background: #ddd;
+}
+input[type=submit], input[type=button] {
+    cursor: pointer;
+}
+input[type=submit]:hover, input[type=button]:hover {
+    background: #ddd;
+}
+input[type=submit]:active, input[type=button]:active {
+    background: #ccc;
+}

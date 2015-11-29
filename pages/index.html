@@ -1,28 +1,52 @@
 <html>
     <head>
         <title>Bang!</title>
-        <style>
-            html, body {
-                margin: 0;
-                background: #000;
-            }
-            canvas {
-                width: 100%;
-                height: 100%;
-                transition: box-shadow 1s, opacity 1s;
-                box-shadow: inset 0 0 10em -1em #000;
-                opacity: 0.5;
-                background: #fff;
-            }
-            canvas:focus {
-                box-shadow: inset 0 0 2em -1em #000;
-                opacity: 1;
-            }
-        </style>
+        <link rel="icon" type="image/x-icon" href="favicon.ico" />
+        <link rel="stylesheet" type="text/css" href="/style.css" />
         <script src="/socket.io/socket.io.js"></script>
-        <script src="/app.js"></script>
     </head>
     <body>
-        <canvas tabIndex="0" id="canvas"></canvas>
+        <canvas id="game" class="absolute full-width full-height" tabIndex="0"></canvas>
+        <div id="login-container" class="form-container absolute full-width full-height flex vertical">
+            <div class="grow-1"></div>
+            <form id="login">
+                <div class="form-group">
+                    <span class="form-header">Identification</span>
+                </div>
+                <div class="form-group">
+                    <span class="form-error"></span>
+                </div>
+                <div class="form-group flex horizontal">
+                    <label class="grow-1" for="name">Name</label>
+                    <input class="grow-2" id="name" name="name" type="text" />
+                </div>
+                <div class="form-group flex horizontal">
+                    <label class="grow-1" for="password">Password</label>
+                    <input class="grow-2" id="password" name="password" type="password" />
+                </div>
+                <div class="form-group flex horizontal right">
+                    <input type="submit" />
+                </div>
+            </form>
+            <div class="grow-1"></div>
+        </div>
+        <div id="lobby" class="absolute full-width full-height">
+        </div>
+        <div id="loader" class="absolute full-width full-height flex vertical">
+            <div class="grow-1"></div>
+            <div class="element">
+                <div class="background-highlight"></div>
+                <div class="background"></div>
+                <div class="pivot"></div>
+                <div class="barrel pos-1"></div>
+                <div class="barrel pos-2"></div>
+                <div class="barrel pos-3"></div>
+                <div class="barrel pos-4"></div>
+                <div class="barrel pos-5"></div>
+                <div class="barrel pos-6"></div>
+            </div>
+            <div class="grow-1"></div>
+        </div>
+        <script src="/app.js"></script>
     </body>
 </html>
