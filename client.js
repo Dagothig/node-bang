@@ -2,13 +2,19 @@ var msgs = require('./shared/messages.js'),
     ui = require('./client/ui.js');
 
 var socket = io(),
-    user;
+    user,
+    users;
 
 var roots = ui.many('body>*'),
+    loader = ui.one('#loader'),
 
     game = ui.one('#game'),
-
-    loader = ui.one('#loader'),
+    gameCanvas = ui.one(game, 'canvas'),
+    lobby = ui.one(game, '.lobby'),
+    usersList = ui.one(game, '.users .list'),
+    messagesList = ui.one(game, '.messages .list'),
+    messageForm = ui.one(game, 'form'),
+    message = ui.one(messageForm, '[name=message]'),
 
     loginContainer = ui.one('#login-container'),
     login = ui.one('#login'),
@@ -25,6 +31,15 @@ login.onsubmit = function() {
         name: name.value,
         password: password.value
     });
+    return false;
+};
+
+messageForm.onsubmit = function() {
+    socket.emit(msgs.message, {
+        token: user.token,
+        message: message.value
+    });
+    message.value = '';
     return false;
 };
 
@@ -46,4 +61,13 @@ socket.on(msgs.user, function(msg) {
         ui.show(game);
     }
     user = msg;
+    console.log(user);
+});
+socket.on(msgs.users, function(msg) {
+    users = msg;
+    usersList.innerHTML = '';
+    msg.forEach((obj) => usersList.innerHTML = '<div>' + obj.name + '</div>' + messagesList.innerHTML);
+});
+socket.on(msgs.message, function(msg) {
+    messagesList.innerHTML = '<div>' + msg.name + ' : ' + msg.message + '</div>' + messagesList.innerHTML;
 });

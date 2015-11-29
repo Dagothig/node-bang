@@ -3,7 +3,6 @@ html, body {
     color: #333;
     font-family: sans-serif;
 }
-#game {}
 #login {
     width: 400px;
     margin: 1em auto;
@@ -18,10 +17,16 @@ html, body {
 }
 
 .hidden {
-    visibility: hidden;
+    display: none !important;
 }
 .absolute {
     position: absolute;
+}
+
+.line {
+    width: 1px;
+    height: 1px;
+    background: #aaa;
 }
 
 .full-width {
@@ -29,6 +34,14 @@ html, body {
 }
 .full-height {
     height: 100%;
+}
+
+.margin {
+    margin: 0.5rem;
+}
+
+.root-bg {
+    background: #aaa;
 }
 
 /* === [FLEX] === */
@@ -44,11 +57,21 @@ html, body {
 .flex.right {
     justify-content: flex-end;
 }
+.flex .center {
+    align-self: center;
+}
+.flex .bottom {
+    align-self: flex-end;
+}
 
 .flex.vertical {
     flex-direction: column;
 }
-.flex.vertical>.grow-1, .flex.vertical>.grow-2 {
+.flex.vertical-reverse {
+    flex-direction: column-reverse;
+}
+.flex.vertical>.grow-1, .flex.vertical>.grow-2,
+.flex.vertical-reverse>.grow-1, .flex.vertical-reverse>.grow-2 {
     height: 0;
 }
 
@@ -66,10 +89,73 @@ html, body {
     flex-grow: 2;
 }
 
-/* === [LOADER] === */
-#loader {
-    background: #aaa;
+/* === [FORM] === */
+form {
+    margin: 0;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 0.5rem;
 }
+form .form-header {
+    font-size: 1.2rem;
+    text-align: center;
+}
+form .form-error {
+    color: #f00;
+}
+form .form-group+.form-group {
+    margin-top: 1rem;
+}
+form .form-group label {
+    text-align: right;
+    align-self: center;
+}
+form .form-group label:after {
+    content: ":";
+    margin: 0 0.25em;
+}
+input, textarea {
+    background: #eee;
+    border-radius: 0.5rem;
+    border: none;
+    padding: 0.75rem;
+}
+input:focus {
+    outline: none;
+    background: #ddd;
+}
+input[type=submit], input[type=button] {
+    cursor: pointer;
+}
+input[type=submit]:hover, input[type=button]:hover {
+    background: #ddd;
+}
+input[type=submit]:active, input[type=button]:active {
+    background: #ccc;
+}
+textarea {
+    resize: none;
+}
+
+/* === [LOBBY] === */
+.lobby {
+    width: 20rem;
+    font-size: 0.8rem;
+}
+.lobby .title {
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+.lobby .list {
+    overflow: auto;
+}
+.lobby .list div {
+    padding: 0 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+/* === [LOADER] === */
 #loader .element {
     position: relative;
     margin: auto;
@@ -233,52 +319,4 @@ html, body {
 #loader .pos-6 {
     top: -2.60rem;
     left: 1.5rem;
-}
-
-/* === [FORM] === */
-.form-container {
-    background: #aaa;
-}
-form {
-    padding: 1rem;
-    background: #fff;
-    border-radius: 0.5rem;
-}
-form .form-header {
-    font-size: 1.2rem;
-    text-align: center;
-}
-form .form-error {
-    color: #f00;
-}
-form .form-group+.form-group {
-    margin-top: 1rem;
-}
-form .form-group label {
-    text-align: right;
-    align-self: center;
-}
-form .form-group label:after {
-    content: ":";
-    margin: 0 0.25em;
-}
-input {
-    align-self: center;
-    background: #eee;
-    border-radius: 0.5rem;
-    border: none;
-    padding: 0.75rem;
-}
-input:focus {
-    outline: none;
-    background: #ddd;
-}
-input[type=submit], input[type=button] {
-    cursor: pointer;
-}
-input[type=submit]:hover, input[type=button]:hover {
-    background: #ddd;
-}
-input[type=submit]:active, input[type=button]:active {
-    background: #ccc;
 }

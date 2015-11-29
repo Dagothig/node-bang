@@ -6,8 +6,25 @@
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
-        <canvas id="game" class="absolute full-width full-height" tabIndex="0"></canvas>
-        <div id="login-container" class="form-container absolute full-width full-height flex vertical">
+        <div id="game" class="absolute full-width full-height flex horizontal">
+            <canvas class="root-bg grow-1"></canvas>
+            <div class="lobby flex vertical">
+                <div class="users grow-1 flex vertical">
+                    <div class="title">Users</div>
+                    <div class="list flex vertical grow-1"></div>
+                </div>
+                <div class="messages grow-1 flex vertical">
+                    <div class="line full-width"></div>
+                    <div class="list flex vertical-reverse grow-1"></div>
+                </div>
+                <form class="flex horizontal">
+                    <input class="grow-1" name="message" placeholder="Enter your message here..."></textarea>
+                    <span class="margin"></span>
+                    <input value="Send" type="submit" />
+                </form>
+            </div>
+        </div>
+        <div id="login-container" class="root-bg absolute full-width full-height flex vertical">
             <div class="grow-1"></div>
             <form id="login">
                 <div class="form-group">
@@ -18,21 +35,19 @@
                 </div>
                 <div class="form-group flex horizontal">
                     <label class="grow-1" for="name">Name</label>
-                    <input class="grow-2" id="name" name="name" type="text" />
+                    <input class="grow-2 center" id="name" name="name" type="text" />
                 </div>
                 <div class="form-group flex horizontal">
                     <label class="grow-1" for="password">Password</label>
-                    <input class="grow-2" id="password" name="password" type="password" />
+                    <input class="grow-2 center" id="password" name="password" type="password" />
                 </div>
                 <div class="form-group flex horizontal right">
-                    <input type="submit" />
+                    <input value="Login" type="submit" />
                 </div>
             </form>
             <div class="grow-1"></div>
         </div>
-        <div id="lobby" class="absolute full-width full-height">
-        </div>
-        <div id="loader" class="absolute full-width full-height flex vertical">
+        <div id="loader" class="root-bg absolute full-width full-height flex vertical">
             <div class="grow-1"></div>
             <div class="element">
                 <div class="background-highlight"></div>

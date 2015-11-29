@@ -4,5 +4,6 @@ module.exports = {
     user: 'user',
     users: 'users',
     game: 'game',
+    message: 'message',
     play: 'play'
 };
