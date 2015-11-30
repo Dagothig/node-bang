@@ -3,7 +3,8 @@ var log = require('./log.js'),
     strings = require('../shared/strings.js'),
     User = require('./user.js');
 
-var listeners = [];
+var listeners = [],
+    disconnectTimout = 5000;
 
 module.exports = {
     setup: function setupLogin(io, users, lobby) {
@@ -11,45 +12,69 @@ module.exports = {
             log('Socket connected');
             socket.emit(msgs.auth);
             socket.on(msgs.auth, function(msg) {
+                var existing = msg && msg.name ? users.findForName(msg.name) : null;
+                // We support reconnection through re-sending the user's token
                 if (msg.token) {
-                    var user = users.findForName(msg.name);
-                    if (user && user.token === msg.token) {
-                        socket.emit(msgs.user, user);
-                    } else {
-                        socket.emit(msgs.user, null);
-                    }
-                } else if (msg.name && msg.password && msg.password.length >= 6) {
+                    if (existing && existing.token === msg.token) socket.emit(msgs.user, existing);
+                    else socket.emit(msgs.user, null);
+                }
+                // If the connection arguments are valid, then we'll go through
+                else if (msg.name && msg.password && msg.password.length >= 6) {
                     var user = new User(msg.name, msg.password);
-                    var existing = users.findForName(user.name);
+                    // If a corresponding user already exists, then we need to check if they
+                    // connected with the same info; otherwise, we give priority to the existing
+                    // user
                     if (existing) {
                         if (user.hash === existing.hash) user = existing;
                         else {
                             socket.emit(msgs.auth, { reason: strings.authNameTaken });
                             return;
                         }
-                    } else users.push(user);
-                    if (user.sockets.indexOf(socket) === -1) user.sockets.push(socket);
+                    }
+                    // Otherwise, then we have a new user on our hands
+                    else {
+                        log(user.name, 'connected');
+                        users.push(user);
+                    }
+
+                    user.addSocket(socket);
                     listeners.forEach((listener) => listener.onConnected(user, socket));
+
+                    // Alert the user with their info
                     socket.emit(msgs.user, {
                         name: user.name,
                         token: user.token
                     });
                     log(msg.name, 'at', user.sockets.length, 'socket(s)');
-                } else {
+                }
+                // Alert the user that the authentication failed
+                else {
                     socket.emit(msgs.auth, { reason: strings.authValidation });
                     return;
                 }
-            })
+            });
+
             socket.on('disconnect', function(msg) {
                 log('Socket disconnected');
+
+                // Check if the socket had a user associated with it
                 var existing = users.findForSocket(socket);
                 if (existing) {
+                    // Remove the socket from the user's list of sockets
                     var sockets = existing.sockets;
                     sockets.splice(sockets.indexOf(socket), 1);
+
+                    // If the user no longer has any socket associated with it,
+                    // start a timeout to disconnect them
                     if (!sockets.length) {
-                        users.remove(existing);
-                        listeners.forEach((listener) => listener.onDisconnected(existing, socket));
+                        existing.disconnectTimout = setTimeout(function () {
+                            log(existing.name, 'disconnected');
+                            existing.disconnectTimout = null;
+                            users.remove(existing);
+                            listeners.forEach((listener) => listener.onDisconnected(existing, socket));
+                        }, disconnectTimout);
                     }
+
                     log(existing.name ,'at', sockets.length, 'socket(s)');
                 }
             });

@@ -5,6 +5,7 @@ var log = require('./log.js'),
 var minPlayers = 4, maxPlayers = 7;
 
 var io, users;
+var gameStartTimer = null, gameStartInterval;
 var game;
 
 function formattedGame(user) {
@@ -18,6 +19,10 @@ function formattedGame(user) {
     } : undefined;
 }
 
+function startGame() {
+    users.forEach((user) => user.joining = false);
+}
+
 function formattedJoining() {
     var joining = users
         .filter((user) => user.joining)
@@ -28,10 +33,39 @@ function formattedJoining() {
         });
     return {
         users: joining,
-        reason: joining.length >= maxPlayers ? strings.playerCapped :
+        reason: (joining.length >= maxPlayers ? strings.playerCapped :
             (joining.length < minPlayers ? strings.notEnoughPlayers :
-            (undefined))
+            (''))) +
+            (gameStartTimer !== null ? strings.startTimer(gameStartTimer) : '')
     }
+}
+
+function canStart() {
+    var count = users.filter((user) => user.joining).length;
+    return count >= minPlayers && count <= maxPlayers;
+}
+function startTimer() {
+    if (gameStartInterval) clearInterval(gameStartInterval);
+
+    gameStartTimer = 10;
+    io.emit(msgs.joining, formattedJoining());
+
+    gameStartInterval = setInterval(function() {
+        gameStartTimer--;
+        if (gameStartTimer) io.emit(msgs.joining, formattedJoining());
+        else {
+            clearInterval(gameStartInterval);
+            gameStartInterval = null;
+            gameStartTimer = null;
+            startGame();
+        }
+    }, 1000);
+}
+function stopTimer() {
+    if (gameStartInterval) clearInterval(gameStartInterval);
+    gameStartInterval = null;
+    gameStartTimer = null;
+    io.emit(msgs.joining, formattedJoining());
 }
 
 module.exports = {
@@ -49,16 +83,26 @@ module.exports = {
                 if (user.token !== msg.token) return;
                 var joining = formattedJoining();
                 if (user.joining !== msg.joining) {
-                    user.joining = !user.joining && msg.joining && joining.users.length < maxPlayers;
+                    user.joining = !user.joining && msg.joining
+                        && joining.users.length < maxPlayers;
+                    // If the status change was successful then the states will be the same now
+                    if (user.joining === msg.joining) {
+                        if (canStart()) startTimer();
+                        else stopTimer();
+                    }
                 }
                 log(user.name, user.joining ? 'is' : 'is not', 'joining');
                 io.emit(msgs.joining, formattedJoining());
             }
         });
-        socket.emit(msgs.joining, formattedJoining());
-        socket.emit(msgs.game, formattedGame(user));
+        if (game) socket.emit(msgs.game, formattedGame(user));
+        else socket.emit(msgs.joining, formattedJoining());
     },
     onDisconnected: function onDisconnected(user, socket) {
+        if (user.joining) {
+            if (canStart()) startTimer();
+            else stopTimer();
+        }
         if (!game) io.emit(msgs.joining, formattedJoining());
     }
 }
