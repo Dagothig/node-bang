@@ -53,7 +53,7 @@ socket.on(msgs.auth, function(msg) {
             token: user.token
         });
     } else {
-        login.formError.innerText = msg ? msg.reason : '';
+        login.handleAuth(msg);
         ui.hide(roots);
         ui.show(login.element);
     }

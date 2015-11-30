@@ -2,7 +2,7 @@ var log = require('./log.js'),
     msgs = require('../shared/messages.js'),
     strings = require('../shared/strings.js');
 
-var maxPlayers = 7;
+var minPlayers = 4, maxPlayers = 7;
 
 var io, users;
 var game;
@@ -19,11 +19,19 @@ function formattedGame(user) {
 }
 
 function formattedJoining() {
-    return users.filter((user) => user.joining).map((user) => {
-        return {
-            name: user.name
-        };
-    });
+    var joining = users
+        .filter((user) => user.joining)
+        .map((user) => {
+            return {
+                name: user.name
+            };
+        });
+    return {
+        users: joining,
+        reason: joining.length >= maxPlayers ? strings.playerCapped :
+            (joining.length < minPlayers ? strings.notEnoughPlayers :
+            (undefined))
+    }
 }
 
 module.exports = {
@@ -41,7 +49,7 @@ module.exports = {
                 if (user.token !== msg.token) return;
                 var joining = formattedJoining();
                 if (user.joining !== msg.joining) {
-                    user.joining = !user.joining && msg.joining && joining.length < maxPlayers;
+                    user.joining = !user.joining && msg.joining && joining.users.length < maxPlayers;
                 }
                 log(user.name, user.joining ? 'is' : 'is not', 'joining');
                 io.emit(msgs.joining, formattedJoining());

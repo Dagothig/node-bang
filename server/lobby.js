@@ -5,11 +5,11 @@ var log = require('./log.js'),
 var io, users;
 
 function formattedUsers() {
-    var formatted = [];
-    users.forEach((user) => formatted.push({
-        name : user.name
-    }));
-    return formatted;
+    return users.map((user) => {
+        return {
+            name: user.name
+        }
+    });
 }
 
 module.exports = {

@@ -17,6 +17,10 @@ module.exports = function(onLogin) {
         form: form,
         formError: formError,
         name: name,
-        password: password
+        password: password,
+
+        handleAuth: function handleAuth(msg) {
+            formError.innerText = msg ? msg.reason : '';
+        }
     };
 };

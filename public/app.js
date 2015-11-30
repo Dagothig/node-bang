@@ -54,7 +54,7 @@ socket.on(msgs.auth, function(msg) {
             token: user.token
         });
     } else {
-        login.formError.innerText = msg ? msg.reason : '';
+        login.handleAuth(msg);
         ui.hide(roots);
         ui.show(login.element);
     }
@@ -94,6 +94,7 @@ module.exports = function(onJoin) {
         pre = ui.one('#pre-game'),
         preform = ui.one(pre, 'form'),
         preheader = ui.one(preform, '.form-header'),
+        preerror = ui.one(preform, '.form-error'),
         precount = ui.one(preform, '#player-count'),
         prejoin = ui.one(preform, '[name=join]');
 
@@ -109,7 +110,9 @@ module.exports = function(onJoin) {
         precount: precount,
         prejoin: prejoin,
 
-        handleJoining: function handleJoining(current, users) {
+        handleJoining: function handleJoining(current, msg) {
+            var users = msg ? msg.users : null;
+            preerror.innerText = msg.reason ? msg.reason : '';
             prejoin.checked = !!users.find((user) => misc.isCurrent(current, user));
             precount.innerText = users.reduce((acc, user) => acc + 1, 0) + " / 4-7";
         },
@@ -196,7 +199,11 @@ module.exports = function(onLogin) {
         form: form,
         formError: formError,
         name: name,
-        password: password
+        password: password,
+
+        handleAuth: function handleAuth(msg) {
+            formError.innerText = msg ? msg.reason : '';
+        }
     };
 };
 
