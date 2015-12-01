@@ -118,6 +118,7 @@ module.exports = function(onJoin) {
         },
 
         handleGame: function handleGame(game) {
+            console.log(game, pre, element);
             if (game) {
                 ui.show(element);
                 ui.hide(pre);
@@ -208,14 +209,18 @@ module.exports = function(onLogin) {
 };
 
 },{"./ui.js":6}],5:[function(require,module,exports){
-module.exports = {
-    isCurrent: function isCurrent(current, user) {
-        return current &&
-            user.name.toLowerCase() === current.name.toLowerCase();
-    }
-};
+var misc = require ('../shared/misc.js');
 
-},{}],6:[function(require,module,exports){
+function isCurrent(current, user) {
+    return current &&
+        user.name.toLowerCase() === current.name.toLowerCase();
+}
+
+misc.isCurrent = isCurrent;
+
+module.exports = misc;
+
+},{"../shared/misc.js":8}],6:[function(require,module,exports){
 function one() {
     if (arguments[0].querySelector) return arguments[0].querySelector(arguments[1]);
     else return document.body.querySelector(arguments[0]);
@@ -254,6 +259,26 @@ module.exports = {
     message: 'message',
     joining: 'joining',
     game: 'game'
+};
+
+},{}],8:[function(require,module,exports){
+function shuffle(arr) {
+    for (var i = 0; i < arr.length; i++) {
+        var ri = Math.floor(Math.random() * arr.length);
+        swap(arr, i, ri);
+    }
+    return arr;
+}
+
+function swap(arr, i1, i2) {
+    var obj = arr[i1];
+    arr[i1] = arr[i2];
+    arr[i2] = obj;
+}
+
+module.exports = {
+    shuffle: shuffle,
+    swap: swap
 };
 
 },{}]},{},[1]);

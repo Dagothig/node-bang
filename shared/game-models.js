@@ -1,5 +1,7 @@
-function Game(users) {
+var misc = require('./misc.js');
 
+function Game(users) {
+    this.players = misc.shuffle(users.map((user) => new Player(user)));
 }
 
 function Player(user) {
@@ -44,11 +46,6 @@ function Turn() {
 var cardPile = [];
 var discardedPile = [];
 
-var actions = {
-    playCard,
-
-};
-
 var cardColors = {
     black: 'black',
     red: 'red'
@@ -68,3 +65,7 @@ var cardSuits = {
         color: cardColors.red
     }
 }
+
+module.exports = {
+    Game: Game
+};

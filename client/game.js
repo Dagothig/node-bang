@@ -30,6 +30,7 @@ module.exports = function(onJoin) {
         },
 
         handleGame: function handleGame(game) {
+            console.log(game, pre, element);
             if (game) {
                 ui.show(element);
                 ui.hide(pre);

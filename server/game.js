@@ -1,6 +1,7 @@
 var log = require('./log.js'),
     msgs = require('../shared/messages.js'),
-    strings = require('../shared/strings.js');
+    strings = require('../shared/strings.js'),
+    models = require('../shared/game-models.js');
 
 var minPlayers = 4, maxPlayers = 7;
 
@@ -20,7 +21,11 @@ function formattedGame(user) {
 }
 
 function startGame() {
-    users.forEach((user) => user.joining = false);
+    game = new models.Game(users.filter((user) => user.joining));
+    users.forEach((user) => {
+        user.joining = false;
+        user.sockets.forEach((socket) => socket.emit(msgs, formattedGame(user)));
+    });
 }
 
 function formattedJoining() {
@@ -95,8 +100,8 @@ module.exports = {
                 io.emit(msgs.joining, formattedJoining());
             }
         });
-        if (game) socket.emit(msgs.game, formattedGame(user));
-        else socket.emit(msgs.joining, formattedJoining());
+        socket.emit(msgs.game, formattedGame(user));
+        socket.emit(msgs.joining, formattedJoining());
     },
     onDisconnected: function onDisconnected(user, socket) {
         if (user.joining) {
