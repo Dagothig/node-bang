@@ -3,6 +3,7 @@ var msgs = require('./shared/messages.js'),
 
 var socket = io(),
     user,
+    ongoingGame,
     users;
 
 var roots = ui.many('body>*'),
@@ -33,6 +34,11 @@ var game = require('./client/game.js')(
             token: user.token,
             joining: joining
         });
+    },
+    function onGame(game) {
+        ongoingGame = game;
+        if (!users) socket.emit(msgs.users);
+        else lobby.handleUsers(user, users, ongoingGame);
     }
 );
 
@@ -68,11 +74,11 @@ socket.on(msgs.user, function(msg) {
         ui.show(connectedContainer);
     }
     user = msg;
-    lobby.handleUsers(user, users);
+    lobby.handleUsers(user, users, ongoingGame);
 });
 socket.on(msgs.users, function(msg) {
     users = msg;
-    lobby.handleUsers(user, users);
+    lobby.handleUsers(user, users, ongoingGame);
 });
 socket.on(msgs.message, function(msg) {
     lobby.handleMessage(msg.name, msg.message);

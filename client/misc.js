@@ -1,10 +1,13 @@
 var misc = require ('../shared/misc.js');
 
+function areTheSame(user1, user2) {
+    return user1.name.toLowerCase() === user2.name.toLowerCase();
+}
 function isCurrent(current, user) {
-    return current &&
-        user.name.toLowerCase() === current.name.toLowerCase();
+    return current && areTheSame(current, user);
 }
 
-misc.isCurrent = isCurrent;
-
-module.exports = misc;
+module.exports = misc.define(misc, {
+    areTheSame: areTheSame,
+    isCurrent: isCurrent
+});

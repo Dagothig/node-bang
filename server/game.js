@@ -13,8 +13,7 @@ function formattedGame(user) {
     return game ? {
         players: game.players.map((player) => {
             return {
-                life: player.life,
-                maxLife: player.maxLife
+                name: player.user.name
             };
         })
     } : undefined;
@@ -24,7 +23,7 @@ function startGame() {
     game = new models.Game(users.filter((user) => user.joining));
     users.forEach((user) => {
         user.joining = false;
-        user.sockets.forEach((socket) => socket.emit(msgs, formattedGame(user)));
+        user.sockets.forEach((socket) => socket.emit(msgs.game, formattedGame(user)));
     });
 }
 
@@ -52,7 +51,7 @@ function canStart() {
 function startTimer() {
     if (gameStartInterval) clearInterval(gameStartInterval);
 
-    gameStartTimer = 10;
+    gameStartTimer = 5;
     io.emit(msgs.joining, formattedJoining());
 
     gameStartInterval = setInterval(function() {

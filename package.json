@@ -11,6 +11,9 @@
   },
   "devDependencies": {
     "gulp": "^3.9.0",
+    "gulp-browserify": "^0.5.1",
+    "gulp-plumber": "^1.0.1",
+    "gulp-rename": "^1.2.2",
     "gulp-streamify": "^1.0.2",
     "gulp-watch": "^4.3.5",
     "vinyl-source-stream": "^1.1.0"

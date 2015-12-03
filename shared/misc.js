@@ -1,6 +1,6 @@
 function shuffle(arr) {
     for (var i = 0; i < arr.length; i++) {
-        var ri = Math.floor(Math.random() * arr.length);
+        var ri = (Math.random() * arr.length)|0 ;
         swap(arr, i, ri);
     }
     return arr;
@@ -12,7 +12,13 @@ function swap(arr, i1, i2) {
     arr[i2] = obj;
 }
 
+function define(dst, src) {
+    for (var key in src) dst[key] = src[key];
+    return dst;
+}
+
 module.exports = {
     shuffle: shuffle,
-    swap: swap
+    swap: swap,
+    define: define
 };

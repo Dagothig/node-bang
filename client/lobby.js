@@ -21,17 +21,20 @@ module.exports = function(onMessage) {
         messageForm: messageForm,
         message: message,
 
-        handleUsers: function handleUsers(current, users) {
+        handleUsers: function handleUsers(current, users, game) {
             usersList.innerHTML = '';
             if (!users) return;
 
-            function surroundWith(tag, obj) {
-                return '<' + tag + '>' + obj + '</' + tag + '>';
+            function surroundWith(tag, clazz, obj) {
+                return '<' + tag + ' class="' + clazz + '">' + obj + '</' + tag + '>';
             }
             function getTag(user) {
                 var tag = user.name
-                if (misc.isCurrent(current, user)) tag = surroundWith('em', tag);
-                return surroundWith('div', tag);
+                if (misc.isCurrent(current, user)) tag = surroundWith('em', '', tag);
+                var player = game ? game.players.find((player) => misc.areTheSame(player, user)) : null;
+                var cssClass = player ? (player.life ? 'alive' : 'dead') : '';
+                var prefix = player && player.character ? player.character.name + ' ' : '';
+                return surroundWith('div', cssClass, prefix + tag);
             }
             var html = '';
             users

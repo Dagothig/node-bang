@@ -2,10 +2,19 @@ var gulp = require('gulp'),
     childProcess = require('child_process'),
     chalk = require('chalk'),
     source = require('vinyl-source-stream'),
-    browserify = require('browserify');
+    browserify = require('gulp-browserify'),
+    rename = require('gulp-rename'),
+    plumber = require('gulp-plumber');
 
 var node,
     chalkColor = chalk.cyan;
+
+function errorHandler(prefix) {
+    return function (e) {
+        console.log(prefix, e.message);
+        this.emit("end");
+    };
+}
 
 gulp.task('server', function() {
     var prefix = '[' + chalkColor('gulp-server') + ']';
@@ -36,12 +45,13 @@ gulp.task('watch-server', function(cb) {
 gulp.task('client', function(cb) {
     var prefix = '[' + chalkColor('gulp-client') + ']';
 
-    var val = browserify('./client.js')
-        .bundle()
-        .pipe(source('app.js'))
+    var val = gulp.src('./client.js')
+        .pipe(plumber({ errorHandler: errorHandler(prefix) }))
+        .pipe(browserify())
+        .pipe(rename('app.js'))
         .pipe(gulp.dest('./public'));
 
-    console.log(prefix, "Client script bundled");
+    val.on('data', () => console.log(prefix, "Client script bundled"));
     return val;
 });
 

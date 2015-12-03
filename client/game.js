@@ -1,7 +1,7 @@
 var ui = require('./ui.js'),
     misc = require('./misc.js');
 
-module.exports = function(onJoin) {
+module.exports = function(onJoin, onGame) {
     var element = ui.one('#game'),
         pre = ui.one('#pre-game'),
         preform = ui.one(pre, 'form'),
@@ -30,10 +30,11 @@ module.exports = function(onJoin) {
         },
 
         handleGame: function handleGame(game) {
-            console.log(game, pre, element);
             if (game) {
+                // TODO: handle the game you doofus!
                 ui.show(element);
                 ui.hide(pre);
+                onGame(game);
             } else {
                 ui.hide(element);
                 ui.show(pre);

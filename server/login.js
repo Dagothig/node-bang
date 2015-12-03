@@ -19,7 +19,7 @@ module.exports = {
                     else socket.emit(msgs.user, null);
                 }
                 // If the connection arguments are valid, then we'll go through
-                else if (msg.name && msg.password && msg.password.length >= 6) {
+                else if (msg.name && msg.password && msg.password.length >= 4) {
                     var user = new User(msg.name, msg.password);
                     // If a corresponding user already exists, then we need to check if they
                     // connected with the same info; otherwise, we give priority to the existing
