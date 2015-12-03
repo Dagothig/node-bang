@@ -35,11 +35,22 @@ module.exports = function(onJoin, onGame, onAction) {
                 ui.hide(pre);
 
                 var acts = game.actions;
-                var f = (a, i) => '<div id="action-' + i + '">' + a + '</div>';
-                element.innerHTML = acts.reduce((tag, action, i) => tag + f(action, i), '');
-                acts.forEach((a, i) => element.querySelector('#action-' + i).onclick = function (e) {
-                    console.log(a);
-                    onAction(a);
+                console.log(acts);
+                var tag = '';
+                for (var a in acts) {
+                    console.log(acts[a]);
+                    Array.prototype.forEach.call(acts[a], (arg) => {
+                        tag +=
+                            '<div class="action" data-action="' + a + '" data-arg="' + arg + '">'
+                            + a + ' - ' + arg +
+                            '</div>';
+                    });
+                }
+                element.innerHTML = tag;
+                Array.prototype.forEach.call(element.querySelectorAll('.action'), (actionTag) => {
+                    var action = actionTag.getAttribute('data-action');
+                    var arg = actionTag.getAttribute('data-arg');
+                    console.log(action, arg);
                 });
             } else {
                 ui.hide(element);

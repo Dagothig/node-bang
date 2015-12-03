@@ -1,7 +1,7 @@
 var Character = require('./character.js');
 
 var characters = [
-    new Character("Bard Cassidy"),
+    new Character("Bart Cassidy"),
     new Character("Black Jack"),
     new Character("Calamity Janet"),
     new Character("El Gringo"),

@@ -1,6 +1,9 @@
-var misc = require('./misc.js'),
+var misc = require('../misc.js'),
+    log = require('../log.js'),
     characters = require('./characters.js'),
-    roles = require('./roles.js');
+    roles = require('./roles.js'),
+    actions = require('../../shared/actions.js'),
+    consts = require('../../shared/consts.js');
 
 function Game(users) {
     this.players = misc.shuffle(users.map((user) => new Player(user)));
@@ -16,9 +19,7 @@ Game.prototype = Object.create({
         if (this.players.length >= 5) roles.push(role.deputy);
         if (this.players.length >= 6) roles.push(role.outlaw);
         if (this.players.length >= 7) roles.push(role.deputy);
-        this.players.forEach((player) => {
-            player.role = roles.splice((Math.random() * roles.length)|0, i);
-        });
+        this.players.forEach((player) => player.role = misc.spliceRand(roles));
     },
     formatted: function formatted(user) {
         return ({
@@ -36,13 +37,29 @@ Game.prototype = Object.create({
 
 var CharacterPick = {
     begin: function begin(game) {
-        game.players.forEach((player) => player.characterChoices)
+        var chars = characters.slice();
+        game.players.forEach((player) =>
+            player.characters = misc.gen(() => misc.spliceRand(chars), consts.characterChoices)
+        );
     },
     actionsFor: function actionsFor(game, user) {
-        return game.findPlayer(user) ? ['eat-cake', 'eat-mamma'] : [];
+        var player = game.findPlayer(user);
+        if (!player) return {};
+        var acts = {};
+        acts[actions.select] = player.characters.map((character) => character.name);
+        return acts;
     },
     handleAction: function handleAction(game, user, msg) {
-        console.log(msg.action);
+        log(msg.action, msg.arg);
+        var player = game.findPlayer(user);
+        switch (msg.action) {
+            case actions.select:
+                player.character = player.characters.find((character) => character.name === msg.arg);
+                delete player.characters;
+                break;
+            default:
+                return;
+        }
     }
 };
 

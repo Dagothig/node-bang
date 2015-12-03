@@ -34,8 +34,8 @@ gulp.task('watch-server', function(cb) {
     console.log(prefix, "Watching server files...");
     return gulp.watch([
             "./server.js",
-            "./shared/*.js",
-            "./server/*.js"
+            "./shared/**/*.js",
+            "./server/**/*.js"
         ],
         ['server']
     );
@@ -56,8 +56,8 @@ gulp.task('watch-client', function(cb) {
     console.log(prefix, "Watching client files...");
     return gulp.watch([
             "./client.js",
-            "./shared/*.js",
-            "./client/*.js",
+            "./shared/**/*.js",
+            "./client/**/*.js",
         ],
         ['client']
     );

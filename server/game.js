@@ -1,9 +1,8 @@
 var log = require('./log.js'),
     msgs = require('../shared/messages.js'),
     strings = require('../shared/strings.js'),
-    Game = require('../shared/game.js');
-
-var minPlayers = 1, maxPlayers = 7;
+    consts = require('../shared/consts.js'),
+    Game = require('./game/game.js');
 
 var io, users;
 var gameStartTimer = null, gameStartInterval;
@@ -14,6 +13,7 @@ function formattedGame(user) {
 }
 
 function startGame() {
+    log("Starting game!");
     game = new Game(users.filter((user) => user.joining));
     users.forEach((user) => {
         user.joining = false;
@@ -31,8 +31,8 @@ function formattedJoining() {
         });
     return {
         users: joining,
-        reason: (joining.length >= maxPlayers ? strings.playerCapped :
-            (joining.length < minPlayers ? strings.notEnoughPlayers :
+        reason: (joining.length >= consts.maxPlayers ? strings.playerCapped :
+            (joining.length < consts.minPlayers ? strings.notEnoughPlayers :
             (''))) +
             (gameStartTimer !== null ? strings.startTimer(gameStartTimer) : '')
     }
@@ -40,16 +40,18 @@ function formattedJoining() {
 
 function canStart() {
     var count = users.filter((user) => user.joining).length;
-    return count >= minPlayers && count <= maxPlayers;
+    return count >= consts.minPlayers && count <= consts.maxPlayers;
 }
 function startTimer() {
     if (gameStartInterval) clearInterval(gameStartInterval);
 
     gameStartTimer = 5;
+    log("Game starts in", gameStartTimer, "seconds");
     io.emit(msgs.joining, formattedJoining());
 
     gameStartInterval = setInterval(function() {
         gameStartTimer--;
+        log("Game starts in", gameStartTimer, "seconds");
         if (gameStartTimer) io.emit(msgs.joining, formattedJoining());
         else {
             clearInterval(gameStartInterval);
@@ -83,7 +85,7 @@ module.exports = {
                 var joining = formattedJoining();
                 if (user.joining !== msg.joining) {
                     user.joining = !user.joining && msg.joining
-                        && joining.users.length < maxPlayers;
+                        && joining.users.length < consts.maxPlayers;
                     // If the status change was successful then the states will be the same now
                     if (user.joining === msg.joining) {
                         if (canStart()) startTimer();
