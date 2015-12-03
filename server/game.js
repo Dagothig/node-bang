@@ -14,11 +14,14 @@ function formattedGame(user) {
 
 function startGame() {
     log("Starting game!");
-    game = new Game(users.filter((user) => user.joining));
+    game = new Game(
+        users.filter((user) => user.joining),
+        () => users.forEach((user) => user.emit(msgs.game, formattedGame(user)))
+    );
     users.forEach((user) => {
         user.joining = false;
-        user.sockets.forEach((socket) => socket.emit(msgs.game, formattedGame(user)));
     });
+    game.begin();
 }
 
 function formattedJoining() {
@@ -45,7 +48,7 @@ function canStart() {
 function startTimer() {
     if (gameStartInterval) clearInterval(gameStartInterval);
 
-    gameStartTimer = 5;
+    gameStartTimer = consts.gameStartTimer;
     log("Game starts in", gameStartTimer, "seconds");
     io.emit(msgs.joining, formattedJoining());
 

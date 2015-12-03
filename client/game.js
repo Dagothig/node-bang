@@ -35,10 +35,8 @@ module.exports = function(onJoin, onGame, onAction) {
                 ui.hide(pre);
 
                 var acts = game.actions;
-                console.log(acts);
                 var tag = '';
                 for (var a in acts) {
-                    console.log(acts[a]);
                     Array.prototype.forEach.call(acts[a], (arg) => {
                         tag +=
                             '<div class="action" data-action="' + a + '" data-arg="' + arg + '">'
@@ -50,7 +48,10 @@ module.exports = function(onJoin, onGame, onAction) {
                 Array.prototype.forEach.call(element.querySelectorAll('.action'), (actionTag) => {
                     var action = actionTag.getAttribute('data-action');
                     var arg = actionTag.getAttribute('data-arg');
-                    console.log(action, arg);
+                    actionTag.onclick = function (e) {
+                        element.innerHTML = '';
+                        onAction(action, arg);
+                    }
                 });
             } else {
                 ui.hide(element);

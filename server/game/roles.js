@@ -1,10 +1,10 @@
 var Role = require('./role.js');
 
 var roles = {
-    sheriff: new Role("Sheriff"),
-    deputy: new Role("Deputy"),
-    outlaw: new Role("Outlaw"),
-    renegade: new Role("Renegade")
+    sheriff: new Role("Sheriff", "Sheriff"),
+    deputy: new Role("Deputy", "Unknown"),
+    outlaw: new Role("Outlaw", "Unknown"),
+    renegade: new Role("Renegade", "Unknown")
 };
 
 module.exports = roles;

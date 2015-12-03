@@ -21,6 +21,9 @@ User.prototype = Object.create({
             clearTimeout(this.disconnectTimout);
             this.disconnectTimout = null;
         }
+    },
+    emit: function emit() {
+        this.sockets.forEach((socket) => socket.emit.apply(socket, arguments));
     }
 });
 

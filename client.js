@@ -40,10 +40,11 @@ var game = require('./client/game.js')(
         if (!users) socket.emit(msgs.users);
         else lobby.handleUsers(user, users, ongoingGame);
     },
-    function onAction(action) {
+    function onAction(action, arg) {
         socket.emit(msgs.action, {
             token: user.token,
-            action: action
+            action: action,
+            arg: arg
         });
     }
 );

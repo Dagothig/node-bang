@@ -5,42 +5,56 @@ var misc = require('../misc.js'),
     actions = require('../../shared/actions.js'),
     consts = require('../../shared/consts.js');
 
-function Game(users) {
+function Game(users, onGameUpdate) {
+    this.onGameUpdate = onGameUpdate;
     this.players = misc.shuffle(users.map((user) => new Player(user)));
-    this.phase = CharacterPick;
-    this.phase.begin(this);
 }
 Game.prototype = Object.create({
+    begin: function() {
+        this.switchToPhase(CharacterPick);
+    },
+    switchToPhase: function switchToPhase(phase) {
+        if (this.phase) this.phase.end(this);
+
+        this.phase = phase;
+        this.phase.begin(this);
+        this.onGameUpdate();
+    },
     findPlayer: function findPlayer(user) {
         return this.players.find((player) => player.user.token === user.token);
     },
-    assignRoles: function assignRoles() {
-        var roles = [role.sheriff, role.outlaw, role.outlaw, role.renegade];
-        if (this.players.length >= 5) roles.push(role.deputy);
-        if (this.players.length >= 6) roles.push(role.outlaw);
-        if (this.players.length >= 7) roles.push(role.deputy);
-        this.players.forEach((player) => player.role = misc.spliceRand(roles));
-    },
     formatted: function formatted(user) {
         return ({
-            players: this.players.map((player) => ({
-                name: player.user.name
-            })),
+            players: this.players.map((player) => {
+                var formatted = { name: player.user.name };
+                if (player.character) formatted.character = { name: player.character.name };
+                if (player.role) formatted.role = { name: player.role.publicName };
+                return formatted;
+            }),
             actions: this.phase.actionsFor(this, user)
         });
     },
     handleAction: function handleAction(user, msg) {
         if (!this.findPlayer(user) || !msg.action) return;
         this.phase.handleAction(this, user, msg);
+        this.onGameUpdate();
     }
 });
 
 var CharacterPick = {
     begin: function begin(game) {
+        log('Character pick starting...');
         var chars = characters.slice();
         game.players.forEach((player) =>
             player.characters = misc.gen(() => misc.spliceRand(chars), consts.characterChoices)
         );
+    },
+    end: function end(game) {
+        log('Character pick ended!');
+        game.players.forEach((player) => {
+            delete player.characters;
+            log(player.user.name, 'is', player.character.name);
+        });
     },
     actionsFor: function actionsFor(game, user) {
         var player = game.findPlayer(user);
@@ -50,18 +64,37 @@ var CharacterPick = {
         return acts;
     },
     handleAction: function handleAction(game, user, msg) {
-        log(msg.action, msg.arg);
         var player = game.findPlayer(user);
         switch (msg.action) {
             case actions.select:
-                player.character = player.characters.find((character) => character.name === msg.arg);
-                delete player.characters;
+                var character = player.characters.find((character) => character.name === msg.arg);
+                if (character) player.character = character;
+                this.checkForEnd(game);
                 break;
             default:
                 return;
         }
+    },
+    checkForEnd: function checkForEnd(game) {
+        var unchosen = game.players.filter((player) => !player.character);
+        if (!unchosen.length) game.switchToPhase(RolePick);
     }
 };
+var RolePick = {
+    begin: function begin(game) {
+        var r = [roles.sheriff, roles.outlaw, roles.outlaw, roles.renegade];
+        if (game.players.length >= 5) r.push(roles.deputy);
+        if (game.players.length >= 6) r.push(roles.outlaw);
+        if (game.players.length >= 7) r.push(roles.deputy);
+        game.players.forEach((player) => {
+            player.role = misc.spliceRand(r);
+            log(player.user.name, 'is', player.role.name);
+        });
+    },
+    end: function end(game) {},
+    actionsFor: function actionsFor(game, user) {},
+    handleAction: function handleAction(game, user, msg) {}
+}
 
 
 function Player(user) {
