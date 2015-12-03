@@ -1,26 +1,20 @@
 var log = require('./log.js'),
     msgs = require('../shared/messages.js'),
     strings = require('../shared/strings.js'),
-    models = require('../shared/game-models.js');
+    Game = require('../shared/game.js');
 
-var minPlayers = 4, maxPlayers = 7;
+var minPlayers = 1, maxPlayers = 7;
 
 var io, users;
 var gameStartTimer = null, gameStartInterval;
 var game;
 
 function formattedGame(user) {
-    return game ? {
-        players: game.players.map((player) => {
-            return {
-                name: player.user.name
-            };
-        })
-    } : undefined;
+    return game ? game.formatted(user) : null;
 }
 
 function startGame() {
-    game = new models.Game(users.filter((user) => user.joining));
+    game = new Game(users.filter((user) => user.joining));
     users.forEach((user) => {
         user.joining = false;
         user.sockets.forEach((socket) => socket.emit(msgs.game, formattedGame(user)));
@@ -82,6 +76,7 @@ module.exports = {
         socket.on(msgs.game, function(msg) {
             socket.emit(msgs.game, formattedGame(user));
         });
+
         socket.on(msgs.joining, function(msg) {
             if (!game) {
                 if (user.token !== msg.token) return;
@@ -99,6 +94,12 @@ module.exports = {
                 io.emit(msgs.joining, formattedJoining());
             }
         });
+
+        socket.on(msgs.action, function(msg) {
+            if (!game || user.token !== msg.token) return;
+            game.handleAction(user, msg);
+        });
+
         socket.emit(msgs.game, formattedGame(user));
         socket.emit(msgs.joining, formattedJoining());
     },

@@ -5,5 +5,6 @@ module.exports = {
     users: 'users',
     message: 'message',
     joining: 'joining',
-    game: 'game'
+    game: 'game',
+    action: 'action'
 };

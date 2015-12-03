@@ -7,7 +7,8 @@ var gulp = require('gulp'),
     plumber = require('gulp-plumber');
 
 var node,
-    chalkColor = chalk.cyan;
+    chalkColor = chalk.cyan,
+    prefix = '[' + chalkColor('gulp') + ']';
 
 function errorHandler(prefix) {
     return function (e) {
@@ -17,7 +18,6 @@ function errorHandler(prefix) {
 }
 
 gulp.task('server', function() {
-    var prefix = '[' + chalkColor('gulp-server') + ']';
     if (node) {
         node.kill();
         console.log(prefix, 'Server killed');
@@ -31,7 +31,6 @@ gulp.task('server', function() {
 });
 
 gulp.task('watch-server', function(cb) {
-    var prefix = '[' + chalkColor('gulp-watch-server') + ']';
     console.log(prefix, "Watching server files...");
     return gulp.watch([
             "./server.js",
@@ -43,8 +42,6 @@ gulp.task('watch-server', function(cb) {
 });
 
 gulp.task('client', function(cb) {
-    var prefix = '[' + chalkColor('gulp-client') + ']';
-
     var val = gulp.src('./client.js')
         .pipe(plumber({ errorHandler: errorHandler(prefix) }))
         .pipe(browserify())
@@ -56,7 +53,6 @@ gulp.task('client', function(cb) {
 });
 
 gulp.task('watch-client', function(cb) {
-    var prefix = '[' + chalkColor('gulp-watch-client') + ']';
     console.log(prefix, "Watching client files...");
     return gulp.watch([
             "./client.js",

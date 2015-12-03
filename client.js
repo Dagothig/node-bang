@@ -39,6 +39,12 @@ var game = require('./client/game.js')(
         ongoingGame = game;
         if (!users) socket.emit(msgs.users);
         else lobby.handleUsers(user, users, ongoingGame);
+    },
+    function onAction(action) {
+        socket.emit(msgs.action, {
+            token: user.token,
+            action: action
+        });
     }
 );
 
@@ -50,9 +56,11 @@ socket.on('disconnect', function() {
     ui.show(loader);
 });
 socket.on(msgs.alert, function(msg) {
+    console.log(msgs.alert, msg);
     alert(msg);
 });
 socket.on(msgs.auth, function(msg) {
+    console.log(msgs.auth, msg);
     if (user) {
         socket.emit(msgs.auth, {
             name: user.name,
@@ -65,6 +73,7 @@ socket.on(msgs.auth, function(msg) {
     }
 });
 socket.on(msgs.user, function(msg) {
+    console.log(msgs.user, msg);
     if (user && !msg) {
         ui.hide(roots);
         ui.show(login.element);
@@ -77,15 +86,19 @@ socket.on(msgs.user, function(msg) {
     lobby.handleUsers(user, users, ongoingGame);
 });
 socket.on(msgs.users, function(msg) {
+    console.log(msgs.users, msg);
     users = msg;
     lobby.handleUsers(user, users, ongoingGame);
 });
 socket.on(msgs.message, function(msg) {
+    console.log(msgs.message, msg);
     lobby.handleMessage(msg.name, msg.message);
 });
 socket.on(msgs.joining, function(msg) {
+    console.log(msgs.joining, msg);
     game.handleJoining(user, msg);
 });
 socket.on(msgs.game, function(msg) {
+    console.log(msgs.game, msg);
     game.handleGame(msg);
 });

@@ -1,7 +1,7 @@
 var ui = require('./ui.js'),
     misc = require('./misc.js');
 
-module.exports = function(onJoin, onGame) {
+module.exports = function(onJoin, onGame, onAction) {
     var element = ui.one('#game'),
         pre = ui.one('#pre-game'),
         preform = ui.one(pre, 'form'),
@@ -31,14 +31,21 @@ module.exports = function(onJoin, onGame) {
 
         handleGame: function handleGame(game) {
             if (game) {
-                // TODO: handle the game you doofus!
                 ui.show(element);
                 ui.hide(pre);
-                onGame(game);
+
+                var acts = game.actions;
+                var f = (a, i) => '<div id="action-' + i + '">' + a + '</div>';
+                element.innerHTML = acts.reduce((tag, action, i) => tag + f(action, i), '');
+                acts.forEach((a, i) => element.querySelector('#action-' + i).onclick = function (e) {
+                    console.log(a);
+                    onAction(a);
+                });
             } else {
                 ui.hide(element);
                 ui.show(pre);
             }
+            onGame(game);
         }
     };
 }
