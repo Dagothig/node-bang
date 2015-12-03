@@ -32,7 +32,7 @@ module.exports = function(onMessage) {
                 var tag = user.name
                 if (misc.isCurrent(current, user)) tag = surroundWith('em', '', tag);
                 var player = game ? game.players.find((player) => misc.areTheSame(player, user)) : null;
-                var cssClass = player ? (player.life ? 'alive' : 'dead') : '';
+                var cssClass = player ? (player.life || !player.maxLife ? 'alive' : 'dead') : '';
                 var prefix = player && player.character ? player.character.name + ' ' : '';
                 return surroundWith('div', cssClass, prefix + tag);
             }

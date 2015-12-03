@@ -28,7 +28,9 @@ Game.prototype = Object.create({
             players: this.players.map((player) => {
                 var formatted = { name: player.user.name };
                 if (player.character) formatted.character = { name: player.character.name };
-                if (player.role) formatted.role = { name: player.role.publicName };
+                if (player.role) formatted.role = {
+                    name: player.user === user ? player.role.name : player.role.publicName
+                };
                 return formatted;
             }),
             actions: this.phase.actionsFor(this, user)

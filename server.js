@@ -1,3 +1,5 @@
+var port = process.env.PORT || 8080;
+
 var express = require('express'),
     http = require('http'),
     socketIO = require('socket.io'),
@@ -22,6 +24,6 @@ login.setup(io, users);
 game.setup(io, users, login);
 lobby.setup(io, users, login);
 
-server.listen(8080, function() {
-    log('Listening on port 8080');
+server.listen(port, function() {
+    log('Listening on port', port);
 });

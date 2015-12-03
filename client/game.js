@@ -29,11 +29,16 @@ module.exports = function(onJoin, onGame, onAction) {
             precount.innerText = users.reduce((acc, user) => acc + 1, 0) + " / 4-7";
         },
 
-        handleGame: function handleGame(game) {
+        handleGame: function handleGame(game, current) {
             if (game) {
                 ui.show(element);
                 ui.hide(pre);
 
+                var player = game && game.players ?
+                    game.players.find((player) => misc.isCurrent(current, player)) :
+                    null;
+
+                // Setup the actions
                 var acts = game.actions;
                 var tag = '';
                 for (var a in acts) {

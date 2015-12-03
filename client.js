@@ -101,5 +101,5 @@ socket.on(msgs.joining, function(msg) {
 });
 socket.on(msgs.game, function(msg) {
     console.log(msgs.game, msg);
-    game.handleGame(msg);
+    game.handleGame(msg, user);
 });

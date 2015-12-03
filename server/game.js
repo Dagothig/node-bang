@@ -89,13 +89,14 @@ module.exports = {
                 if (user.joining !== msg.joining) {
                     user.joining = !user.joining && msg.joining
                         && joining.users.length < consts.maxPlayers;
+                    log(user.name, user.joining ? 'is' : 'is not', 'joining');
                     // If the status change was successful then the states will be the same now
                     if (user.joining === msg.joining) {
                         if (canStart()) startTimer();
                         else stopTimer();
                     }
                 }
-                log(user.name, user.joining ? 'is' : 'is not', 'joining');
+
                 io.emit(msgs.joining, formattedJoining());
             }
         });
