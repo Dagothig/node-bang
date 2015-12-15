@@ -1,5 +1,6 @@
 var ui = require('./ui.js'),
-    misc = require('./misc.js');
+    misc = require('./misc.js'),
+    consts = require('../shared/consts.js');
 
 module.exports = function(onJoin, onGame, onAction) {
     var element = ui.one('#game'),
@@ -26,7 +27,10 @@ module.exports = function(onJoin, onGame, onAction) {
             var users = msg ? msg.users : null;
             preerror.innerText = msg.reason ? msg.reason : '';
             prejoin.checked = !!users.find((user) => misc.isCurrent(current, user));
-            precount.innerText = users.reduce((acc, user) => acc + 1, 0) + " / 4-7";
+            precount.innerText =
+                users.reduce((acc, user) => acc + 1, 0) +
+                " / " +
+                consts.minPlayers + "-" + consts.maxPlayers;
         },
 
         handleGame: function handleGame(game, current) {
@@ -38,9 +42,12 @@ module.exports = function(onJoin, onGame, onAction) {
                     game.players.find((player) => misc.isCurrent(current, player)) :
                     null;
 
+                // Time
+                var tag = '';
+                tag += '<div>' + game.remainingTime + '</div>'
+
                 // Setup the actions
                 var acts = game.actions;
-                var tag = '';
                 for (var a in acts) {
                     Array.prototype.forEach.call(acts[a], (arg) => {
                         tag +=

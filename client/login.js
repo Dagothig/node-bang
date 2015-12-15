@@ -8,6 +8,7 @@ module.exports = function(onLogin) {
         password = ui.one(form, '[name=password]');
 
     element.onsubmit = function() {
+        name.value = name.value.trim();
         onLogin(name.value, password.value);
         return false;
     };

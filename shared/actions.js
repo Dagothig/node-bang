@@ -1,3 +1,4 @@
 module.exports = {
-    select: "select"
+    select: "select",
+    confirm: "confirm"
 };

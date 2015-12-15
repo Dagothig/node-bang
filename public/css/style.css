@@ -40,6 +40,14 @@ html, body {
     background: #aaa;
 }
 
+.box {
+    box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.5);
+}
+
+.box-inset {
+    box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.5) inset;
+}
+
 /* === [FLEX] === */
 .flex {
     display: flex;
@@ -74,7 +82,13 @@ html, body {
 .flex.horizontal {
     flex-direction: row;
 }
-.flex.horizontal>.grow-1, .flex.horizontal>.grow-2 {
+.flex.horizontal-reverse {
+    flex-direction: row-reverse;
+}
+.flex.horizontal>.grow-1,
+.flex.horizontal>.grow-2,
+.flex.horizontal-reverse>.grow-1,
+.flex.horizontal-reverse>.grow-2 {
     width: 0;
 }
 
@@ -89,6 +103,9 @@ html, body {
 .form-box {
     width: 400px;
     margin: 1rem auto;
+    border-left: solid 2px #ddd;
+    border-right: solid 2px #ddd;
+    border-bottom: solid 6px #ddd;
 }
 form {
     margin: 0;
@@ -114,24 +131,58 @@ form .form-group label:after {
     content: ":";
     margin: 0 0.25em;
 }
-input, textarea {
+input, textarea, input+.check {
     background: #eee;
-    border-radius: 0.5rem;
-    border: none;
     padding: 0.75rem;
+    border-radius: 0.5rem;
+    border-style: solid;
+    border-color: #ddd;
+    border-top-width: 3px;
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 0;
 }
-input:focus {
+input:focus,
+input[type=submit]:hover,
+input[type=button]:hover,
+input[type=checkbox]:hover+.check,
+input[type=checkbox]:focus+.check {
     outline: none;
     background: #ddd;
+    border-color: #bbb;
 }
-input[type=submit], input[type=button] {
+input:focus,
+input[type=checkbox]:focus+.check {
+    box-shadow: 0 0 0 1px #08f;
+}
+input[type=submit],
+input[type=button] {
     cursor: pointer;
+    border-top-width: 0;
+    border-bottom-width: 3px;
 }
-input[type=submit]:hover, input[type=button]:hover {
-    background: #ddd;
-}
-input[type=submit]:active, input[type=button]:active {
+input[type=submit]:active,
+input[type=button]:active {
     background: #ccc;
+    border-color: #bbb;
+}
+input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+}
+input[type=checkbox]+.check {
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0);
+    text-align: center;
+    padding: 0;
+    width: 1.5rem;
+    line-height: 1.5rem;
+}
+input[type=checkbox]+.check:after {
+    display: none;
+}
+input[type=checkbox]:checked+.check {
+    color: rgba(0, 0, 0, 1);
 }
 textarea {
     resize: none;
@@ -143,22 +194,28 @@ textarea {
     font-size: 0.8rem;
 }
 #lobby .title {
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
     font-size: 1rem;
 }
 #lobby .list {
     overflow: auto;
+    background: #eee;
+    border: none;
+    border-top: solid 3px #ddd;
+    border-left: solid 1px #ddd;
+    border-right: solid 1px #ddd;
+    padding: 0.25rem 0;
 }
 #lobby .list div {
-    padding: 0 0.5rem;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+    padding: 0.25rem 0.5rem;
 }
 #lobby .list .alive {
-    color: #0f0;
+    color: #1e3;
+    text-shadow: 0 1px #088020;
 }
 #lobby .list .dead {
-    color: #f00;
+    color: #e31;
+    text-shadow: 0 1px #802008;
 }
 #lobby .list em {
     font-style: normal;

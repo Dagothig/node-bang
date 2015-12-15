@@ -83,22 +83,20 @@ module.exports = {
         });
 
         socket.on(msgs.joining, function(msg) {
-            if (!game) {
-                if (user.token !== msg.token) return;
-                var joining = formattedJoining();
-                if (user.joining !== msg.joining) {
-                    user.joining = !user.joining && msg.joining
-                        && joining.users.length < consts.maxPlayers;
-                    log(user.name, user.joining ? 'is' : 'is not', 'joining');
-                    // If the status change was successful then the states will be the same now
-                    if (user.joining === msg.joining) {
-                        if (canStart()) startTimer();
-                        else stopTimer();
-                    }
+            if (game || user.token !== msg.token) return;
+            var joining = formattedJoining();
+            if (user.joining !== msg.joining) {
+                user.joining = !user.joining && msg.joining
+                    && joining.users.length < consts.maxPlayers;
+                log(user.name, user.joining ? 'is' : 'is not', 'joining');
+                // If the status change was successful then the states will be the same now
+                if (user.joining === msg.joining) {
+                    if (canStart()) startTimer();
+                    else stopTimer();
                 }
-
-                io.emit(msgs.joining, formattedJoining());
             }
+
+            io.emit(msgs.joining, formattedJoining());
         });
 
         socket.on(msgs.action, function(msg) {

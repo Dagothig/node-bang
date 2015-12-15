@@ -2,7 +2,8 @@
     <head>
         <title>Bang!</title>
         <link rel="icon" type="image/x-icon" href="favicon.ico" />
-        <link rel="stylesheet" type="text/css" href="/style.css" />
+        <link rel="stylesheet" type="text/css" href="/css/font-awesome.css" />
+        <link rel="stylesheet" type="text/css" href="/css/style.css" />
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
@@ -10,7 +11,7 @@
             <div id="game" class="grow-1"></div>
             <div id="pre-game" class="grow-1 flex vertical root-bg">
                 <div class="grow-1"></div>
-                <form class="form-box">
+                <form class="form-box box">
                     <div class="form-group">
                         <span class="form-header">New game</span>
                     </div>
@@ -23,6 +24,7 @@
                         <label class="grow-1" for="join">Participate</label>
                         <span class="grow-1 center">
                             <input id="join" type="checkbox" name="join" />
+                            <label for="join" class="check fa fa-check"></span>
                         </span>
                     </div>
                 </form>
@@ -34,19 +36,19 @@
                     <div class="list flex vertical grow-1"></div>
                 </div>
                 <div class="messages grow-1 flex vertical">
-                    <div class="line full-width"></div>
+                    <div class="title">Chat</div>
                     <div class="list flex vertical-reverse grow-1"></div>
+                    <form class="flex horizontal">
+                        <input class="grow-1" name="message" placeholder="Enter your message here..."></textarea>
+                        <span class="margin"></span>
+                        <input value="Send" type="submit" />
+                    </form>
                 </div>
-                <form class="flex horizontal">
-                    <input class="grow-1" name="message" placeholder="Enter your message here..."></textarea>
-                    <span class="margin"></span>
-                    <input value="Send" type="submit" />
-                </form>
             </div>
         </div>
         <div id="login" class="hidden root-bg absolute full-width full-height flex vertical">
             <div class="grow-1"></div>
-            <form class="form-box">
+            <form class="form-box box">
                 <div class="form-group">
                     <span class="form-header">Identification</span>
                 </div>

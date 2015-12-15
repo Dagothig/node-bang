@@ -12,6 +12,7 @@ module.exports = {
             log('Socket connected');
             socket.emit(msgs.auth);
             socket.on(msgs.auth, function(msg) {
+                if (msg && msg.name) msg.name = msg.name.trim();
                 var existing = msg && msg.name ? users.findForName(msg.name) : null;
                 // We support reconnection through re-sending the user's token
                 if (msg.token) {
