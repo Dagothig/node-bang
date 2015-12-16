@@ -14,7 +14,7 @@ require('fs').readdir('./pages', (err, files) => {
     if (err) throw err;
     files.forEach((file) => {
         var stripped = file.replace('.html', '');
-        app.get('/' + stripped === 'index' ? '' : stripped, (req, res) => {
+        app.get('/' + (stripped === 'index' ? '' : stripped), (req, res) => {
             res.sendFile(__dirname + '/pages/' + file);
         });
     });

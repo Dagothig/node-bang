@@ -60,5 +60,6 @@ module.exports = new Phase('Playing', {
 
     format: function format(game, formatted) {
         formatted.turn = this.turn.player.name;
+        return formatted;
     }
 });

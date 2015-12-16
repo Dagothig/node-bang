@@ -45,7 +45,6 @@ Game.prototype = Object.create({
                     formatted.life = player.life;
                     formatted.lifeMax = player.lifeMax;
                 }
-                log(formatted);
                 return formatted;
             }),
             actions: this.phase.actionsFor(this, user)
