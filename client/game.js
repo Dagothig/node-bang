@@ -1,6 +1,6 @@
-var ui = require('./ui.js'),
-    misc = require('./misc.js'),
-    consts = require('../shared/consts.js');
+var ui = require('./ui'),
+    misc = require('./misc'),
+    consts = require('../shared/consts');
 
 module.exports = function(onJoin, onGame, onAction) {
     var element = ui.one('#game'),

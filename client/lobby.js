@@ -1,5 +1,5 @@
-var ui = require('./ui.js'),
-    misc = require('./misc.js');
+var ui = require('./ui'),
+    misc = require('./misc');
 
 module.exports = function(onMessage) {
     var element = ui.one('#lobby'),

@@ -1,6 +1,6 @@
-var log = require('./log.js'),
-    msgs = require('../shared/messages.js'),
-    strings = require('../shared/strings.js');
+var log = aReq('server/log'),
+    msgs = aReq('shared/messages'),
+    strings = aReq('shared/strings');
 
 var io, users;
 
@@ -22,6 +22,7 @@ module.exports = {
         socket.on(msgs.message, function(msg) {
             // Sanitize message
             if (msg && msg.message) {
+                msg.message = msg.message.trim();
                 msg.message = msg.message.replace(/</g, '&lt;');
                 msg.message = msg.message.replace(/>/g, '&gt;');
             }

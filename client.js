@@ -51,17 +51,20 @@ var game = require('./client/game.js')(
 
 ui.hide(roots);
 
-socket.on('connect', function() {});
+socket.on('connect', function() {
+    console.log('connected');
+});
 socket.on('disconnect', function() {
+    console.log('disconnected');
     ui.hide(roots);
     ui.show(loader);
 });
 socket.on(msgs.alert, function(msg) {
-    console.log(msgs.alert, msg);
+    console.log('received', msgs.alert, msg);
     alert(msg);
 });
 socket.on(msgs.auth, function(msg) {
-    console.log(msgs.auth, msg);
+    console.log('received', msgs.auth, msg);
     if (user) {
         socket.emit(msgs.auth, {
             name: user.name,
@@ -74,7 +77,7 @@ socket.on(msgs.auth, function(msg) {
     }
 });
 socket.on(msgs.user, function(msg) {
-    console.log(msgs.user, msg);
+    console.log('received', msgs.user, msg);
     if (user && !msg) {
         ui.hide(roots);
         ui.show(login.element);
@@ -87,19 +90,19 @@ socket.on(msgs.user, function(msg) {
     lobby.handleUsers(user, users, ongoingGame);
 });
 socket.on(msgs.users, function(msg) {
-    console.log(msgs.users, msg);
+    console.log('received', msgs.users, msg);
     users = msg;
     lobby.handleUsers(user, users, ongoingGame);
 });
 socket.on(msgs.message, function(msg) {
-    console.log(msgs.message, msg);
+    console.log('received', msgs.message, msg);
     lobby.handleMessage(msg.name, msg.message);
 });
 socket.on(msgs.joining, function(msg) {
-    console.log(msgs.joining, msg);
+    console.log('received', msgs.joining, msg);
     game.handleJoining(user, msg);
 });
 socket.on(msgs.game, function(msg) {
-    console.log(msgs.game, msg);
+    console.log('received', msgs.game, msg);
     game.handleGame(msg, user);
 });

@@ -1,7 +1,7 @@
-var log = require('./log.js'),
-    msgs = require('../shared/messages.js'),
-    strings = require('../shared/strings.js'),
-    User = require('./user.js');
+var log = aReq('server/log'),
+    msgs = aReq('shared/messages'),
+    strings = aReq('shared/strings'),
+    User = aReq('server/user');
 
 var listeners = [],
     disconnectTimout = 5000;

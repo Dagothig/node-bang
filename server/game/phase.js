@@ -1,6 +1,6 @@
-var misc = require('../misc.js'),
-    log = require('../log.js'),
-    warn = require('../warn.js');
+var misc = aReq('server/misc'),
+    log = aReq('server/log'),
+    warn = aReq('server/warn');
 
 function Phase(name, obj) {
     var warnMissing = (key) => warn('Phase', '"' + name + '"', 'does not handle', '"' + key + '"');

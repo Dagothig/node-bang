@@ -1,13 +1,13 @@
-var misc = require('../misc.js'),
-    log = require('../log.js'),
-    warn = require('../warn.js'),
-    consts = require('../../shared/consts.js'),
+var misc = aReq('server/misc'),
+    log = aReq('server/log'),
+    warn = aReq('server/warn'),
+    consts = aReq('shared/consts'),
 
-    actions = require('../../shared/actions.js'),
-    roles = require('./roles.js'),
+    actions = aReq('shared/actions'),
+    roles = aReq('server/game/roles'),
 
-    Phase = require('./phase.js'),
-    Playing = require('./playing.js');
+    Phase = aReq('server/game/phase'),
+    Playing = aReq('server/game/playing');
 
 module.exports = new Phase('Role pick', {
     begin: function begin(game) {

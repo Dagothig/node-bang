@@ -1,8 +1,8 @@
-var log = require('./log.js'),
-    msgs = require('../shared/messages.js'),
-    strings = require('../shared/strings.js'),
-    consts = require('../shared/consts.js'),
-    Game = require('./game/game.js');
+var log = aReq('server/log'),
+    msgs = aReq('shared/messages'),
+    strings = aReq('shared/strings'),
+    consts = aReq('shared/consts'),
+    Game = aReq('server/game/game');
 
 var io, users;
 var gameStartTimer = null, gameStartInterval;

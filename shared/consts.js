@@ -5,5 +5,5 @@ module.exports = {
     characterChoices: 2,
     characterPickMaxTime: 60,
     rolePickMaxTime: 10,
-    initialCardPickCountMax: 5
+    initCardMax: 5
 };

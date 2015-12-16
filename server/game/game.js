@@ -1,15 +1,15 @@
-var misc = require('../misc.js'),
-    log = require('../log.js'),
-    warn = require('../warn.js'),
+var misc = aReq('server/misc'),
+    log = aReq('server/log'),
+    warn = aReq('server/warn'),
 
-    CharacterPick = require('./character-pick.js');
+    CharacterPick = aReq('server/game/character-pick');
 
 function Game(users, onGameUpdate) {
     this.onGameUpdate = onGameUpdate;
-    this.players = misc.shuffle(users.map((user) => new Player(user)));
+    this.players = misc.shuffle(users.map(user => ({ user: user })));
 }
 Game.prototype = Object.create({
-    begin: function() {
+    begin: function begin() {
         this.switchToPhase(CharacterPick);
     },
     switchToPhase: function switchToPhase(phase) {
@@ -36,6 +36,15 @@ Game.prototype = Object.create({
                 if (player.role) formatted.role = {
                     name: player.user === user ? player.role.name : player.role.publicName
                 };
+                if (player.hand) formatted.hand = {
+                    cardMax : player.hand.cardMax,
+                    cardCount : player.hand.cardCount,
+                    cards: player.hand.slice()
+                };
+                if (player.lifeMax) {
+                    formatted.life = player.life;
+                    formatted.lifeMax = player.lifeMax;
+                }
                 log(formatted);
                 return formatted;
             }),
@@ -50,9 +59,5 @@ Game.prototype = Object.create({
         this.onGameUpdate();
     }
 });
-
-function Player(user) {
-    this.user = user;
-}
 
 module.exports = Game;

@@ -1,4 +1,4 @@
-var ui = require('./ui.js');
+var ui = require('./ui');
 
 module.exports = function(onLogin) {
     var element = ui.one('#login'),

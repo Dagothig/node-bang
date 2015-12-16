@@ -1,25 +1,45 @@
-var misc = require('../misc.js'),
-    log = require('../log.js'),
-    warn = require('../warn.js'),
-    consts = require('../../shared/consts.js'),
+var misc = aReq('server/misc'),
+    log = aReq('server/log'),
+    warn = aReq('server/warn'),
+    consts = aReq('shared/consts'),
 
-    roles = require('./roles.js'),
-    Phase = require('./phase.js');
+    roles = aReq('server/game/roles'),
+    Phase = aReq('server/game/phase');
 
 function Turn(player) {
-
+    this.player = player;
 }
 
 module.exports = new Phase('Playing', {
 
     begin: function begin(game) {
-        this.cards = require('./cards.js');
+        this.cards = misc.shuffle(aReq('server/game/cards'));
         this.discarded = [];
         this.turn = new Turn(game.players.find(p => p.role === roles.sheriff));
+
+        game.players.forEach(p => {
+            p.life = p.lifeMax = p.character.lifeMax + p.role.lifeBonus;
+            log(p.life, p.lifeMax, p.character, p.role);
+            var handObj = {
+                get initCardMax() {
+                    return Math.min(p.lifeMax, consts.initCardMax);
+                },
+                get cardMax() {
+                    return p.life;
+                },
+                get cardCount() {
+                    return p.hand ? p.hand.length : 0;
+                }
+            };
+            Object.assign(
+                p.hand = misc.gen(() => this.cards.pop(), handObj.initCardMax),
+                handObj
+            );
+        });
     },
 
     end: function end(game) {
-
+        game.players.forEach(p => p.hand = null);
     },
 
     actionsFor: function actionsFor(game, user) {
