@@ -8,7 +8,7 @@ var http = require('http'),
     app = express(),
     server = http.Server(app);
 
-// Setup the static assets and routes
+// Setup the static assets and pages
 app.use(express.static('public'));
 require('fs').readdir('./pages', (err, files) => {
     if (err) throw err;

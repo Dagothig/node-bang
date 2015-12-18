@@ -36,11 +36,16 @@ Game.prototype = Object.create({
                 if (player.role) formatted.role = {
                     name: player.user === user ? player.role.name : player.role.publicName
                 };
-                if (player.hand) formatted.hand = {
-                    cardMax : player.hand.cardMax,
-                    cardCount : player.hand.cardCount,
-                    cards: player.hand.slice()
-                };
+                if (player.hand) {
+                    formatted.hand = {
+                        cardMax : player.hand.cardMax,
+                        cardCount : player.hand.cardCount
+                    };
+                    // TODO: format cards properly
+                    if (player.user === user) {
+                        formatted.hand.cards = player.hand.slice();
+                    }
+                }
                 if (player.lifeMax) {
                     formatted.life = player.life;
                     formatted.lifeMax = player.lifeMax;
@@ -49,8 +54,7 @@ Game.prototype = Object.create({
             }),
             actions: this.phase.actionsFor(this, user)
         });
-        if (this.phase) return this.phase.format(this, obj);
-        else return obj;
+        return this.phase ? this.phase.format(this, obj) : obj;
     },
     handleAction: function handleAction(user, msg) {
         if (!this.findPlayer(user) || !msg.action) return;
