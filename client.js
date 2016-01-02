@@ -55,7 +55,7 @@ socket.on('connect', function() {
     console.log('connected');
 });
 socket.on('disconnect', function() {
-    console.log('disconnected');
+console.log('disconnected');
     ui.hide(roots);
     ui.show(loader);
 });

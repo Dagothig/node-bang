@@ -7,7 +7,7 @@ function isCurrent(current, user) {
     return current && areTheSame(current, user);
 }
 
-module.exports = misc.define(misc, {
+module.exports = misc.merge(misc, {
     areTheSame: areTheSame,
     isCurrent: isCurrent
 });

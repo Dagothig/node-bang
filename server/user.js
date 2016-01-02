@@ -1,4 +1,7 @@
-var crypto = require('crypto');
+var crypto = require('crypto'),
+    log = aReq('server/log'),
+    warn = aReq('server/warn'),
+    consts = aReq('shared/consts');
 
 function User(name, password) {
     this.sockets = [];
@@ -16,11 +19,24 @@ User.prototype = Object.create({
     addSocket: function addSocket(socket) {
         // Add the socket if its not already listed
         if (this.sockets.indexOf(socket) === -1) this.sockets.push(socket);
+        else warn('Attempting to add used socket to ', this.name);
+        log(this.name, 'at', this.sockets.length, 'socket(s)');
         // Clear the timeout
         if (this.disconnectTimout) {
             clearTimeout(this.disconnectTimout);
             this.disconnectTimout = null;
         }
+    },
+    removeSocket: function removeSocket(socket, disconnectCallback) {
+        var index = this.sockets.indexOf(socket);
+        if (index >= 0) this.sockets.splice(index, 1);
+        else warn('Attempting to remove non-present socket from', this.name);
+        log(this.name ,'at', this.sockets.length, 'socket(s)');
+
+        if (this.sockets.length) return;
+        this.disconnectTimout = setTimeout(() => {
+            disconnectCallback();
+        }, consts.disconnectTimeout);
     },
     emit: function emit() {
         this.sockets.forEach((socket) => socket.emit.apply(socket, arguments));

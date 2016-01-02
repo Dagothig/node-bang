@@ -31,8 +31,8 @@ module.exports = new Phase('Role pick', {
         }, 1000);
     },
     end: function end(game) {
-        game.players.forEach((player) => {
-            delete player.confirmedRole;
+        game.players.forEach(p => {
+            delete p.confirmedRole;
         });
         if (this.remainingInterval) {
             clearInterval(this.remainingInterval);
@@ -57,10 +57,11 @@ module.exports = new Phase('Role pick', {
                 return;
         }
     },
-    format: function format(game, formatted) {
+    format: function format(game, user, formatted) {
         formatted.remainingTime = this.remainingTime;
         return formatted;
     },
+    formatPlayer: (game, user, player, formatted) => formatted,
     checkForEnd: function checkForEnd(game) {
         var unconfirmed = game.players.filter((player) => !player.confirmedRole);
         if (!unconfirmed.length) game.switchToPhase(Playing);

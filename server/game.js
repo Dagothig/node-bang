@@ -2,116 +2,113 @@ var log = aReq('server/log'),
     msgs = aReq('shared/messages'),
     strings = aReq('shared/strings'),
     consts = aReq('shared/consts'),
+    misc = aReq('server/misc'),
     Game = aReq('server/game/game');
 
-var io, users;
 var gameStartTimer = null, gameStartInterval;
 var game;
 
-function formattedGame(user) {
-    return game ? game.formatted(user) : null;
-}
-
-function startGame() {
-    log("Starting game!");
-    game = new Game(
-        users.filter((user) => user.joining),
-        () => users.forEach((user) => user.emit(msgs.game, formattedGame(user)))
-    );
-    users.forEach((user) => {
-        user.joining = false;
-    });
-    game.begin();
-}
-
-function formattedJoining() {
+var formattedGame = user => game ? game.formatted(user) : null;
+var formattedReason = joining => [
+    (joining.length >= consts.maxPlayers ? strings.playerCapped :
+    (joining.length < consts.minPlayers ? strings.notEnoughPlayers :
+    null)),
+    (gameStartTimer !== null ? strings.startTimer(gameStartTimer) :
+    null)
+].filter(n => n).join('\n');
+var formattedJoining = users => {
     var joining = users
-        .filter((user) => user.joining)
-        .map((user) => {
-            return {
-                name: user.name
-            };
-        });
+        .filter(user => user.joining)
+        .map(user => ({
+            name: user.name
+        }));
     return {
         users: joining,
-        reason: (joining.length >= consts.maxPlayers ? strings.playerCapped :
-            (joining.length < consts.minPlayers ? strings.notEnoughPlayers :
-            (''))) +
-            (gameStartTimer !== null ? strings.startTimer(gameStartTimer) : '')
-    }
+        reason: formattedReason(joining)
+    };
 }
+var canStart = users => misc.bounded(
+    users.filter(user => user.joining).length,
+    consts.minPlayers, consts.maxPlayers
+);
 
-function canStart() {
-    var count = users.filter((user) => user.joining).length;
-    return count >= consts.minPlayers && count <= consts.maxPlayers;
-}
-function startTimer() {
+function startTimer(io, users) {
     if (gameStartInterval) clearInterval(gameStartInterval);
 
     gameStartTimer = consts.gameStartTimer;
     log("Game starts in", gameStartTimer, "seconds");
-    io.emit(msgs.joining, formattedJoining());
+    io.emit(msgs.joining, formattedJoining(users));
 
     gameStartInterval = setInterval(function() {
         gameStartTimer--;
         log("Game starts in", gameStartTimer, "seconds");
-        if (gameStartTimer) io.emit(msgs.joining, formattedJoining());
+        if (gameStartTimer) io.emit(msgs.joining, formattedJoining(users));
         else {
             clearInterval(gameStartInterval);
             gameStartInterval = null;
             gameStartTimer = null;
-            startGame();
+            startGame(io, users);
         }
     }, 1000);
 }
-function stopTimer() {
+
+function stopTimer(io, users) {
     if (gameStartInterval) clearInterval(gameStartInterval);
     gameStartInterval = null;
     gameStartTimer = null;
-    io.emit(msgs.joining, formattedJoining());
+    io.emit(msgs.joining, formattedJoining(users));
 }
 
-module.exports = {
-    setup: function setupLobby() {
-        io = arguments[0];
-        users = arguments[1];
-        arguments[2].listen(this);
-    },
-    onConnected: function onConnected(user, socket) {
-        socket.on(msgs.game, function(msg) {
-            socket.emit(msgs.game, formattedGame(user));
-        });
+function startGame(io, users) {
+    log("Starting game!");
+    game = new Game(
+        users.filter(user => user.joining),
+        () => users.forEach(user => user.emit(msgs.game, formattedGame(user)))
+    );
+    users.forEach(user => user.joining = false);
+    game.begin();
+}
 
-        socket.on(msgs.joining, function(msg) {
-            if (game || user.token !== msg.token) return;
-            var joining = formattedJoining();
-            if (user.joining !== msg.joining) {
-                user.joining = !user.joining && msg.joining
-                    && joining.users.length < consts.maxPlayers;
-                log(user.name, user.joining ? 'is' : 'is not', 'joining');
-                // If the status change was successful then the states will be the same now
-                if (user.joining === msg.joining) {
-                    if (canStart()) startTimer();
-                    else stopTimer();
-                }
-            }
+function handleGame(io, users, user, socket) {
+    socket.emit(msgs.game, formattedGame(user));
+}
 
-            io.emit(msgs.joining, formattedJoining());
-        });
+function handleJoining(io, users, user, socket, msg) {
+    if (user.token !== msg.token || game) return;
+    var joining = formattedJoining(users);
+    if (user.joining !== msg.joining) {
+        user.joining = !user.joining && msg.joining
+            && joining.users.length < consts.maxPlayers;
+        log(user.name, user.joining ? 'is' : 'is not', 'joining');
+        // If the status change was successful then the states will be the same now
+        if (user.joining === msg.joining) {
+            if (canStart(users)) startTimer(io, users);
+            else stopTimer(io, users);
+        }
+    }
 
-        socket.on(msgs.action, function(msg) {
-            if (!game || user.token !== msg.token) return;
-            game.handleAction(user, msg);
-        });
+    io.emit(msgs.joining, formattedJoining(users));
+}
+
+function handleAction(io, users, user, socket, msg) {
+    if (user.token !== msg.token || !game) return;
+    game.handleAction(user, msg);
+}
+
+module.exports = (io, users) => ({
+    onConnected: (user, socket) => {
+        socket.on(msgs.game, () => handleGame(io, users, user, socket));
+        socket.on(msgs.joining, msg => handleJoining(io, users, user, socket, msg));
+        socket.on(msgs.action, msg => handleAction(io, users, user, socket, msg));
 
         socket.emit(msgs.game, formattedGame(user));
-        socket.emit(msgs.joining, formattedJoining());
+        socket.emit(msgs.joining, formattedJoining(users));
     },
-    onDisconnected: function onDisconnected(user, socket) {
+    onDisconnected: (user, socket) => {
         if (user.joining) {
-            if (canStart()) startTimer();
-            else stopTimer();
+            if (canStart(users)) startTimer(io, users);
+            else stopTimer(io, users);
         }
-        if (!game) io.emit(msgs.joining, formattedJoining());
+        if (!game) io.emit(msgs.joining, formattedJoining(users));
     }
-}
+});

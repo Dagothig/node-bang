@@ -1,6 +1,8 @@
 require('./global');
 
-var log = aReq('server/log');
+var log = aReq('server/log'),
+    warn = aReq('server/warn'),
+    misc = aReq('server/misc');
 
 // Setup the server itself
 var http = require('http'),
@@ -21,21 +23,17 @@ require('fs').readdir('./pages', (err, files) => {
 });
 
 // Setup the server sockets functionalities
-var socketIO = require('socket.io'),
-    io = socketIO(server),
+var io = require('socket.io')(server),
 
     users = aReq('server/users'),
 
-    login = aReq('server/login'),
-    game = aReq('server/game'),
-    lobby = aReq('server/lobby');
+    login = aReq('server/login')(io, users),
+    lobby = aReq('server/lobby')(io, users),
+    game = aReq('server/game')(io, users);
 
-login.setup(io, users);
-game.setup(io, users, login);
-lobby.setup(io, users, login);
+login.listen(lobby);
+login.listen(game);
 
 // Listen on port
 var port = process.env.PORT || 8080;
-server.listen(port, function() {
-    log('Listening on port', port);
-});
+server.listen(port, () => log('Listening on port', port));
