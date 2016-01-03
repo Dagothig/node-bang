@@ -4,7 +4,7 @@ module.exports = {
 
     minPlayers: 1,//4, TODO put back the proper amount
     maxPlayers: 1,
-    gameStartTimer: 10,//10, TODO put back the proper amount
+    gameStartTimer: 1,//10, TODO put back the proper amount
     characterChoices: 2,
     characterPickMaxTime: 1,//60
     rolePickMaxTime: 1,// 10

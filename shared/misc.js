@@ -1,6 +1,6 @@
 function shuffle(arr) {
     for (var i = 0; i < arr.length; i++) {
-        var ri = (Math.random() * arr.length)|0 ;
+        var ri = (Math.random() * arr.length)|0;
         swap(arr, i, ri);
     }
     return arr;

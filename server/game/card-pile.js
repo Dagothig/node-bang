@@ -13,8 +13,13 @@ CardPile.prototype = Object.create({
             if (!card) {
                 this._backing = misc.shuffle(this.discarded);
                 this.discarded = [];
+                continue;
             }
             cards.push(card);
+            amount--;
         }
+        return cards;
     }
 });
+
+module.exports = CardPile;

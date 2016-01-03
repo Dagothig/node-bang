@@ -10,24 +10,49 @@ var misc = aReq('server/misc'),
 
 function Turn(player) {
     this.player = player;
+    this.phase = this.getNextPhase();
 }
 Turn.prototype = Object.create({
-
+    getNextPhase: function() {
+        if (!this.phase) return new Turn.phases.Draw(this.player);
+        var nextPhase = this.phase.constructor.nextPhase;
+        if (nextPhase) return new nextPhase(this.player);
+        return null;
+    }
 });
-function TurnPhase(steps) {
-    this.steps = steps;
+function Draw(player) {
+
 }
-var turnPhases = {
-    draw: new TurnPhase(),
-    play: new TurnPhase(),
-    discard: new TurnPhase()
+function Play(player) {
+
+}
+function Discard(player) {
+
+}
+Draw.nextPhase = Play;
+Play.nextPhase = Discard;
+Turn.phases = {
+    Draw: Draw,
+    Play: Play,
+    Discard: Discard
 };
 
 module.exports = new Phase('Playing', {
 
-    begin: function begin(game) {
+    getNextTurn: function(game) {
+        var player;
+        if (!this.turn) {
+            player = game.players.find(p => p.role === roles.sheriff);
+        } else {
+            var index = (game.players.indexOf[this.turn.player] + 1) % game.players.length;
+            player = game.players[index];
+        }
+        return new Turn(player);
+    },
+
+    begin: function(game) {
         this.cards = new CardPile(aReq('server/game/cards'));
-        this.turn = new Turn(game.players.find(p => p.role === roles.sheriff));
+        this.turn = this.getNextTurn(game);
 
         game.players.forEach(p => {
             // Life
@@ -55,17 +80,17 @@ module.exports = new Phase('Playing', {
 
             // Distance
             misc.merge(p, {
-                modifier: function modifier(name) {
+                modifier: function(name) {
                     var modifier = name + 'Modifier';
                     return this.character[modifier]|0
                         + this.role[modifier]|0
                         + this.equipped.stat(modifier)|0;
                 },
-                stat: function stat(name, baseVal) {
+                stat: function(name, baseVal) {
                     return baseVal + this.modifier(name);
                 },
 
-                distanceTo: function distanceTo(to) {
+                distanceTo: function(to) {
                     var players = game.players;
                     var dist = Math.abs(players.indexOf(this) - players.indexOf(to));
                     return Math.min(dist, players.length - dist) + to.modifier('distance');
@@ -89,14 +114,14 @@ module.exports = new Phase('Playing', {
         });
     },
 
-    actionsFor: function actionsFor(game, user) {
+    actionsFor: function(game, user) {
         var player = game.findPlayer(user);
         if (!player) return {};
         var acts = {};
         return acts;
     },
 
-    handleAction: function handleAction(game, user, msg) {
+    handleAction: function(game, user, msg) {
         var player = game.findPlayer(user);
         if (!player) return;
         switch (msg.action) {
@@ -105,12 +130,12 @@ module.exports = new Phase('Playing', {
         }
     },
 
-    format: function format(game, user, formatted) {
+    format: function(game, user, formatted) {
         return formatted;
     },
 
-    formatPlayer: function formatPlayer(game, user, player, formatted) {
-        return Object.assign(formatted, {
+    formatPlayer: function(game, user, player, formatted) {
+        return misc.merge(formatted, {
             hand: {
                 cardMax : player.hand.cardMax,
                 cardCount : player.hand.cardCount,

@@ -5,7 +5,8 @@ var misc = require('./shared/misc'),
 	source = require('vinyl-source-stream'),
 	browserify = require('gulp-browserify'),
 	rename = require('gulp-rename'),
-	plumber = require('gulp-plumber');
+	plumber = require('gulp-plumber'),
+	sloc = require('gulp-sloc');
 
 var node;
 
@@ -62,6 +63,17 @@ gulp.task('watch-client', function(cb) {
 		"./shared/**/*.js",
 		"./client/**/*.js",
 	], ['client']);
+});
+
+gulp.task('sloc', function(cb) {
+	gulp.src([
+		'./server.js',
+		'./client.js',
+		'./shared/**/*.js',
+		'./server/**/*.js',
+		'./client/**/*.js',
+		'./public/**/*.html'
+	]).pipe(sloc());
 });
 
 gulp.task('default', ['server', 'watch-server', 'client', 'watch-client']);
