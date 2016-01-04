@@ -34,7 +34,8 @@ var characters = [
     }),
 
     new Character("Paul Regret", {
-        lifeMax: 3,
+        lifeModifier: -1,
+        initCardsModifier: -1,
         distanceModifier: 1
     }),
 
@@ -63,7 +64,7 @@ var characters = [
     }),
 
     new Character("Willy the Kid", {
-        bangsMax: Number.POSITIVE_INFINITY
+        bangsModifier: 1000
     })
 ];
 

@@ -42,7 +42,7 @@ function startTimer(io, users) {
     gameStartInterval = setInterval(function() {
         gameStartTimer--;
         log("Game starts in", gameStartTimer, "seconds");
-        if (gameStartTimer) io.emit(msgs.joining, formattedJoining(users));
+        if (gameStartTimer > 0) io.emit(msgs.joining, formattedJoining(users));
         else {
             clearInterval(gameStartInterval);
             gameStartInterval = null;

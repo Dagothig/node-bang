@@ -1,41 +1,13 @@
 var misc = aReq('server/misc'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),
-    consts = aReq('shared/consts'),
 
+    stats = aReq('server/game/stats'),
     roles = aReq('server/game/roles'),
 
     Phase = aReq('server/game/phase'),
-    CardPile = aReq('server/game/card-pile');
-
-function Turn(player) {
-    this.player = player;
-    this.phase = this.getNextPhase();
-}
-Turn.prototype = Object.create({
-    getNextPhase: function() {
-        if (!this.phase) return new Turn.phases.Draw(this.player);
-        var nextPhase = this.phase.constructor.nextPhase;
-        if (nextPhase) return new nextPhase(this.player);
-        return null;
-    }
-});
-function Draw(player) {
-
-}
-function Play(player) {
-
-}
-function Discard(player) {
-
-}
-Draw.nextPhase = Play;
-Play.nextPhase = Discard;
-Turn.phases = {
-    Draw: Draw,
-    Play: Play,
-    Discard: Discard
-};
+    CardPile = aReq('server/game/card-pile'),
+    Turn = aReq('server/game/turn');
 
 module.exports = new Phase('Playing', {
 
@@ -47,59 +19,65 @@ module.exports = new Phase('Playing', {
             var index = (game.players.indexOf[this.turn.player] + 1) % game.players.length;
             player = game.players[index];
         }
-        return new Turn(player);
+        return new Turn(game, player);
     },
 
     begin: function(game) {
         this.cards = new CardPile(aReq('server/game/cards'));
+        game.players.forEach(p => this.extendPlayer(p));
         this.turn = this.getNextTurn(game);
+    },
 
-        game.players.forEach(p => {
-            // Life
-            p.life = p.lifeMax = p.character.lifeMax + p.role.lifeBonus;
+    extendPlayer: function(player) {
+        // Equipped first: it's needed for stat calculations
+        player.equipped = misc.merge([], {
+            stat: function(stat) {
+                return this.reduce((sum, equipment) => {
+                    return sum + equipment[stat]|0;
+                }, 0);
+            }
+        });
 
-            // Hand
-            var handSize = Math.min(p.lifeMax, consts.initCardMax);
-            p.hand = misc.merge(this.cards.take(handSize), {
-                get cardMax() {
-                    return p.life;
-                },
-                get cardCount() {
-                    return p.hand ? p.hand.length : 0;
-                }
-            });
+        // Distance second: it's needed for the remainder of the player values
+        misc.merge(player, {
+            modifier: function(name) {
+                var modifier = name + 'Modifier';
+                return this.character[modifier]|0
+                    + this.role[modifier]|0
+                    + this.equipped.stat(modifier)|0;
+            },
+            stat: function(name) {
+                if (stats[name] === undefined) throw 'State ' + name + ' does not exist';
+                return stats[name] + this.modifier(name);
+            },
 
-            // Equipped
-            p.equipped = misc.merge([], {
-                stat: function(stat) {
-                    return this.reduce((sum, equipment) => {
-                        return sum + equipment[stat]|0;
-                    }, 0);
-                }
-            });
+            distanceTo: function(to) {
+                var players = game.players;
+                var dist = Math.abs(players.indexOf(this) - players.indexOf(to));
+                return Math.min(dist, players.length - dist) + to.modifier('distance');
+            }
+        });
 
-            // Distance
-            misc.merge(p, {
-                modifier: function(name) {
-                    var modifier = name + 'Modifier';
-                    return this.character[modifier]|0
-                        + this.role[modifier]|0
-                        + this.equipped.stat(modifier)|0;
-                },
-                stat: function(name, baseVal) {
-                    return baseVal + this.modifier(name);
-                },
+        // Life third: it's used in the hand limit calculations
+        player.life = player.lifeMax = player.stat('life');
 
-                distanceTo: function(to) {
-                    var players = game.players;
-                    var dist = Math.abs(players.indexOf(this) - players.indexOf(to));
-                    return Math.min(dist, players.length - dist) + to.modifier('distance');
-                }
-            });
+        // Hand
+        var cards = this.cards;
+        player.hand = misc.merge(cards.draw(player.stat('initCards')), {
+            drawFromPile: function(amount) {
+                cards.draw(amount).forEach(card => this.push(card));
+            },
+
+            get cardMax() {
+                return player.life;
+            },
+            get cardCount() {
+                return player.hand ? player.hand.length : 0;
+            }
         });
     },
 
-    end: function end(game) {
+    end: function(game) {
         game.players.forEach(p => {
             delete p.life;
             delete p.lifeMax;
@@ -116,18 +94,14 @@ module.exports = new Phase('Playing', {
 
     actionsFor: function(game, user) {
         var player = game.findPlayer(user);
-        if (!player) return {};
-        var acts = {};
-        return acts;
+        if (!player || !this.turn) return {};
+        return this.turn.actionsFor(player);
     },
 
     handleAction: function(game, user, msg) {
         var player = game.findPlayer(user);
-        if (!player) return;
-        switch (msg.action) {
-            default:
-                return;
-        }
+        if (!player || !this.turn) return;
+        this.turn.handleAction(player, msg);
     },
 
     format: function(game, user, formatted) {

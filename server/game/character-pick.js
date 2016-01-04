@@ -3,7 +3,7 @@ var misc = aReq('server/misc'),
     warn = aReq('server/warn'),
     consts = aReq('shared/consts'),
 
-    actions = aReq('shared/actions'),
+    actions = aReq('server/actions'),
 
     Phase = aReq('server/game/phase'),
     RolePick = aReq('server/game/role-pick');
@@ -14,7 +14,7 @@ module.exports = new Phase('Character pick', {
         this.stopTimer();
         this.remainingTime = time;
         this.remainingInterval = setInterval(() => {
-            if (--this.remainingTime) game.onGameUpdate();
+            if (--this.remainingTime > 0) game.onGameUpdate();
             else game.switchToPhase(RolePick);
         }, 1000);
     },
@@ -53,7 +53,7 @@ module.exports = new Phase('Character pick', {
         var player = game.findPlayer(user);
         if (!player) return {};
         var acts = {};
-        acts[actions.select] = player.characters.map((character) => character.name);
+        acts[actions.select] = player.characters.map(character => character.name);
         return acts;
     },
 

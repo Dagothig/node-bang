@@ -40,6 +40,7 @@ gulp.task('watch-server', function(cb) {
 	log("Watching server files...");
 	return gulp.watch([
 		"./server.js",
+		"./global.js",
 		"./shared/**/*.js",
 		"./server/**/*.js"
 	], ['server']);

@@ -5,7 +5,7 @@ function CardPile(cards) {
     this.discarded = [];
 }
 CardPile.prototype = Object.create({
-    take: function take(amount) {
+    draw: function draw(amount) {
         amount = amount ||  1;
         var cards = [];
         while (amount > 0) {

@@ -1,4 +1,5 @@
 module.exports = {
     select: "select",
-    confirm: "confirm"
+    confirm: "confirm",
+    draw: "draw"
 };

@@ -1,10 +1,13 @@
 var Role = aReq('server/game/role');
 
 var roles = {
-    sheriff: new Role("Sheriff", "Sheriff", 1),
-    deputy: new Role("Deputy", "Unknown", 0),
-    outlaw: new Role("Outlaw", "Unknown", 0),
-    renegade: new Role("Renegade", "Unknown", 0)
+    sheriff: new Role("Sheriff", "Sheriff", {
+        lifeModifier: 1,
+        initCardsModifier: 1
+    }),
+    deputy: new Role("Deputy", "Unknown", {}),
+    outlaw: new Role("Outlaw", "Unknown", {}),
+    renegade: new Role("Renegade", "Unknown", {})
 };
 
 module.exports = roles;

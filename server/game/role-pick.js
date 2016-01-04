@@ -3,7 +3,7 @@ var misc = aReq('server/misc'),
     warn = aReq('server/warn'),
     consts = aReq('shared/consts'),
 
-    actions = aReq('shared/actions'),
+    actions = aReq('server/actions'),
     roles = aReq('server/game/roles'),
 
     Phase = aReq('server/game/phase'),
@@ -26,7 +26,7 @@ module.exports = new Phase('Role pick', {
 
         this.remainingTime = consts.rolePickMaxTime;
         this.remainingInterval = setInterval(() => {
-            if (--this.remainingTime) game.onGameUpdate();
+            if (--this.remainingTime > 0) game.onGameUpdate();
             else game.switchToPhase(Playing);
         }, 1000);
     },
