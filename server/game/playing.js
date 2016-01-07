@@ -37,7 +37,7 @@ module.exports = new Phase('Playing', {
         player.equipped = misc.merge([], {
             stat: function(stat) {
                 return this.reduce((sum, equipment) => {
-                    return sum + equipment[stat]|0;
+                    return sum + (equipment[stat]|0);
                 }, 0);
             }
         });
@@ -46,9 +46,9 @@ module.exports = new Phase('Playing', {
         misc.merge(player, {
             modifier: function(name) {
                 var modifier = name + 'Modifier';
-                return this.character[modifier]|0
-                    + this.role[modifier]|0
-                    + this.equipped.stat(modifier)|0;
+                return (this.character[modifier]|0)
+                    + (this.role[modifier]|0)
+                    + (this.equipped.stat(modifier)|0);
             },
             stat: function(name) {
                 if (stats[name] === undefined) throw 'State ' + name + ' does not exist';

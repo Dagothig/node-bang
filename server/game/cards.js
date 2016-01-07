@@ -4,24 +4,28 @@ var log = aReq('server/log'),
 
 function Bang(suit, rank) {
     var id = 'bang:' + suit.name + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown, step => {
-        step.event = new events.TargetEvent(
-            step.game, step.player, false, step.player.stat('bangRange'),
-            target => {
-                step.player.hand.discard(id);
-                step.event = new events.CardChoiceEvent(
-                    step.game, target,
-                    card => card instanceof Mancato,
-                    card => {
-                        target.hand.discard(card.id);
-                        delete step.event;
-                    },
-                    () => step.event = target.damage(1)
-                );
-            },
-            () => delete step.event
-        );
-    });
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => step.bangs < step.player.stat('bangs'),
+        step => {
+            step.event = new events.TargetEvent(
+                step.game, step.player, false, step.player.stat('bangRange'),
+                target => {
+                    step.bangs++;
+                    step.player.hand.discard(id);
+                    step.event = new events.CardChoiceEvent(
+                        step.game, target,
+                        card => card instanceof Mancato,
+                        card => {
+                            target.hand.discard(card.id);
+                            delete step.event;
+                        },
+                        () => step.event = target.damage(1)
+                    );
+                },
+                () => delete step.event
+            );
+        }
+    );
 }
 
 function Mancato(suit, rank) {

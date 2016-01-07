@@ -53,7 +53,7 @@ misc.merge(Play.prototype, Step.prototype, {
             var acts = {};
             acts[actions.endTurn] = [actions.endTurn];
             acts[actions.play] = this.player.hand
-                .filter(card => card.onPlay)
+                .filter(card => card.filter(this))
                 .map(card => card.id);
             return acts;
         }
@@ -66,7 +66,7 @@ misc.merge(Play.prototype, Step.prototype, {
                 this.turn.goToNextStep();
             } else if (msg.action === actions.play) {
                 var card = this.player.hand.find(card => card.id === msg.arg);
-                if (card && card.onPlay) card.onPlay(this);
+                if (card && card.filter(this)) card.onPlay(this);
             }
         }
     }

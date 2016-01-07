@@ -1,7 +1,7 @@
 var Character = aReq('server/game/character');
 
 var characters = [
-    new Character("Bart Cassidy", {
+    /*new Character("Bart Cassidy", {
 
     }),
 
@@ -27,7 +27,7 @@ var characters = [
 
     new Character("Kit Carlson", {
 
-    }),
+    }),*/
 
     new Character("Lucky Duke", {
 
@@ -46,7 +46,7 @@ var characters = [
     new Character("Rose Doolan", {
         bangRangeModifier: 1,
         rangeModifider: 1
-    }),
+    })/*,
 
     new Character("Sid Ketchum", {
 
@@ -66,7 +66,7 @@ var characters = [
 
     new Character("Willy the Kid", {
         bangsModifier: 1000
-    })
+    })*/
 ];
 
 module.exports = characters;

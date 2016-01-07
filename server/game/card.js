@@ -33,11 +33,12 @@ var types = {
     blue: 'blue'
 };
 
-function Card(id, suit, rank, type, onPlay) {
+function Card(id, suit, rank, type, filter, onPlay) {
     this.id = id;
     this.suit = suit;
     this.rank = rank;
     this.type = type;
+    this.filter = filter || () => false;
     this.onPlay = onPlay;
 }
 Object.assign(Card, {
