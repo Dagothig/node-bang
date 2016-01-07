@@ -16,10 +16,7 @@ function Bang(suit, rank) {
                         target.hand.discard(card.id);
                         delete step.event;
                     },
-                    () => {
-                        throw 'Handle bang succesful!';
-                        delete step.event;
-                    }
+                    () => step.event = target.damage(1)
                 );
             },
             () => delete step.event

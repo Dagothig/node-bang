@@ -63,6 +63,10 @@ module.exports = new Phase('Playing', {
 
         // Life third: it's used in the hand limit calculations
         player.life = player.lifeMax = player.stat('life');
+        player.damage = function(amount) {
+            this.life -= amount;
+            if (this.life <= 0) throw 'Handle dying you dimwit!';
+        }
 
         // Hand
         var cards = this.cards;
@@ -94,6 +98,7 @@ module.exports = new Phase('Playing', {
         game.players.forEach(p => {
             delete p.life;
             delete p.lifeMax;
+            delete p.damage;
 
             delete p.hand;
 
