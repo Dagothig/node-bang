@@ -5,6 +5,5 @@ var misc = aReq('server/misc'),
 function Player(user) {
     this.user = user;
 }
-Player.prototype = {};
 
 module.exports = Player;

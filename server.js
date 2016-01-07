@@ -31,8 +31,7 @@ var io = require('socket.io')(server),
     lobby = aReq('server/lobby')(io, users),
     game = aReq('server/game')(io, users);
 
-login.listen(lobby);
-login.listen(game);
+login.addHandlers(lobby, game);
 
 // Listen on port
 var port = process.env.PORT || 8080;

@@ -9,7 +9,7 @@ function Game(users, onGameUpdate) {
     this.onGameUpdate = onGameUpdate;
     this.players = misc.shuffle(users.map(user => new Player(user)));
 }
-Game.prototype = Object.create({
+misc.merge(Game.prototype, {
     begin: function begin() {
         this.switchToPhase(CharacterPick);
     },

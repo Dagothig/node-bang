@@ -44,7 +44,7 @@ module.exports = function(onJoin, onGame, onAction) {
 
                 // Time
                 var tag = '';
-                tag += '<div>' + game.remainingTime + '</div>'
+                if (game.remainingTime !== undefined) tag += '<div>' + game.remainingTime + '</div>'
 
                 // Setup the actions
                 var acts = game.actions;

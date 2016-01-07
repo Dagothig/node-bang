@@ -1,4 +1,5 @@
 var log = aReq('server/log'),
+    warn = aReq('server/warn'),
     msgs = aReq('shared/messages'),
     strings = aReq('shared/strings'),
     consts = aReq('shared/consts'),
@@ -72,13 +73,14 @@ module.exports = (io, users) => {
 
         socket.on(msgs.auth, msg => handleAuth(io, users, socket, msg));
         socket.on('disconnect', () => handleDisconnect(io, users, socket));
+        socket.on('error', err => { throw err; });
 
         socket.emit(msgs.auth);
     });
 
     return {
-        listen: function listen(listener) {
-            listeners.push(listener);
+        addHandlers: function() {
+            listeners.push.apply(listeners, arguments);
         }
     };
 };

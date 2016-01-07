@@ -36,13 +36,10 @@ function startTimer(io, users) {
     if (gameStartInterval) clearInterval(gameStartInterval);
 
     gameStartTimer = consts.gameStartTimer;
-    log("Game starts in", gameStartTimer, "seconds");
     io.emit(msgs.joining, formattedJoining(users));
 
     gameStartInterval = setInterval(function() {
-        gameStartTimer--;
-        log("Game starts in", gameStartTimer, "seconds");
-        if (gameStartTimer > 0) io.emit(msgs.joining, formattedJoining(users));
+        if (--gameStartTimer > 0) io.emit(msgs.joining, formattedJoining(users));
         else {
             clearInterval(gameStartInterval);
             gameStartInterval = null;

@@ -7,22 +7,44 @@ var colors = {
     black: 'black',
     red: 'red'
 }
-var ranks = ['ace', 1, 2, 3, 4, 5, 6, 7, 8, 9, 'jack', 'queen', 'king'];
-var suits = [
-    new Suit('spades', colors.black),
-    new Suit('clovers', colors.black),
-    new Suit('hearts', colors.red),
-    new Suit('diamonds', colors.red)
-];
+var ranks = {
+    ace: 'ace',
+    two: 'two',
+    three: 'three',
+    four: 'four',
+    five: 'five',
+    six: 'six',
+    seven: 'seven',
+    eight: 'eight',
+    nine: 'nine',
+    ten: 'ten',
+    jack: 'jack',
+    queen: 'queen',
+    king: 'king'
+}
+var suits = {
+    spades: new Suit('spades', colors.black),
+    clovers: new Suit('clovers', colors.black),
+    hearts: new Suit('hearts', colors.red),
+    diamonds: new Suit('diamonds', colors.red)
+};
+var types = {
+    brown: 'brown',
+    blue: 'blue'
+};
 
-function Card(suit, rank) {
+function Card(id, suit, rank, type, onPlay) {
+    this.id = id;
     this.suit = suit;
     this.rank = rank;
+    this.type = type;
+    this.onPlay = onPlay;
 }
 Object.assign(Card, {
     colors: colors,
     ranks: ranks,
-    suits: suits
+    suits: suits,
+    types: types
 });
 
 module.exports = Card;

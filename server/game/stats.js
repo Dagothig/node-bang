@@ -1,6 +1,7 @@
 module.exports = {
     distance: 0,
-    range: 0,
+    bangRange: 1,
+    range: 1,
     life: 4,
     bangs: 1,
     draw: 2,

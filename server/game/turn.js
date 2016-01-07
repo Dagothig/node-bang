@@ -1,12 +1,21 @@
+var misc = aReq('server/misc'),
+    log = aReq('server/log');
+
 function Turn(game, player) {
     this.game = game;
     this.phase = game.phase;
     this.player = player;
+
+    log('It is', this.player.user.name + "'s turn");
     this.goToNextStep();
 }
-Turn.prototype = Object.create({
+misc.merge(Turn.prototype, {
     goToNextStep: function() {
+        if (this.step) this.step.end();
         this.step = this.getNextStep();
+        if (this.step) this.step.start();
+        else this.phase.goToNextTurn(this.game);
+
     },
     getNextStep: function() {
         var nextStep = !this.step ?

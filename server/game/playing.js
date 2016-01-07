@@ -11,12 +11,16 @@ var misc = aReq('server/misc'),
 
 module.exports = new Phase('Playing', {
 
+    goToNextTurn: function(game) {
+        this.turn = this.getNextTurn(game);
+    },
+
     getNextTurn: function(game) {
         var player;
         if (!this.turn) {
             player = game.players.find(p => p.role === roles.sheriff);
         } else {
-            var index = (game.players.indexOf[this.turn.player] + 1) % game.players.length;
+            var index = (game.players.indexOf(this.turn.player) + 1) % game.players.length;
             player = game.players[index];
         }
         return new Turn(game, player);
@@ -25,7 +29,7 @@ module.exports = new Phase('Playing', {
     begin: function(game) {
         this.cards = new CardPile(aReq('server/game/cards'));
         game.players.forEach(p => this.extendPlayer(p));
-        this.turn = this.getNextTurn(game);
+        this.goToNextTurn(game);
     },
 
     extendPlayer: function(player) {
@@ -51,8 +55,7 @@ module.exports = new Phase('Playing', {
                 return stats[name] + this.modifier(name);
             },
 
-            distanceTo: function(to) {
-                var players = game.players;
+            distanceTo: function(players, to) {
                 var dist = Math.abs(players.indexOf(this) - players.indexOf(to));
                 return Math.min(dist, players.length - dist) + to.modifier('distance');
             }
@@ -67,12 +70,22 @@ module.exports = new Phase('Playing', {
             drawFromPile: function(amount) {
                 cards.draw(amount).forEach(card => this.push(card));
             },
+            discard: function(cardId) {
+                var card = this.find(card => card.id === cardId);
+                var index = this.indexOf(card);
+                if (index < 0 || index >= this.length) return null;
+                this.splice(index, 1);
+                cards.discarded.push(card);
+            },
 
             get cardMax() {
                 return player.life;
             },
             get cardCount() {
                 return player.hand ? player.hand.length : 0;
+            },
+            get isTooLarge() {
+                return this.cardCount > this.cardMax;
             }
         });
     },
@@ -111,12 +124,10 @@ module.exports = new Phase('Playing', {
     formatPlayer: function(game, user, player, formatted) {
         return misc.merge(formatted, {
             hand: {
-                cardMax : player.hand.cardMax,
-                cardCount : player.hand.cardCount,
                 // TODO: format cards properly
                 cards: player.user === user ?
                     player.hand.slice() :
-                    undefined
+                    player.hand.length
             },
             life: player.life,
             lifeMax: player.lifeMax

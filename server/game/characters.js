@@ -44,6 +44,7 @@ var characters = [
     }),
 
     new Character("Rose Doolan", {
+        bangRangeModifier: 1,
         rangeModifider: 1
     }),
 

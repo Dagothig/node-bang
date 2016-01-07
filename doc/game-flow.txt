@@ -31,7 +31,17 @@ Play
             Choose player
             While check if bang
     Blue
-
-
+        Weapons
+            Affect stats
+        Mustang
+            Affect stats
+        Mirino
+            Affect stats
+        Barile
+            On bang! draw to check; if good, ignore shot
+        Jail
+            On start of turn, draw; if good, discard; if bad, pass turn and discard
+        Dynamite
+            On start of turn, draw; if good, pass to next; if bad, explode
 Discard
     While cards > max, choose discard (from hand)
