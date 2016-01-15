@@ -49,30 +49,27 @@ module.exports = new Phase('Character pick', {
         this.stopTimer();
     },
 
-    actionsFor: function actionsFor(game, user) {
-        var player = game.findPlayer(user);
+    actionsFor: function actionsFor(game, player) {
         if (!player) return {};
         var acts = {};
         acts[actions.select] = player.characters.map(character => character.name);
         return acts;
     },
 
-    handleAction: function handleAction(game, user, msg) {
-        var p = game.findPlayer(user);
-        if (!p) return;
-
-        if (msg.action === actions.select) {
-            p.character = p.characters.find((c) => c.name === msg.arg) || p.character;
-            this.checkForEnd(game);
-        }
+    handleAction: function handleAction(game, player, msg) {
+        if (!player || msg.action !== actions.select) return;
+        player.character =
+            player.characters.find((c) => c.name === msg.arg)
+            || player.character;
+        this.checkForEnd(game);
     },
 
-    format: function format(game, user, formatted) {
+    format: function format(game, player, formatted) {
         formatted.remainingTime = this.remainingTime;
         return formatted;
     },
 
-    formatPlayer: (game, user, player, formatted) => formatted,
+    formatPlayer: (game, player, other, formatted) => formatted,
 
     checkForEnd: function checkForEnd(game) {
         var unchosen = game.players.filter((player) => !player.character);

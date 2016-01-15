@@ -10,7 +10,7 @@ var misc = aReq('server/misc'),
     Playing = aReq('server/game/playing');
 
 module.exports = new Phase('Role pick', {
-    begin: function begin(game) {
+    begin: function(game) {
         // We "support" roles for as low as 1 player for debugging purposes
         var r = [roles.sheriff];
         if (game.players.length >= 2) r.push(roles.renegade);
@@ -30,7 +30,7 @@ module.exports = new Phase('Role pick', {
             else game.switchToPhase(Playing);
         }, 1000);
     },
-    end: function end(game) {
+    end: function(game) {
         game.players.forEach(p => {
             delete p.confirmedRole;
         });
@@ -40,14 +40,13 @@ module.exports = new Phase('Role pick', {
             this.remainingTime = null;
         }
     },
-    actionsFor: function actionsFor(game, user) {
-        var player = game.findPlayer(user), acts = {};
+    actionsFor: function(game, player) {
+        var acts = {};
         if (!player) return acts;
         if (!player.confirmedRole) acts[actions.confirm] = [actions.confirm];
         return acts;
     },
-    handleAction: function handleAction(game, user, msg) {
-        var player = game.findPlayer(user);
+    handleAction: function(game, player, msg) {
         if (!player) return;
         switch (msg.action) {
             case actions.confirm:
@@ -57,13 +56,13 @@ module.exports = new Phase('Role pick', {
                 return;
         }
     },
-    format: function format(game, user, formatted) {
+    format: function(game, player, formatted) {
         formatted.remainingTime = this.remainingTime;
         return formatted;
     },
-    formatPlayer: (game, user, player, formatted) => formatted,
-    checkForEnd: function checkForEnd(game) {
-        var unconfirmed = game.players.filter((player) => !player.confirmedRole);
+    formatPlayer: (game, player, other, formatted) => formatted,
+    checkForEnd: function(game) {
+        var unconfirmed = game.players.filter(player => !player.confirmedRole);
         if (!unconfirmed.length) game.switchToPhase(Playing);
     }
 });

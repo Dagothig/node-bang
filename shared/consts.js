@@ -6,7 +6,7 @@ module.exports = {
     maxPlayers: 2,
     gameStartTimer: 0,//10, TODO put back the proper amount
     characterChoices: 2,
-    characterPickMaxTime: 3,//60
+    characterPickMaxTime: 0,//60
     rolePickMaxTime: 0,// 10
 
     initCardMax: 5,

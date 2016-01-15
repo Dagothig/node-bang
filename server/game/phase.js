@@ -12,12 +12,12 @@ function Phase(name, obj) {
             this[key] = defaults[key];
         }
     }) ({
-        begin: (game) => {},
-        end: (game) => {},
-        actionsFor: (game, user) => ({}),
-        handleAction: (game, user, msg) => {},
-        format: (game, user, formatted) => formatted,
-        formatPlayer: (game, user, player, formatted) => formatted
+        begin: game => {},
+        end: game => {},
+        actionsFor: (game, player) => ({}),
+        handleAction: (game, player, msg) => {},
+        format: (game, player, formatted) => formatted,
+        formatPlayer: (game, player, other, formatted) => formatted
     });
 }
 

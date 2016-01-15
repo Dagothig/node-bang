@@ -11,6 +11,12 @@ function Step(turn) {
 }
 // Specifically overriding step prototype so it doesn't have a constructor
 Step.prototype = {
+    get name() {
+        return this.constructor.name;
+    },
+    format: function() {
+        return { name: this.name };
+    },
     start: function() {},
     actionsFor: function(player) {},
     handleAction: function(player) {},
@@ -46,6 +52,12 @@ function Play(turn) {
     this.bangs = 0;
 }
 misc.merge(Play.prototype, Step.prototype, {
+    format: function() {
+        return misc.merge(Step.prototype.format.call(this), {
+            event: this.event && this.event.format ?
+                this.event.format() : undefined
+        });
+    },
     actionsFor: function(player) {
         if (this.event) return this.event.actionsFor(player);
         else {

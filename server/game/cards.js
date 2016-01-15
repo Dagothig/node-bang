@@ -3,7 +3,7 @@ var log = aReq('server/log'),
     events = aReq('server/game/events');
 
 function Bang(suit, rank) {
-    var id = 'bang:' + suit.name + ':' + rank;
+    var id = 'bang:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown,
         step => step.bangs < step.player.stat('bangs'),
         step => {
@@ -29,7 +29,7 @@ function Bang(suit, rank) {
 }
 
 function Mancato(suit, rank) {
-    var id = 'mancato:' + suit.name + ':' + rank;
+    var id = 'mancato:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown);
 }
 

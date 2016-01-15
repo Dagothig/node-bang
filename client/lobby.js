@@ -21,7 +21,7 @@ module.exports = function(onMessage) {
         messageForm: messageForm,
         message: message,
 
-        handleUsers: function handleUsers(current, users, game) {
+        handleUsers: function(current, users) {
             usersList.innerHTML = '';
             if (!users) return;
 
@@ -31,14 +31,7 @@ module.exports = function(onMessage) {
             function getTag(user) {
                 var tag = user.name
                 if (misc.isCurrent(current, user)) tag = surroundWith('em', '', tag);
-                var player = game ? game.players.find((player) => misc.areTheSame(player, user)) : null;
-                var cssClass = player ? (player.life || !player.maxLife ? 'alive' : 'dead') : '';
-                var prefix = player ? (
-                    (player.character ? player.character.name + ' ' : '') +
-                    (player.character && player.role ? ', ' : '') +
-                    (player.role ? player.role.name + ' ' : '')
-                ) :  '';
-                return surroundWith('div', '', surroundWith('span', cssClass, prefix) + tag);
+                return surroundWith('div', '', tag);
             }
             var html = '';
             users
@@ -46,7 +39,7 @@ module.exports = function(onMessage) {
                 .forEach((user) => html += getTag(user));
             usersList.innerHTML = html;
         },
-        handleMessage: function handleMessage(name, message) {
+        handleMessage: function(name, message) {
             messagesList.innerHTML =
                 '<div>' + name + ' : ' + message + '</div>' +
                 messagesList.innerHTML;

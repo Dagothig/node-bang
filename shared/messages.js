@@ -6,5 +6,6 @@ module.exports = {
     message: 'message',
     joining: 'joining',
     game: 'game',
-    action: 'action'
+    action: 'action',
+    event: 'event'
 };

@@ -1,14 +1,14 @@
 var misc = require('./shared/misc'),
-	gulp = require('gulp'),
-	childProcess = require('child_process'),
 	chalk = require('chalk'),
-	source = require('vinyl-source-stream'),
-	browserify = require('gulp-browserify'),
-	rename = require('gulp-rename'),
-	plumber = require('gulp-plumber'),
-	sloc = require('gulp-sloc');
+	gulp = require('gulp');
 
 var node;
+
+function log() {
+	var prepended = Array.from(arguments);
+	prepended.unshift(chalk.gray(misc.simpleTime()) + ' [' + chalk.cyan('gulp')  + ']');
+	console.log.apply(this, prepended);
+}
 
 function errorHandler(prefix) {
 	return function (e) {
@@ -17,23 +17,20 @@ function errorHandler(prefix) {
 	};
 }
 
-function log() {
-	var prepended = Array.from(arguments);
-	prepended.unshift(chalk.gray(misc.simpleTime()) + ' [' + chalk.cyan('gulp')  + ']');
-	console.log.apply(this, prepended);
-}
-
 gulp.task('server', function() {
 	if (node) {
 		node.kill();
 		log('Server killed');
 	}
+
+	log('Starting server...');
+
+	var childProcess = require('child_process');
 	node = childProcess.spawn(
 		'node',
 		['server.js'],
 		{ stdio: 'inherit' }
 	);
-	log('Server started');
 });
 
 gulp.task('watch-server', function(cb) {
@@ -47,6 +44,11 @@ gulp.task('watch-server', function(cb) {
 });
 
 gulp.task('client', function(cb) {
+	log('Bundling client script...');
+	var plumber = require('gulp-plumber'),
+		browserify = require('gulp-browserify'),
+		rename = require('gulp-rename');
+
 	var val = gulp.src('./client.js')
 		.pipe(plumber({ errorHandler: errorHandler('client') }))
 		.pipe(browserify())
@@ -74,10 +76,10 @@ gulp.task('sloc', function(cb) {
 		'./server/**/*.js',
 		'./client/**/*.js',
 		'./public/**/*.html'
-	]).pipe(sloc());
+	]).pipe(require('gulp-sloc')());
 });
 
-gulp.task('default', ['server', 'watch-server', 'client', 'watch-client']);
+gulp.task('default', ['server', 'client', 'watch-server', 'watch-client']);
 
 process.on("exit", function() {
 	if (node) node.kill();

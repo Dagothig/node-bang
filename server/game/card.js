@@ -1,12 +1,3 @@
-function Suit(name, color) {
-    this.name = name;
-    this.color = color;
-}
-
-var colors = {
-    black: 'black',
-    red: 'red'
-}
 var ranks = {
     ace: 'ace',
     two: 'two',
@@ -23,10 +14,10 @@ var ranks = {
     king: 'king'
 }
 var suits = {
-    spades: new Suit('spades', colors.black),
-    clovers: new Suit('clovers', colors.black),
-    hearts: new Suit('hearts', colors.red),
-    diamonds: new Suit('diamonds', colors.red)
+    spades: 'spades',
+    clovers: 'clovers',
+    hearts: 'hearts',
+    diamonds: 'diamonds'
 };
 var types = {
     brown: 'brown',
@@ -42,7 +33,6 @@ function Card(id, suit, rank, type, filter, onPlay) {
     this.onPlay = onPlay;
 }
 Object.assign(Card, {
-    colors: colors,
     ranks: ranks,
     suits: suits,
     types: types

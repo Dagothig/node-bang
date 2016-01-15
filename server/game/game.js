@@ -5,15 +5,16 @@ var misc = aReq('server/misc'),
     Player = aReq('server/game/player'),
     CharacterPick = aReq('server/game/character-pick');
 
-function Game(users, onGameUpdate) {
+function Game(users, onGameUpdate, onGameEvent) {
     this.onGameUpdate = onGameUpdate;
+    this.onGameEvent = onGameEvent;
     this.players = misc.shuffle(users.map(user => new Player(user)));
 }
 misc.merge(Game.prototype, {
-    begin: function begin() {
+    begin: function() {
         this.switchToPhase(CharacterPick);
     },
-    switchToPhase: function switchToPhase(phase) {
+    switchToPhase: function(phase) {
         if (this.phase) {
             this.phase.end(this);
             log(this.phase.name, 'ending');
@@ -24,35 +25,36 @@ misc.merge(Game.prototype, {
         this.phase.begin(this);
         this.onGameUpdate();
     },
-    findPlayer: function findPlayer(user) {
-        return this.players.find((player) => player.user.token === user.token);
+    findPlayer: function(user) {
+        return this.players.find(player => player.user.token === user.token);
     },
-    nextPlayer: function nextPlayer(player) {
-        return this.players[(this.players.indexOf(player) + 1) % this.players.length];
-    },
-    formatted: function formatted(user) {
-        var game = this;
+    formatted: function(user) {
+        var game = this, player = this.findPlayer(user);
         return this.phase.format(game, user, {
-            players: this.players.map((player) =>
-                this.phase.formatPlayer(game, user, player, {
-                    name: player.user.name,
-                    character: player.character ? {
-                        name: player.character.name
+            players: this.players.map(other =>
+                this.phase.formatPlayer(game, player, other, {
+                    name: other.user.name,
+                    character: other.character ? {
+                        name: other.character.name
                     } : undefined,
-                    role: player.role ? {
-                        name: player.user === user ?
-                            player.role.name :
-                            player.role.publicName
+                    role: other.role ? {
+                        name: player === other ?
+                            other.role.name :
+                            other.role.publicName
                     } : undefined,
                 })
             ),
-            actions: this.phase.actionsFor(this, user)
+            actions: this.phase.actionsFor(this, player)
         });
     },
-    handleAction: function handleAction(user, msg) {
-        if (!this.findPlayer(user) || !msg.action) return;
-        this.phase.handleAction(this, user, msg);
+    handleAction: function(user, msg) {
+        var player = this.findPlayer(user);
+        if (!player || !msg.action) return;
+        this.phase.handleAction(this, player, msg);
         this.onGameUpdate();
+    },
+    handleDisconnect: function(user) {
+
     }
 });
 

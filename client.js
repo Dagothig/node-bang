@@ -37,8 +37,6 @@ var game = require('./client/game.js')(
     },
     function onGame(game) {
         ongoingGame = game;
-        if (!users) socket.emit(msgs.users);
-        else lobby.handleUsers(user, users, ongoingGame);
     },
     function onAction(action, arg) {
         socket.emit(msgs.action, {
@@ -87,12 +85,12 @@ socket.on(msgs.user, function(msg) {
         ui.show(connectedContainer);
     }
     user = msg;
-    lobby.handleUsers(user, users, ongoingGame);
+    lobby.handleUsers(user, users);
 });
 socket.on(msgs.users, function(msg) {
     console.log('received', msgs.users, msg);
     users = msg;
-    lobby.handleUsers(user, users, ongoingGame);
+    lobby.handleUsers(user, users);
 });
 socket.on(msgs.message, function(msg) {
     console.log('received', msgs.message, msg);
@@ -104,5 +102,6 @@ socket.on(msgs.joining, function(msg) {
 });
 socket.on(msgs.game, function(msg) {
     console.log('received', msgs.game, msg);
+    ongoingGame = msg;
     game.handleGame(msg, user);
 });

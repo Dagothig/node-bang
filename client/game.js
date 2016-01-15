@@ -3,73 +3,119 @@ var ui = require('./ui'),
     consts = require('../shared/consts');
 
 module.exports = function(onJoin, onGame, onAction) {
-    var element = ui.one('#game'),
-        pre = ui.one('#pre-game'),
-        preform = ui.one(pre, 'form'),
-        preheader = ui.one(preform, '.form-header'),
-        preerror = ui.one(preform, '.form-error'),
-        precount = ui.one(preform, '#player-count'),
-        prejoin = ui.one(preform, '[name=join]');
+    var tagGame = ui.one('#game'),
+        tagExtra = ui.one(tagGame, '#extra'),
+        tagPlayers = ui.one(tagGame, '#players'),
+        tagActions = ui.one(tagGame, '#actions'),
 
-    prejoin.onchange = function(e) {
+        tagPre = ui.one('#pre-game'),
+        tagPreForm = ui.one(tagPre, 'form'),
+        tagPreHeader = ui.one(tagPreForm, '.form-header'),
+        tagPreError = ui.one(tagPreForm, '.form-error'),
+        tagPreCount = ui.one(tagPreForm, '#player-count'),
+        tagPreJoin = ui.one(tagPreForm, '[name=join]');
+
+    tagPreJoin.onchange = function(e) {
         onJoin(e.target.checked);
     };
 
     return {
-        element: element,
-        pre: pre,
-        preform: preform,
-        preheader: preheader,
-        precount: precount,
-        prejoin: prejoin,
+        tagGame: tagGame,
+        tagPre: tagPre,
+        tagPreForm: tagPreForm,
+        tagPreHeader: tagPreHeader,
+        tagPreCount: tagPreCount,
+        tagPreJoin: tagPreJoin,
 
-        handleJoining: function handleJoining(current, msg) {
+        handleJoining: function(current, msg) {
             var users = msg ? msg.users : null;
-            preerror.innerText = msg.reason ? msg.reason : '';
-            prejoin.checked = !!users.find((user) => misc.isCurrent(current, user));
-            precount.innerText =
+            tagPreError.innerText = msg.reason ? msg.reason : '';
+            tagPreJoin.checked = !!users.find((user) => misc.isCurrent(current, user));
+            tagPreCount.innerText =
                 users.reduce((acc, user) => acc + 1, 0) +
                 " / " +
                 consts.minPlayers + "-" + consts.maxPlayers;
         },
 
-        handleGame: function handleGame(game, current) {
+        handleGame: function(game, current) {
             if (game) {
-                ui.show(element);
-                ui.hide(pre);
+                ui.show(tagGame);
+                ui.hide(tagPre);
 
-                var player = game && game.players ?
-                    game.players.find((player) => misc.isCurrent(current, player)) :
-                    null;
-
-                // Time
-                var tag = '';
-                if (game.remainingTime !== undefined) tag += '<div>' + game.remainingTime + '</div>'
-
-                // Setup the actions
-                var acts = game.actions;
-                for (var a in acts) {
-                    Array.prototype.forEach.call(acts[a], (arg) => {
-                        tag +=
-                            '<div class="action" data-action="' + a + '" data-arg="' + arg + '">'
-                            + a + ' - ' + arg +
-                            '</div>';
-                    });
-                }
-                element.innerHTML = tag;
-                Array.prototype.forEach.call(element.querySelectorAll('.action'), (actionTag) => {
-                    var action = actionTag.getAttribute('data-action');
-                    var arg = actionTag.getAttribute('data-arg');
-                    actionTag.onclick = function (e) {
-                        element.innerHTML = '';
-                        onAction(action, arg);
-                    }
+                this.display(tagExtra, game && {
+                    remainingTime: game.remainingTime,
+                    turn: game.turn
                 });
+                this.display(tagPlayers, game && game.players);
+                this.displayActions(game && game.actions);
             } else {
-                ui.hide(element);
-                ui.show(pre);
+                ui.hide(tagGame);
+                ui.show(tagPre);
             }
             onGame(game);
+        },
+
+        display: function(tag, obj) {
+            tag.innerHTML = obj ? ('<ul>'
+                + Object.keys(obj)
+                    .filter(k => obj[k] !== undefined)
+                    .map(k => this.formatTree(k, obj[k]))
+                    .reduce((s, e) => s + e, '')
+                + '</ul>') : '';
+        },
+
+        displayPlayers: function(players) {
+            if (!players) {
+                tagPlayers.innerHTML = '';
+                return;
+            }
+
+            var player = game && game.players ?
+                game.players.find(player => misc.isCurrent(current, player)) :
+                null;
+
+            tagPlayers.innerHTML = players.reduce((s, p) => s + this.displayPlayer(p), '');
+        },
+        displayPlayer: function(player) {
+            return '<div>' + player.name + '</div>';
+        },
+
+        displayActions: function(actions) {
+            if (!actions) {
+                tagActions.innerHTML = '';
+                return;
+            }
+
+            var tag = '';
+
+            // Setup the actions
+            for (var a in actions) {
+                Array.prototype.forEach.call(actions[a], arg => tag +=
+                    '<div class="action" data-action="' + a + '" data-arg="' + arg + '">'
+                    + a + ' - ' + arg +
+                    '</div>'
+                );
+            }
+            tagActions.innerHTML = tag;
+            Array.prototype.forEach.call(tagActions.querySelectorAll('.action'), actionTag => {
+                var action = actionTag.getAttribute('data-action');
+                var arg = actionTag.getAttribute('data-arg');
+                actionTag.onclick = function (e) {
+                    tagActions.innerHTML = '';
+                    onAction(action, arg);
+                }
+            });
+        },
+
+        formatTree: function(name, obj) {
+            return '<li>'
+                + '<div>' + name + '</div>'
+                + Object.keys(obj).map(k =>
+                    (typeof obj[k] === 'object') ?
+                        ('<ul>' + this.formatTree(k, obj[k]) + '</ul>') :
+                        ('<div>' + k + ': ' + obj[k] + '</div>')
+                ).reduce((s, e) => s + e, '')
+                + '</li>';
         }
     };
 }

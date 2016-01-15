@@ -60,7 +60,8 @@ function startGame(io, users) {
     log("Starting game!");
     game = new Game(
         users.filter(user => user.joining),
-        () => users.forEach(user => user.emit(msgs.game, formattedGame(user)))
+        () => users.forEach(user => user.emit(msgs.game, formattedGame(user))),
+        msg => io.emit(msgs.event, msg)
     );
     users.forEach(user => user.joining = false);
     game.begin();
@@ -102,10 +103,13 @@ module.exports = (io, users) => ({
         socket.emit(msgs.joining, formattedJoining(users));
     },
     onDisconnected: (user, socket) => {
-        if (user.joining) {
-            if (canStart(users)) startTimer(io, users);
-            else stopTimer(io, users);
+        if (game) game.handleDisconnect(user);
+        else {
+            if (user.joining) {
+                if (canStart(users)) startTimer(io, users);
+                else stopTimer(io, users);
+            }
+            io.emit(msgs.joining, formattedJoining(users));
         }
-        if (!game) io.emit(msgs.joining, formattedJoining(users));
     }
 });

@@ -80,6 +80,7 @@ module.exports = new Phase('Playing', {
                 if (index < 0 || index >= this.length) return null;
                 this.splice(index, 1);
                 cards.discarded.push(card);
+                return card;
             },
 
             get cardMax() {
@@ -110,32 +111,39 @@ module.exports = new Phase('Playing', {
         });
     },
 
-    actionsFor: function(game, user) {
-        var player = game.findPlayer(user);
+    actionsFor: function(game, player) {
         if (!player || !this.turn) return {};
         return this.turn.actionsFor(player);
     },
 
-    handleAction: function(game, user, msg) {
-        var player = game.findPlayer(user);
+    handleAction: function(game, player, msg) {
         if (!player || !this.turn) return;
         this.turn.handleAction(player, msg);
     },
 
-    format: function(game, user, formatted) {
-        return formatted;
+    format: function(game, player, formatted) {
+        return misc.merge(formatted, {
+            turn: {
+                player: this.turn.player.name,
+                step: this.turn.step.format()
+            }
+        });
     },
 
-    formatPlayer: function(game, user, player, formatted) {
+    formatPlayer: function(game, player, other, formatted) {
         return misc.merge(formatted, {
             hand: {
                 // TODO: format cards properly
-                cards: player.user === user ?
-                    player.hand.slice() :
-                    player.hand.length
+                cards: player === other ?
+                    other.hand.slice().map(card => ({
+                        id : card.id,
+                        rank: card.rank,
+                        suit: card.suit
+                    })) :
+                    other.hand.length
             },
-            life: player.life,
-            lifeMax: player.lifeMax
+            life: other.life,
+            lifeMax: other.lifeMax
         });
     }
 });
