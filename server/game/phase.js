@@ -16,6 +16,7 @@ function Phase(name, obj) {
         end: game => {},
         actionsFor: (game, player) => ({}),
         handleAction: (game, player, msg) => {},
+        handleDisconnect: (game, player) => {},
         format: (game, player, formatted) => formatted,
         formatPlayer: (game, player, other, formatted) => formatted
     });

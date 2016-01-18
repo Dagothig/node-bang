@@ -10,7 +10,7 @@ var misc = aReq('server/misc'),
 
 module.exports = new Phase('Character pick', {
 
-    startTimer: function startTimer(game, time) {
+    startTimer: function(game, time) {
         this.stopTimer();
         this.remainingTime = time;
         this.remainingInterval = setInterval(() => {
@@ -19,7 +19,7 @@ module.exports = new Phase('Character pick', {
         }, 1000);
     },
 
-    stopTimer: function stopTimer() {
+    stopTimer: function() {
         if (this.remainingInterval) {
             clearInterval(this.remainingInterval);
             delete this.remainingInterval;
@@ -27,7 +27,7 @@ module.exports = new Phase('Character pick', {
         }
     },
 
-    begin: function begin(game) {
+    begin: function(game) {
         var chars = aReq('server/game/characters').slice();
         game.players.forEach(p => {
             p.characters = misc.gen(() => misc.spliceRand(chars), consts.characterChoices);
@@ -36,7 +36,7 @@ module.exports = new Phase('Character pick', {
         this.startTimer(game, consts.characterPickMaxTime);
     },
 
-    end: function end(game) {
+    end: function(game) {
         game.players.filter(p => !p.character).forEach(p => {
             p.character = misc.spliceRand(p.characters);
         });
@@ -49,14 +49,14 @@ module.exports = new Phase('Character pick', {
         this.stopTimer();
     },
 
-    actionsFor: function actionsFor(game, player) {
+    actionsFor: function(game, player) {
         if (!player) return {};
         var acts = {};
         acts[actions.select] = player.characters.map(character => character.name);
         return acts;
     },
 
-    handleAction: function handleAction(game, player, msg) {
+    handleAction: function(game, player, msg) {
         if (!player || msg.action !== actions.select) return;
         player.character =
             player.characters.find((c) => c.name === msg.arg)
@@ -64,15 +64,21 @@ module.exports = new Phase('Character pick', {
         this.checkForEnd(game);
     },
 
-    format: function format(game, player, formatted) {
+    handleDisconnect: function(game, player) {
+        game.players.splice(game.players.indexOf(player), 1);
+        if (game.players.length < consts.minPlayers) game.end();
+        else game.onGameUpdate();
+    },
+
+    format: function(game, player, formatted) {
         formatted.remainingTime = this.remainingTime;
         return formatted;
     },
 
     formatPlayer: (game, player, other, formatted) => formatted,
 
-    checkForEnd: function checkForEnd(game) {
+    checkForEnd: function(game) {
         var unchosen = game.players.filter((player) => !player.character);
-        if (!unchosen.length) this.startTimer(Math.min(3, this.remainingTime));
+        if (!unchosen.length) this.startTimer(game, Math.min(3, this.remainingTime));
     }
 });

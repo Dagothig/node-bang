@@ -21,7 +21,8 @@ misc.merge(CardPile.prototype, {
             amount--;
         }
         return cards;
-    }
+    },
+    get length() { return this._backing.length; }
 });
 
 module.exports = CardPile;

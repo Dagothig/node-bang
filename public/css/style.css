@@ -36,6 +36,10 @@ html, body {
     margin: 0.5rem;
 }
 
+.scroll {
+  overflow: auto;
+}
+
 .root-bg {
     background: #aaa;
 }

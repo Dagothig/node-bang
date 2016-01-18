@@ -44,7 +44,8 @@ module.exports = function(onJoin, onGame, onAction) {
 
                 this.display(tagExtra, game && {
                     remainingTime: game.remainingTime,
-                    turn: game.turn
+                    turn: game.turn,
+                    cards: game.cards
                 });
                 this.display(tagPlayers, game && game.players);
                 this.displayActions(game && game.actions);
@@ -56,12 +57,7 @@ module.exports = function(onJoin, onGame, onAction) {
         },
 
         display: function(tag, obj) {
-            tag.innerHTML = obj ? ('<ul>'
-                + Object.keys(obj)
-                    .filter(k => obj[k] !== undefined)
-                    .map(k => this.formatTree(k, obj[k]))
-                    .reduce((s, e) => s + e, '')
-                + '</ul>') : '';
+            tag.innerHTML = obj ? this.format('', obj) : '';
         },
 
         displayPlayers: function(players) {
@@ -107,15 +103,15 @@ module.exports = function(onJoin, onGame, onAction) {
             });
         },
 
-        formatTree: function(name, obj) {
-            return '<li>'
-                + '<div>' + name + '</div>'
-                + Object.keys(obj).map(k =>
-                    (typeof obj[k] === 'object') ?
-                        ('<ul>' + this.formatTree(k, obj[k]) + '</ul>') :
-                        ('<div>' + k + ': ' + obj[k] + '</div>')
-                ).reduce((s, e) => s + e, '')
-                + '</li>';
+        format: function(name, obj) {
+            return (name.length ? name + ': ' : '') + ((typeof obj === 'object') ? this.formatTree(obj) : obj);
+        },
+        formatTree: function(obj) {
+            return '<ul>'
+                + Object.keys(obj)
+                    .filter(k => obj[k] !== undefined)
+                    .reduce((s, k) => s + '<li>' + this.format(k, obj[k]) + '</li>', '')
+                + '</ul>';
         }
     };
 }

@@ -4,6 +4,7 @@ var misc = aReq('server/misc'),
 
     stats = aReq('server/game/stats'),
     roles = aReq('server/game/roles'),
+    cardTypes = aReq('server/game/card-types'),
 
     Phase = aReq('server/game/phase'),
     CardPile = aReq('server/game/card-pile'),
@@ -16,23 +17,21 @@ module.exports = new Phase('Playing', {
     },
 
     getNextTurn: function(game) {
-        var player;
-        if (!this.turn) {
-            player = game.players.find(p => p.role === roles.sheriff);
-        } else {
-            var index = (game.players.indexOf(this.turn.player) + 1) % game.players.length;
-            player = game.players[index];
-        }
+        var player, alive = game.players.filter(p => p.alive);
+        if (!this.turn) player = alive.find(p => p.role === roles.sheriff);
+        else player = alive[(alive.indexOf(this.turn.player) + 1) % alive.length];
         return new Turn(game, player);
     },
 
     begin: function(game) {
         this.cards = new CardPile(aReq('server/game/cards'));
-        game.players.forEach(p => this.extendPlayer(p));
+        game.players.forEach(p => this.extendPlayer(game, p));
         this.goToNextTurn(game);
     },
 
-    extendPlayer: function(player) {
+    extendPlayer: function(game, player) {
+        var phase = this;
+
         // Equipped first: it's needed for stat calculations
         player.equipped = misc.merge([], {
             stat: function(stat) {
@@ -63,10 +62,28 @@ module.exports = new Phase('Playing', {
 
         // Life third: it's used in the hand limit calculations
         player.life = player.lifeMax = player.stat('life');
-        player.damage = function(amount) {
+        player.damage = function(amount, onResult) {
             this.life -= amount;
-            if (this.life <= 0) throw 'Handle dying you dimwit!';
-        }
+            if (this.dead) return cardTypes.Beer.getDeathEvent(
+                game, player,
+                () => {
+                    phase.checkForEnd(game);
+                    onResult();
+                }
+            );
+            else onResult();
+        };
+        player.heal = function(amount) {
+            this.life = Math.min(this.life + amount, this.lifeMax);
+        };
+        misc.merge(player, {
+            get dead() {
+                return this.life <= 0;
+            },
+            get alive() {
+                return this.life > 0;
+            }
+        });
 
         // Hand
         var cards = this.cards;
@@ -100,6 +117,9 @@ module.exports = new Phase('Playing', {
             delete p.life;
             delete p.lifeMax;
             delete p.damage;
+            delete p.heal;
+            delete p.dead;
+            delete p.alive;
 
             delete p.hand;
 
@@ -121,11 +141,24 @@ module.exports = new Phase('Playing', {
         this.turn.handleAction(player, msg);
     },
 
+    handleDisconnect: function(game, player) {
+        player.life = 0;
+        phase.checkForEnd(game);
+    },
+
     format: function(game, player, formatted) {
         return misc.merge(formatted, {
             turn: {
                 player: this.turn.player.name,
                 step: this.turn.step.format()
+            },
+            cards: {
+                pile: this.cards.length,
+                discard: this.cards.discarded.map(card => ({
+                    id : card.id,
+                    rank: card.rank,
+                    suit: card.suit
+                }))
             }
         });
     },
@@ -145,5 +178,27 @@ module.exports = new Phase('Playing', {
             life: other.life,
             lifeMax: other.lifeMax
         });
+    },
+
+    checkForEnd: function(game) {
+        var alive = game.players.filter(p => p.alive);
+        var aliveCount = {};
+        Object.keys(roles).forEach(key => aliveCount[key] = 0);
+        alive.forEach(p => aliveCount[p.role.key]++);
+        // If the sheriff is dead, then either a renegade or the outlaws have won
+        if (!aliveCount.sheriff) {
+            // If there is one alive and it's a renegade; they have won
+            if (alive.length === 1 && alive[0].role === roles.renegade) {
+                game.end();
+            }
+            // Otherwise, outlaws have won
+            else {
+                game.end();
+            }
+        }
+        // If no outlaws and no renegades have won, then the sheriff and deputies have won
+        else if (!(aliveCount.outlaw + aliveCount.renegade)) {
+            game.end();
+        }
     }
 });

@@ -1,81 +1,64 @@
-var log = aReq('server/log'),
-    Card = aReq('server/game/card'),
-    events = aReq('server/game/events');
+var Card = aReq('server/game/card'),
+    cardTypes = aReq('server/game/card-types');
 
-function Bang(suit, rank) {
-    var id = 'bang:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
-        step => step.bangs < step.player.stat('bangs'),
-        step => {
-            step.event = new events.TargetEvent(
-                step.game, step.player, false, step.player.stat('bangRange'),
-                target => {
-                    step.bangs++;
-                    step.player.hand.discard(id);
-                    step.event = new events.CardChoiceEvent(
-                        step.game, target,
-                        card => card instanceof Mancato,
-                        card => {
-                            target.hand.discard(card.id);
-                            delete step.event;
-                        },
-                        () => step.event = target.damage(1)
-                    );
-                },
-                () => delete step.event
-            );
-        }
-    );
-}
+var suits = Card.suits, ranks = Card.ranks;
 
-function Mancato(suit, rank) {
-    var id = 'mancato:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown);
-}
+var Bang = cardTypes.Bang,
+    Mancato = cardTypes.Mancato,
+    Beer = cardTypes.Beer,
+    Saloon = cardTypes.Saloon;
 
 var cards = [
-    new Bang(Card.suits.diamonds, Card.ranks.ace),
-    new Bang(Card.suits.diamonds, Card.ranks.two),
-    new Bang(Card.suits.diamonds, Card.ranks.three),
-    new Bang(Card.suits.diamonds, Card.ranks.four),
-    new Bang(Card.suits.diamonds, Card.ranks.five),
-    new Bang(Card.suits.diamonds, Card.ranks.six),
-    new Bang(Card.suits.diamonds, Card.ranks.seven),
-    new Bang(Card.suits.diamonds, Card.ranks.eight),
-    new Bang(Card.suits.diamonds, Card.ranks.nine),
-    new Bang(Card.suits.diamonds, Card.ranks.ten),
-    new Bang(Card.suits.diamonds, Card.ranks.jack),
-    new Bang(Card.suits.diamonds, Card.ranks.queen),
-    new Bang(Card.suits.diamonds, Card.ranks.king),
+    new Bang(suits.diamonds, ranks.ace),
+    new Bang(suits.diamonds, ranks.two),
+    new Bang(suits.diamonds, ranks.three),
+    new Bang(suits.diamonds, ranks.four),
+    new Bang(suits.diamonds, ranks.five),
+    new Bang(suits.diamonds, ranks.six),
+    new Bang(suits.diamonds, ranks.seven),
+    new Bang(suits.diamonds, ranks.eight),
+    new Bang(suits.diamonds, ranks.nine),
+    new Bang(suits.diamonds, ranks.ten),
+    new Bang(suits.diamonds, ranks.jack),
+    new Bang(suits.diamonds, ranks.queen),
+    new Bang(suits.diamonds, ranks.king),
 
-    new Bang(Card.suits.clovers, Card.ranks.two),
-    new Bang(Card.suits.clovers, Card.ranks.three),
-    new Bang(Card.suits.clovers, Card.ranks.five),
-    new Bang(Card.suits.clovers, Card.ranks.four),
-    new Bang(Card.suits.clovers, Card.ranks.six),
-    new Bang(Card.suits.clovers, Card.ranks.seven),
-    new Bang(Card.suits.clovers, Card.ranks.eight),
-    new Bang(Card.suits.clovers, Card.ranks.nine),
+    new Bang(suits.clovers, ranks.two),
+    new Bang(suits.clovers, ranks.three),
+    new Bang(suits.clovers, ranks.five),
+    new Bang(suits.clovers, ranks.four),
+    new Bang(suits.clovers, ranks.six),
+    new Bang(suits.clovers, ranks.seven),
+    new Bang(suits.clovers, ranks.eight),
+    new Bang(suits.clovers, ranks.nine),
 
-    new Bang(Card.suits.hearts, Card.ranks.ace),
-    new Bang(Card.suits.hearts, Card.ranks.queen),
-    new Bang(Card.suits.hearts, Card.ranks.king),
+    new Bang(suits.hearts, ranks.ace),
+    new Bang(suits.hearts, ranks.queen),
+    new Bang(suits.hearts, ranks.king),
 
-    new Bang(Card.suits.spades, Card.ranks.ace),
+    new Bang(suits.spades, ranks.ace),
 
-    new Mancato(Card.suits.spades, Card.ranks.ace),
-    new Mancato(Card.suits.spades, Card.ranks.two),
-    new Mancato(Card.suits.spades, Card.ranks.three),
-    new Mancato(Card.suits.spades, Card.ranks.four),
-    new Mancato(Card.suits.spades, Card.ranks.five),
-    new Mancato(Card.suits.spades, Card.ranks.six),
+    new Mancato(suits.spades, ranks.ace),
+    new Mancato(suits.spades, ranks.two),
+    new Mancato(suits.spades, ranks.three),
+    new Mancato(suits.spades, ranks.four),
+    new Mancato(suits.spades, ranks.five),
+    new Mancato(suits.spades, ranks.six),
 
-    new Mancato(Card.suits.spades, Card.ranks.seven),
-    new Mancato(Card.suits.spades, Card.ranks.eight),
-    new Mancato(Card.suits.spades, Card.ranks.nine),
-    new Mancato(Card.suits.spades, Card.ranks.ten),
-    new Mancato(Card.suits.spades, Card.ranks.jack),
-    new Mancato(Card.suits.spades, Card.ranks.queen),
+    new Mancato(suits.spades, ranks.seven),
+    new Mancato(suits.spades, ranks.eight),
+    new Mancato(suits.spades, ranks.nine),
+    new Mancato(suits.spades, ranks.ten),
+    new Mancato(suits.spades, ranks.jack),
+    new Mancato(suits.spades, ranks.queen),
+
+    new Beer(suits.hearts, ranks.ace),
+    new Beer(suits.hearts, ranks.two),
+    new Beer(suits.hearts, ranks.three),
+    new Beer(suits.hearts, ranks.four),
+
+    new Saloon(suits.hearts, ranks.five),
+    new Saloon(suits.hearts, ranks.six)
 ];
 
 module.exports = cards;

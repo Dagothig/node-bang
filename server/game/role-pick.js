@@ -56,6 +56,11 @@ module.exports = new Phase('Role pick', {
                 return;
         }
     },
+    handleDisconnect: function(game, player) {
+        game.players.splice(game.players.indexOf(player), 1);
+        if (game.players.length < consts.minPlayers) game.end();
+        else game.onGameUpdate();
+    },
     format: function(game, player, formatted) {
         formatted.remainingTime = this.remainingTime;
         return formatted;

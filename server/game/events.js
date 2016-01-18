@@ -2,13 +2,11 @@ var log = aReq('server/log'),
     actions = aReq('server/actions'),
     misc = aReq('server/misc');
 
-function TargetEvent(game, player, includePlayer, maxRange, onTarget, onCancel) {
-    var filter = p => {
-        log(player.distanceTo(game.players, p));
-        return (includePlayer || p !== player) &&
-            player.distanceTo(game.players, p) <= maxRange;
-    };
-    var targets = game.players.filter(filter);
+function TargetEvent(game, player, includePlayer, maxRange, onTarget, onCancel, format) {
+    var alive = game.players.filter(p => p.alive);
+    var filter = p => (includePlayer || p !== player)
+        && player.distanceTo(alive, p) <= maxRange;
+    var targets = alive.filter(filter);
     return {
         actionsFor: function(p) {
             if (p !== player) return {};
@@ -26,11 +24,12 @@ function TargetEvent(game, player, includePlayer, maxRange, onTarget, onCancel) 
             } else if (msg.action === actions.cancel) {
                 onCancel();
             }
-        }
+        },
+        format: format
     };
 }
 
-function CardChoiceEvent(game, player, filter, onChoice, onCancel) {
+function CardChoiceEvent(game, player, filter, onChoice, onCancel, format) {
     return {
         actionsFor: function(p) {
             if (p !== player) return {};
@@ -47,7 +46,8 @@ function CardChoiceEvent(game, player, filter, onChoice, onCancel) {
             } else if (msg.action === actions.cancel) {
                 onCancel();
             }
-        }
+        },
+        format: format
     }
 }
 

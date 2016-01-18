@@ -5,14 +5,18 @@ var misc = aReq('server/misc'),
     Player = aReq('server/game/player'),
     CharacterPick = aReq('server/game/character-pick');
 
-function Game(users, onGameUpdate, onGameEvent) {
+function Game(users, onGameUpdate, onGameEvent, onGameEnd) {
     this.onGameUpdate = onGameUpdate;
     this.onGameEvent = onGameEvent;
+    this.onGameEnd = onGameEnd;
     this.players = misc.shuffle(users.map(user => new Player(user)));
 }
 misc.merge(Game.prototype, {
     begin: function() {
         this.switchToPhase(CharacterPick);
+    },
+    end: function() {
+        this.onGameEnd();
     },
     switchToPhase: function(phase) {
         if (this.phase) {
@@ -54,7 +58,9 @@ misc.merge(Game.prototype, {
         this.onGameUpdate();
     },
     handleDisconnect: function(user) {
-
+        var player = this.findPlayer(user);
+        if (!player) return;
+        this.phase.handleDisconnect(this, player);
     }
 });
 

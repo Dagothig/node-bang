@@ -9,5 +9,6 @@ var roles = {
     outlaw: new Role("Outlaw", "Unknown", {}),
     renegade: new Role("Renegade", "Unknown", {})
 };
+Object.keys(roles).forEach(key => roles[key].key = key);
 
 module.exports = roles;

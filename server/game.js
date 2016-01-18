@@ -60,8 +60,16 @@ function startGame(io, users) {
     log("Starting game!");
     game = new Game(
         users.filter(user => user.joining),
+        // On update
         () => users.forEach(user => user.emit(msgs.game, formattedGame(user))),
-        msg => io.emit(msgs.event, msg)
+        // On event
+        msg => io.emit(msgs.event, msg),
+        // On end
+        () => {
+            game = null;
+            io.emit(msgs.game, null);
+            io.emit(msgs.joining, formattedJoining(users));
+        }
     );
     users.forEach(user => user.joining = false);
     game.begin();
