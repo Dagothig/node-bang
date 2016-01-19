@@ -1,6 +1,7 @@
 var log = aReq('server/log'),
     Card = aReq('server/game/card'),
-    events = aReq('server/game/events');
+    events = aReq('server/game/events'),
+    misc = aReq('server/misc');
 
 function getBangTargetEvent(step, cardId) {
     return new events.TargetEvent(
@@ -12,22 +13,20 @@ function getBangTargetEvent(step, cardId) {
             step.event = getBangResponseEvent(step, target);
         },
         // onCancel
-        () => delete step.event
+        () => step.event = null
     );
 }
 function getBangResponseEvent(step, target) {
     return new events.CardChoiceEvent(
-        step.game, target,
-        // filter
-        card => card instanceof Mancato,
+        step.game, target, target.hand.filter(c => c instanceof Mancato),
         // onChoice
         card => {
             target.hand.discard(card.id);
-            delete step.event;
+            step.event = null;
         },
         // onCancel
         () => step.event = target.damage(1, () => {
-            delete step.event;
+            step.event = null;
         }),
         // format
         () => ({
@@ -61,9 +60,7 @@ function Beer(suit, rank) {
 }
 Beer.getDeathEvent = function(game, player, onResult) {
     return new events.CardChoiceEvent(
-        game, player,
-        // filter
-        card => card instanceof Beer,
+        game, player, player.hand.filter(c => c instanceof Beer),
         // onChoice
         card => {
             player.hand.discard(card.id);
@@ -94,9 +91,238 @@ function Saloon(suit, rank) {
     );
 }
 
+function handleDrawCard(step, card, amount) {
+    step.player.hand.discard(card.id);
+    step.player.hand.drawFromPile(amount);
+}
+function Stagecoach(suit, rank) {
+    var id = 'stagecoach:' + suit + ':' + rank;
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => true,
+        step => handleDrawCard(step, this, 2)
+    );
+}
+function WellsFargo(suit, rank) {
+    var id = 'wellsfargo:' + suit + ':' + rank;
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => true,
+        step => handleDrawCard(step, this, 3)
+    );
+}
+
+function handleEmporio(step, players, player, cards) {
+    step.event = events.CardChoiceEvent(
+        step.game, player, cards,
+        // onChoice
+        card => {
+            player.hand.push(cards.splice(cards.indexOf(card), 1)[0]);
+            if (cards.length) {
+                var currentIndex = players.indexOf(player);
+                var nextIndex = (currentIndex + 1) % players.length;
+                var nextPlayer = players[nextIndex];
+                handleEmporio(step, players, nextPlayer, cards);
+            } else {
+                step.event = null;
+            }
+        },
+        // onCancel
+        undefined,
+        // format
+        () => ({
+            name: 'Emporio',
+            cards: cards.map(c => c.id),
+            player: player.name
+        })
+    );
+}
+function Emporio(suit, rank) {
+    var id = 'emporio:' + suit + ':' + rank;
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => true,
+        // Card onPlay
+        step => {
+            step.player.hand.discard(this.id);
+            var alive = step.game.players.filter(p => p.alive);
+            var current = alive[alive.indexOf(step.player)];
+            var cards = step.phase.cards.draw(alive.length);
+            handleEmporio(step, alive, current, cards);
+        }
+    );
+}
+
+function getBangEveryoneEvent(game, player, cardFilter, onResolved) {
+    var composition = new events.ComposedEvent(
+        game.players
+            .filter(p => p.alive && p !== player)
+            .map(p => {
+                var delegate = new events.DelegateEvent(
+                    new events.CardChoiceEvent(
+                        game, p, p.hand.filter(cardFilter),
+                        // onChoice
+                        card => {
+                            p.hand.discard(card.id);
+                            delegate.event = null;
+                        },
+                        // onCancel
+                        () => delegate.event = p.damage(1, () => delegate.event = null)
+                    ),
+                    // onDelegate resolved
+                    () => composition.resolved(delegate)
+                );
+                return delegate;
+            }),
+        // onComposition resolved
+        () => onResolved()
+    );
+    return composition;
+}
+function Gatling(suit, rank) {
+    var id = 'gatling:' + suit + ':' + rank;
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => true,
+        step => {
+            step.player.hand.discard(this.id);
+            step.event = misc.merge(getBangEveryoneEvent(
+                step.game, step.player, c => c instanceof Mancato,
+                () => step.event = null
+            ), {
+                format: () => ({
+                    name: 'Gatling'
+                })
+            });
+        }
+    );
+}
+function Indians(suit, rank) {
+    var id = 'indians:' + suit + ':' + rank;
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => true,
+        step => {
+            step.player.hand.discard(this.id);
+            step.event = misc.merge(getBangEveryoneEvent(
+                step.game, step.player, c => c instanceof Bang,
+                () => step.event = null
+            ), {
+                format: () => ({
+                    name: 'Indians'
+                })
+            });
+        }
+    );
+}
+
+function Panico(suit, rank) {
+    var id = 'panico:' + suit + ':' + rank;
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => true,
+        // Card onPlay
+        step => {
+            var delegate = new events.DelegateEvent(
+                new events.TargetEvent(
+                    step.game, step.player, false, step.player.stat('range'),
+                    // Target onTarget
+                    target => delegate.event = new events.CardChoiceEvent(
+                        step.game, step.player,
+                        target.equipped.concat(target.hand.map((c, i) => ({ id: 'hand:' + i}))),
+                        // CardChoice onChoice
+                        choice => {
+                            step.player.hand.discard(this.id);
+                            var card;
+                            if (choice.id.startsWith('hand:')) {
+                                var index = choice.id.substring('hand:'.length);
+                                card = target.hand.remove(target.hand[index].id);
+                            } else {
+                                card = target.equipped.remove(choice.id);
+                            }
+                            step.player.hand.push(card);
+                            delegate.event = null;
+                        },
+                        // CardChoice onCancel
+                        () => delegate.event = null
+                    ),
+                    // Target onCancel
+                    () => delegate.event = null
+                ),
+                // Delegate onResolved
+                () => step.event = null
+            );
+            step.event = delegate;
+        }
+    );
+}
+
+function CatBalou(suit, rank) {
+    var id = 'catbalou:' + suit + ':' + rank;
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => true,
+        // Card onPlay
+        step => {
+            var delegate = new events.DelegateEvent(
+                new events.TargetEvent(
+                    step.game, step.player, false, 1000,
+                    // Target onTarget
+                    target => delegate.event = new events.CardChoiceEvent(
+                        step.game, step.player,
+                        target.equipped.concat(target.hand.map((c, i) => ({ id: 'hand:' + i}))),
+                        // CardChoice onChoice
+                        card => {
+                            step.player.hand.discard(this.id);
+                            if (card.id.startsWith('hand')) {
+                                var index = card.id.substring('hand:'.length);
+                                target.hand.discard(target.hand[index].id);
+                            } else {
+                                target.equipped.discard(card.id);
+                            }
+                            delegate.event = null;
+                        },
+                        // CardChoice onCancel
+                        () => delegate.event = null
+                    ),
+                    // Target onCancel
+                    () => delegate.event = null
+                ),
+                // Delegate onResolved
+                () => step.event = null
+            );
+            step.event = delegate;
+        }
+    );
+}
+
+function Duel(suit, rank) {
+    var id = 'duel:' + suit + ':' + rank;
+    Card.call(this, id, suit, rank, Card.types.brown,
+        step => true,
+        step => {
+            var delegate = new events.DelegateEvent(
+                new events.TargetEvent(
+                    step.game, step.player, false, 1000,
+                    // Target onTarget
+                    target => {
+                        step.player.hand.discard(this.id);
+                    },
+                    // Target onCancel
+                    () => delegate.event = null
+                ),
+                // Delegate onResolved
+                () => step.event = null
+            );
+            step.event = delegate;
+        }
+    );
+}
+
 module.exports = {
     Bang: Bang,
     Mancato: Mancato,
     Beer: Beer,
-    Saloon: Saloon
-}
+    Saloon: Saloon,
+    Stagecoach: Stagecoach,
+    WellsFargo: WellsFargo,
+    Emporio: Emporio,
+    Gatling: Gatling,
+    Indians : Indians,
+    Panico: Panico,
+    CatBalou: CatBalou,
+    Duel: Duel
+};

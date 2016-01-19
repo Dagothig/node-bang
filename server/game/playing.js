@@ -38,6 +38,14 @@ module.exports = new Phase('Playing', {
                 return this.reduce((sum, equipment) => {
                     return sum + (equipment[stat]|0);
                 }, 0);
+            },
+            remove: function(cardId) {
+                var index = this.indexOf(this.find(card => card.id === cardId));
+                return (index >= 0 && index < this.length) ? this.splice(index, 1)[0] : null;
+            },
+            discard: function(cardId) {
+                var card = this.remove(cardId);
+                if (card) cards.discarded.push(card);
             }
         });
 
@@ -91,13 +99,13 @@ module.exports = new Phase('Playing', {
             drawFromPile: function(amount) {
                 cards.draw(amount).forEach(card => this.push(card));
             },
+            remove: function(cardId) {
+                var index = this.indexOf(this.find(card => card.id === cardId));
+                return (index >= 0 && index < this.length) ? this.splice(index, 1)[0] : null;
+            },
             discard: function(cardId) {
-                var card = this.find(card => card.id === cardId);
-                var index = this.indexOf(card);
-                if (index < 0 || index >= this.length) return null;
-                this.splice(index, 1);
-                cards.discarded.push(card);
-                return card;
+                var card = this.remove(cardId);
+                if (card) cards.discarded.push(card);
             },
 
             get cardMax() {
@@ -143,7 +151,8 @@ module.exports = new Phase('Playing', {
 
     handleDisconnect: function(game, player) {
         player.life = 0;
-        phase.checkForEnd(game);
+        this.checkForEnd(game);
+        throw 'Checking for end is insufficient: need to make it drop players from events and such';
     },
 
     format: function(game, player, formatted) {

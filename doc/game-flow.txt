@@ -3,29 +3,29 @@ Draw
 
 Play
     Brown
-        Bang
+        [[Bang]]
             Choose player
             Check if missed
             Check beer
-        Beer
+        [[Beer]]
             Heal player
-        Saloon
+        [[Saloon]]
             Heal players
-        Stagecoach / Wells fargo
+        [[Stagecoach / Wells fargo]]
             Draw cards
-        Emporio
+        [[Emporio]]
             Take cards
             Player chooses
             While next != player, choose
-        Panic
+        [[Panico]]
             Choose player
             Choose card
-        Cat balou
+        [[Cat balou]]
             Choose player
             Choose card
-        Gatling
+        [[Gatling]]
             Per player / check if missed
-        Indians
+        [[Indians]]
             Per player / check if bang!
         Duel
             Choose player

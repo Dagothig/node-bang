@@ -6,7 +6,14 @@ var suits = Card.suits, ranks = Card.ranks;
 var Bang = cardTypes.Bang,
     Mancato = cardTypes.Mancato,
     Beer = cardTypes.Beer,
-    Saloon = cardTypes.Saloon;
+    Saloon = cardTypes.Saloon,
+    Stagecoach = cardTypes.Stagecoach,
+    WellsFargo = cardTypes.WellsFargo,
+    Emporio = cardTypes.Emporio,
+    Gatling = cardTypes.Gatling,
+    Indians = cardTypes.Indians,
+    Panico = cardTypes.Panico,
+    CatBalou = cardTypes.CatBalou;
 
 var cards = [
     new Bang(suits.diamonds, ranks.ace),
@@ -58,7 +65,29 @@ var cards = [
     new Beer(suits.hearts, ranks.four),
 
     new Saloon(suits.hearts, ranks.five),
-    new Saloon(suits.hearts, ranks.six)
+    new Saloon(suits.hearts, ranks.six),
+
+    new Stagecoach(suits.hearts, ranks.seven),
+    new Stagecoach(suits.hearts, ranks.eight),
+
+    new WellsFargo(suits.hearts, ranks.nine),
+    new WellsFargo(suits.hearts, ranks.ten),
+
+    new Emporio(suits.hearts, ranks.jack),
+    new Emporio(suits.hearts, ranks.queen),
+    new Emporio(suits.hearts, ranks.king),
+
+    new Gatling(suits.hearts, ranks.one),
+    new Gatling(suits.hearts, ranks.one),
+
+    new Indians(suits.hearts, ranks.one),
+    new Indians(suits.hearts, ranks.one),
+
+    new Panico(suits.hearts, ranks.one),
+    new Panico(suits.hearts, ranks.one),
+
+    new CatBalou(suits.hearts, ranks.one),
+    new CatBalou(suits.hearts, ranks.one)
 ];
 
 module.exports = cards;
