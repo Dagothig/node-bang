@@ -172,7 +172,7 @@ function getBangEveryoneEvent(game, player, cardFilter, onResolved) {
                 return delegate;
             }),
         // onComposition resolved
-        () => onResolved()
+        onResolved
     );
     return composition;
 }
@@ -289,25 +289,39 @@ function CatBalou(suit, rank) {
     );
 }
 
+function handleDuel(step, source, target) {
+    step.event = events.CardChoiceEvent(
+        step.game, target, target.hand.filter(c => c instanceof Bang),
+        // onChoice
+        card => {
+            target.hand.discard(card.id);
+            handleDuel(step, target, source);
+        },
+        // onCancel
+        () => step.event = target.damage(1, () => step.event = null),
+        // format
+        () => ({
+            name: 'Duel',
+            source: source.name,
+            target: target.name
+        })
+    );
+}
 function Duel(suit, rank) {
     var id = 'duel:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown,
         step => true,
         step => {
-            var delegate = new events.DelegateEvent(
-                new events.TargetEvent(
-                    step.game, step.player, false, 1000,
-                    // Target onTarget
-                    target => {
-                        step.player.hand.discard(this.id);
-                    },
-                    // Target onCancel
-                    () => delegate.event = null
-                ),
-                // Delegate onResolved
+            step.event = new events.TargetEvent(
+                step.game, step.player, false, 1000,
+                // Target onTarget
+                target => {
+                    step.player.hand.discard(this.id);
+                    handleDuel(step, step.player, target);
+                },
+                // Target onCancel
                 () => step.event = null
             );
-            step.event = delegate;
         }
     );
 }

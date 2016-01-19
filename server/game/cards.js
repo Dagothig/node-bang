@@ -13,7 +13,8 @@ var Bang = cardTypes.Bang,
     Gatling = cardTypes.Gatling,
     Indians = cardTypes.Indians,
     Panico = cardTypes.Panico,
-    CatBalou = cardTypes.CatBalou;
+    CatBalou = cardTypes.CatBalou,
+    Duel = cardTypes.Duel;
 
 var cards = [
     new Bang(suits.diamonds, ranks.ace),
@@ -77,17 +78,22 @@ var cards = [
     new Emporio(suits.hearts, ranks.queen),
     new Emporio(suits.hearts, ranks.king),
 
-    new Gatling(suits.hearts, ranks.one),
-    new Gatling(suits.hearts, ranks.one),
+    new Gatling(suits.hearts, ranks.ace),
+    new Gatling(suits.hearts, ranks.two),
 
-    new Indians(suits.hearts, ranks.one),
-    new Indians(suits.hearts, ranks.one),
+    new Indians(suits.hearts, ranks.ace),
+    new Indians(suits.hearts, ranks.two),
 
-    new Panico(suits.hearts, ranks.one),
-    new Panico(suits.hearts, ranks.one),
+    new Panico(suits.hearts, ranks.ace),
+    new Panico(suits.hearts, ranks.two),
 
-    new CatBalou(suits.hearts, ranks.one),
-    new CatBalou(suits.hearts, ranks.one)
+    new CatBalou(suits.hearts, ranks.ace),
+    new CatBalou(suits.hearts, ranks.two),
+
+    new Duel(suits.hearts, ranks.ace),
+    new Duel(suits.hearts, ranks.two),
+    new Duel(suits.hearts, ranks.three),
+    new Duel(suits.hearts, ranks.four)
 ];
 
 module.exports = cards;

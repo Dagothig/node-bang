@@ -27,7 +27,7 @@ Play
             Per player / check if missed
         [[Indians]]
             Per player / check if bang!
-        Duel
+        [[Duel]]
             Choose player
             While check if bang
     Blue

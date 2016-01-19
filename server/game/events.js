@@ -79,7 +79,9 @@ function ComposedEvent(events, onResolved) {
             return this.events.reduce((f, e) => misc.merge(f, e.format()), {});
         },
         resolved: function(event) {
-            this.events.splice(this.events.indexOf(event), 1);
+            var index = this.events.indexOf(event);
+            if (index < 0 || index >= this.events.length) return;
+            this.events.splice(index, 1);
             if (!this.events.length) onResolved();
         }
     };

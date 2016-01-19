@@ -58,7 +58,7 @@ module.exports = new Phase('Playing', {
                     + (this.equipped.stat(modifier)|0);
             },
             stat: function(name) {
-                if (stats[name] === undefined) throw 'State ' + name + ' does not exist';
+                if (stats[name] === undefined) throw 'Stat ' + name + ' does not exist';
                 return stats[name] + this.modifier(name);
             },
 
@@ -76,6 +76,7 @@ module.exports = new Phase('Playing', {
                 game, player,
                 () => {
                     phase.checkForEnd(game);
+                    if (player.dead && phase.turn.player === player) throw 'Handle current player death';
                     onResult();
                 }
             );
