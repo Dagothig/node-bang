@@ -42,7 +42,7 @@ misc.merge(Game.prototype, {
                         name: other.character.name
                     } : undefined,
                     role: other.role ? {
-                        name: player === other ?
+                        name: player === other || player.dead ?
                             other.role.name :
                             other.role.publicName
                     } : undefined,

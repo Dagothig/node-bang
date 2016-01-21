@@ -31,11 +31,11 @@ Play
             Choose player
             While check if bang
     Blue
-        Weapons
+        [[Weapons]]
             Affect stats
-        Mustang
+        [[Mustang]]
             Affect stats
-        Mirino
+        [[Mirino]]
             Affect stats
         Barile
             On bang! draw to check; if good, ignore shot

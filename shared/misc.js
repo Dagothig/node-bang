@@ -13,7 +13,7 @@ function swap(arr, i1, i2) {
 }
 
 function spliceRand(arr) {
-    return arr.splice((Math.random() * arr.length)|0, 1).find(() => true);
+    return arr.splice((Math.random() * arr.length)|0, 1)[0];
 }
 
 function gen(f, c) {

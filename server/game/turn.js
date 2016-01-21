@@ -31,7 +31,7 @@ misc.merge(Turn.prototype, {
     },
     handleAction: function(player, msg) {
         if (!this.step) return;
-        return this.step.handleAction(player, msg);
+        this.step.handleAction(player, msg);
     }
 });
 Turn.steps = aReq('server/game/steps');

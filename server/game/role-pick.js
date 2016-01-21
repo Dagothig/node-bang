@@ -19,6 +19,7 @@ module.exports = new Phase('Role pick', {
         if (game.players.length >= 5) r.push(roles.deputy);
         if (game.players.length >= 6) r.push(roles.outlaw);
         if (game.players.length >= 7) r.push(roles.deputy);
+        if (game.players.length >= 8) r.push(roles.outlaw);
         game.players.forEach((player) => {
             player.role = misc.spliceRand(r);
             log(player.user.name, 'is', player.role.name);

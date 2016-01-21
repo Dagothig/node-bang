@@ -71,15 +71,13 @@ misc.merge(Play.prototype, Step.prototype, {
         }
     },
     handleAction: function(player, msg) {
-        if (this.event) this.event.handleAction(player, msg);
-        else {
-            if (this.player !== player) return;
-            if (msg.action === actions.endTurn) {
-                this.turn.goToNextStep();
-            } else if (msg.action === actions.play) {
-                var card = this.player.hand.find(card => card.id === msg.arg);
-                if (card && card.filter(this)) card.onPlay(this);
-            }
+        if (this.event) return this.event.handleAction(player, msg);
+
+        if (this.player !== player) return;
+        if (msg.action === actions.endTurn) return this.turn.goToNextStep();
+        if (msg.action === actions.play) {
+            var card = this.player.hand.find(card => card.id === msg.arg);
+            if (card && card.filter(this)) return card.onPlay(this);
         }
     }
 });

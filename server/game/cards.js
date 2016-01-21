@@ -14,7 +14,13 @@ var Bang = cardTypes.Bang,
     Indians = cardTypes.Indians,
     Panico = cardTypes.Panico,
     CatBalou = cardTypes.CatBalou,
-    Duel = cardTypes.Duel;
+    Duel = cardTypes.Duel,
+    Gun = cardTypes.Gun,
+    Mustang = cardTypes.Mustang,
+    Mirino = cardTypes.Mirino,
+    Barile = cardTypes.Barile,
+    Prigione = cardTypes.Prigione,
+    Dynamite = cardTypes.Dynamite;
 
 var cards = [
     new Bang(suits.diamonds, ranks.ace),
@@ -93,7 +99,25 @@ var cards = [
     new Duel(suits.hearts, ranks.ace),
     new Duel(suits.hearts, ranks.two),
     new Duel(suits.hearts, ranks.three),
-    new Duel(suits.hearts, ranks.four)
+    new Duel(suits.hearts, ranks.four),
+
+    new Gun('volcanic', suits.hearts, ranks.ace, { bangsModifier: 1000 }),
+    new Gun('volcanic', suits.hearts, ranks.two, { bangsModifier: 1000 }),
+    new Gun('schofield', suits.hearts, ranks.three, { bangRangeModifier: 1 }),
+    new Gun('schofield', suits.hearts, ranks.four, { bangRangeModifier: 1 }),
+    new Gun('remington', suits.hearts, ranks.five, { bangRangeModifier: 2 }),
+    new Gun('remington', suits.hearts, ranks.six, { bangRangeModifier: 2 }),
+    new Gun('carabine', suits.hearts, ranks.seven, { bangRangeModifier: 3 }),
+    new Gun('carabine', suits.hearts, ranks.eight, { bangRangeModifier: 3 }),
+    new Gun('winchester', suits.hearts, ranks.nine, { bangRangeModifier: 4 }),
+    new Gun('winchester', suits.hearts, ranks.ten, { bangRangeModifier: 4 }),
+
+    new Mustang(suits.hearts, ranks.ace),
+    new Mustang(suits.hearts, ranks.two),
+    new Mustang(suits.hearts, ranks.three),
+
+    new Mirino(suits.hearts, ranks.ace),
+    new Mirino(suits.hearts, ranks.two)
 ];
 
 module.exports = cards;

@@ -223,17 +223,13 @@ function Panico(suit, rank) {
                     // Target onTarget
                     target => delegate.event = new events.CardChoiceEvent(
                         step.game, step.player,
-                        target.equipped.concat(target.hand.map((c, i) => ({ id: 'hand:' + i}))),
+                        target.equipped.concat(target.hand.length ? { id: 'hand'} : []),
                         // CardChoice onChoice
                         choice => {
                             step.player.hand.discard(this.id);
                             var card;
-                            if (choice.id.startsWith('hand:')) {
-                                var index = choice.id.substring('hand:'.length);
-                                card = target.hand.remove(target.hand[index].id);
-                            } else {
-                                card = target.equipped.remove(choice.id);
-                            }
+                            if (choice.id === 'hand') card = misc.spliceRand(target.hand);
+                            else card = target.equipped.remove(choice.id);
                             step.player.hand.push(card);
                             delegate.event = null;
                         },
@@ -326,6 +322,53 @@ function Duel(suit, rank) {
     );
 }
 
+function Equipment(id, suit, rank, slot, targetSrc, overrides) {
+    this.slot = slot;
+    Card.call(this, id, suit, rank, Card.types.blue,
+        step => true,
+        step => targetSrc(step, target => {
+            step.player.hand.remove(this.id);
+            var current = target.equipped.find(c => c.slot === this.slot);
+            if (current) target.equipped.discard(current.id);
+            target.equipped.push(this);
+        })
+    );
+    misc.merge(this, overrides);
+}
+
+var targetSelf = (step, onResolved) => onResolved(step.player);
+function Gun(name, suit, rank, overrides) {
+    var id = name + ':' + suit + ':' + rank;
+    Equipment.call(this, id, suit, rank, 'weapon', targetSelf, overrides);
+}
+
+function Mustang(suit, rank) {
+    var id = 'mustang:' + suit + ':' + rank;
+    Equipment.call(this, id, suit, rank, 'mustang', targetSelf, {
+        distanceModifier: 1
+    });
+}
+
+function Mirino(suit, rank) {
+    var id = 'mirino:' + suit + ':' + rank;
+    Equipment.call(this, id, suit, rank, 'mirino', targetSelf, {
+        bangRangeModifier: 1,
+        rangeModifier: 1
+    });
+}
+
+function Barile() {
+    throw 'Barile not implemented';
+}
+
+function Prigione() {
+    throw 'Prigione not implemented';
+}
+
+function Dynamite() {
+    throw 'Dynamite not implemented';
+}
+
 module.exports = {
     Bang: Bang,
     Mancato: Mancato,
@@ -338,5 +381,11 @@ module.exports = {
     Indians : Indians,
     Panico: Panico,
     CatBalou: CatBalou,
-    Duel: Duel
+    Duel: Duel,
+    Gun: Gun,
+    Mustang : Mustang,
+    Mirino: Mirino,
+    Barile: Barile,
+    Prigione: Prigione,
+    Dynamite: Dynamite
 };

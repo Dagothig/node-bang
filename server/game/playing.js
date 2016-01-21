@@ -65,6 +65,12 @@ module.exports = new Phase('Playing', {
             distanceTo: function(players, to) {
                 var dist = Math.abs(players.indexOf(this) - players.indexOf(to));
                 return Math.min(dist, players.length - dist) + to.modifier('distance');
+            },
+
+            stats: function() {
+                var obj = {};
+                Object.keys(stats).forEach(stat => obj[stat] = this.stat(stat));
+                return obj;
             }
         });
 
@@ -75,8 +81,8 @@ module.exports = new Phase('Playing', {
             if (this.dead) return cardTypes.Beer.getDeathEvent(
                 game, player,
                 () => {
+                    if (player.dead && player === phase.turn.player) throw 'Need to handle player death during turn';
                     phase.checkForEnd(game);
-                    if (player.dead && phase.turn.player === player) throw 'Handle current player death';
                     onResult();
                 }
             );
@@ -178,15 +184,23 @@ module.exports = new Phase('Playing', {
             hand: {
                 // TODO: format cards properly
                 cards: player === other ?
-                    other.hand.slice().map(card => ({
-                        id : card.id,
+                    other.hand.map(card => ({
+                        id: card.id,
                         rank: card.rank,
-                        suit: card.suit
+                        suit: card.suit,
+                        type: card.type
                     })) :
                     other.hand.length
             },
+            equipment: other.equipped.map(card => ({
+                id: card.id,
+                rank: card.rank,
+                suit: card.suit,
+                type: card.type
+            })),
             life: other.life,
-            lifeMax: other.lifeMax
+            stats: other.stats(),
+            distance: player.distanceTo(game.players, other)
         });
     },
 
