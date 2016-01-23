@@ -15,7 +15,6 @@ misc.merge(Turn.prototype, {
         this.step = this.getNextStep();
         if (this.step) this.step.start();
         else this.phase.goToNextTurn(this.game);
-
     },
     getNextStep: function() {
         var nextStep = !this.step ?

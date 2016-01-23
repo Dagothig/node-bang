@@ -335,8 +335,15 @@ function Equipment(id, suit, rank, slot, targetSrc, overrides) {
     );
     misc.merge(this, overrides);
 }
-
 var targetSelf = (step, onResolved) => onResolved(step.player);
+var targetAny = (step, onResolved) => step.event = new events.TargetEvent(
+    step.game, step.player, true, 1000,
+    // onTarget
+    target => onResolved(target),
+    // onCancel
+    () => step.event = null
+);
+
 function Gun(name, suit, rank, overrides) {
     var id = name + ':' + suit + ':' + rank;
     Equipment.call(this, id, suit, rank, 'weapon', targetSelf, overrides);
@@ -358,15 +365,24 @@ function Mirino(suit, rank) {
 }
 
 function Barile() {
-    throw 'Barile not implemented';
+    var id = 'barile:' + suit + ':' + rank;
+    Equipment.call(this, id, suit, rank, 'barile', targetSelf, {
+        // TODO barile
+    });
 }
 
 function Prigione() {
-    throw 'Prigione not implemented';
+    var id = 'prigione:' + suit + ':' + rank;
+    Equipment.call(this, id, suit, rank, 'prigione', targetAny, {
+        // TODO prigione
+    });
 }
 
 function Dynamite() {
-    throw 'Dynamite not implemented';
+    var id = 'dynamite:' + suit + ':' + rank;
+    Equipment.call(this, id, suit, rank, 'dynamite', targetAny, {
+        // TODO dynamite
+    });
 }
 
 module.exports = {

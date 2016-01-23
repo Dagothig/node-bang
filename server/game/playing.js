@@ -46,6 +46,9 @@ module.exports = new Phase('Playing', {
             discard: function(cardId) {
                 var card = this.remove(cardId);
                 if (card) cards.discarded.push(card);
+            },
+            handlers: function(event) {
+                return this.filter(e => e[event]);
             }
         });
 
@@ -71,27 +74,38 @@ module.exports = new Phase('Playing', {
                 var obj = {};
                 Object.keys(stats).forEach(stat => obj[stat] = this.stat(stat));
                 return obj;
+            },
+
+            handlers: function(handler) {
+                var handlers = [];
+                var charHandler = this.character[handler],
+                    roleHandler = this.role[handler],
+                    equippedHandlers = this.equipped.handlers(handler);
+                if (charHandler) handlers.push(charHandler);
+                if (roleHandler) handlers.push(roleHandler);
+                equippedHandlers.forEach(e => handlers.push(e));
+                return handlers;
             }
         });
 
         // Life third: it's used in the hand limit calculations
-        player.life = player.lifeMax = player.stat('life');
-        player.damage = function(amount, onResult) {
-            this.life -= amount;
-            if (this.dead) return cardTypes.Beer.getDeathEvent(
-                game, player,
-                () => {
-                    if (player.dead && player === phase.turn.player) throw 'Need to handle player death during turn';
-                    phase.checkForEnd(game);
-                    onResult();
-                }
-            );
-            else onResult();
-        };
-        player.heal = function(amount) {
-            this.life = Math.min(this.life + amount, this.lifeMax);
-        };
         misc.merge(player, {
+            life: player.stat('life'),
+            damage: function(amount, onResult) {
+                this.life -= amount;
+                if (this.dead) return cardTypes.Beer.getDeathEvent(
+                    game, player,
+                    () => {
+                        if (player.dead && player === phase.turn.player) throw 'Need to handle player death during turn';
+                        phase.checkForEnd(game);
+                        onResult();
+                    }
+                );
+                else onResult();
+            },
+            heal: function(amount) {
+                this.life = Math.min(this.life + amount, this.stat('life'));
+            },
             get dead() {
                 return this.life <= 0;
             },
@@ -129,20 +143,22 @@ module.exports = new Phase('Playing', {
 
     end: function(game) {
         game.players.forEach(p => {
+            delete p.equipped;
+
+            delete p.modifier;
+            delete p.stat;
+            delete p.distanceTo;
+            delete p.stats;
+
+            delete p.onEvent;
+
             delete p.life;
-            delete p.lifeMax;
             delete p.damage;
             delete p.heal;
             delete p.dead;
             delete p.alive;
 
             delete p.hand;
-
-            delete p.rangeModifier;
-            delete p.distanceModifier;
-            delete p.range;
-            delete p.bangRange;
-            delete p.distanceTo;
         });
     },
 

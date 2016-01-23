@@ -45,3 +45,44 @@ Play
             On start of turn, draw; if good, pass to next; if bad, explode
 Discard
     While cards > max, choose discard (from hand)
+
+
+Bob's turn ->
+    Bob bangs Jean ->
+        Jean uses [card ~ Mancato]
+        resolved
+    resolved
+
+    Bob bangs Jean ->
+        Jean does nothing
+            Jean takes 1 damage
+                Jean picks card from hand
+                resolved
+            resolved
+        resolved
+    resolved
+
+    Bob duels Jean ->
+        Jean bangs
+        Bob does nothing
+            Bob takes 1 damage
+                Bob dies
+                    Vulture Sam picks the corpse clean
+
+                resolved
+            resolved
+        resolved
+    resolved
+
+Bob is dead
+end
+
+play#damage(amount): event
+card#onPlay(game, player): event
+event#onResolved(cb)
+
+bang#onPlay(game, player): event
+    -> targetEvent#onResolved(cb)
+        bang#onTarget
+            -> damagelay
+        bang#onCancel onResolved()
