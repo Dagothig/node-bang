@@ -3,127 +3,115 @@ var log = aReq('server/log'),
     events = aReq('server/game/events'),
     misc = aReq('server/misc');
 
-function getBangTargetEvent(step, cardId) {
-    return new events.TargetEvent(
-        step.game, step.player, false, step.player.stat('bangRange'),
-        // onTarget
-        target => {
-            step.bangs++;
-            step.player.hand.discard(cardId);
-            step.event = getBangResponseEvent(step, target);
-        },
-        // onCancel
-        () => step.event = null
-    );
-}
-function getBangResponseEvent(step, target) {
-    return new events.CardChoiceEvent(
-        step.game, target, target.hand.filter(c => c instanceof Mancato),
-        // onChoice
-        card => {
-            target.hand.discard(card.id);
-            step.event = null;
-        },
-        // onCancel
-        () => step.event = target.damage(1, () => {
-            step.event = null;
-        }),
-        // format
-        () => ({
-            name: 'Bang',
-            target: target.name
-        })
-    );
-}
 function Bang(suit, rank) {
-    var id = 'bang:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
+    Card.call(this,
+        'bang', suit, rank, Card.types.brown,
+        // Filter
         step => step.bangs < step.player.stat('bangs'),
-        step => step.event = getBangTargetEvent(step, this.id)
+        // onPlay
+        (game, cards, player, onResolved) => new events.TargetBang(
+            game.players, player,
+            // onTarget; trying to bang someone
+            target => {
+                player.hand.discard(this.id);
+                onResolved(new events.CardTypeEvent(
+                    target, Mancato,
+                    // onCard; damage avoided
+                    card => onResolved(target.hand.discard(card.id)),
+                    // onCancel; damage goes through
+                    () => onResolved(target.damage(1, onResolved))
+                ));
+            },
+            // onCancel; no card was used
+            () => onResolved()
+        )
     );
 }
+misc.extend(Card, Bang);
 
 function Mancato(suit, rank) {
     var id = 'mancato:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown);
 }
+misc.extend(Card, Mancato);
 
 function Beer(suit, rank) {
-    var id = 'beer:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        step => {
-            step.player.hand.discard(this.id);
-            step.player.heal(1);
+    Card.call(this,
+        'beer', suit, rank, Card.types.brown,
+        () => true,
+        (game, cards, player, onResolved) => {
+            player.hand.discard(this.id);
+            player.heal(1);
+            onResolved();
         }
     );
 }
-Beer.getDeathEvent = function(game, player, onResult) {
-    return new events.CardChoiceEvent(
-        game, player, player.hand.filter(c => c instanceof Beer),
-        // onChoice
-        card => {
-            player.hand.discard(card.id);
-            player.heal(1);
-            if (player.alive) onResult();
-            else game.onGameUpdate();
-        },
-        // onCancel
-        () => onResult(),
-        // format
-        () => ({
-            name: 'Dying',
-            player: player.name
-        })
-    );
-};
+misc.extend(Card, Beer);
+
+Beer.getDeathEvent = (game, player, onResult) => new events.CardTypeEvent(
+    player, Beer,
+    // onChoice
+    card => {
+        player.hand.discard(card.id);
+        player.heal(1);
+        if (player.alive) onResult();
+        else game.onGameUpdate();
+    },
+    // onCancel
+    () => onResult(),
+    // format
+    () => ({
+        name: 'Dying',
+        player: player.name
+    })
+);
 
 function Saloon(suit, rank) {
     var id = 'saloon:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        step => {
-            step.player.hand.discard(this.id);
-            step.game.players
+        () => true,
+        (game, cards, player, onResolved) => {
+            player.hand.discard(this.id);
+            game.players
                 .filter(p => p.alive)
                 .forEach(p => p.heal(1));
+            onResolved();
         }
     );
 }
+misc.extend(Card, Saloon);
 
-function handleDrawCard(step, card, amount) {
-    step.player.hand.discard(card.id);
-    step.player.hand.drawFromPile(amount);
+function handleDrawCard(player, card, amount, onResolved) {
+    player.hand.discard(card.id);
+    player.hand.drawFromPile(amount);
 }
 function Stagecoach(suit, rank) {
     var id = 'stagecoach:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        step => handleDrawCard(step, this, 2)
+        () => true,
+        (game, cards, player, onResolved) => handleDrawCard(player, this, 2, onResolved)
     );
 }
+misc.extend(Card, Stagecoach);
 function WellsFargo(suit, rank) {
     var id = 'wellsfargo:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        step => handleDrawCard(step, this, 3)
+        () => true,
+        (game, cards, player, onResolved) => handleDrawCard(player, this, 3, onResolved)
     );
 }
+misc.extend(Card, WellsFargo);
 
-function handleEmporio(step, players, player, cards) {
-    step.event = events.CardChoiceEvent(
-        step.game, player, cards,
+function handleEmporio(players, player, cards, onResolved) {
+    return events.CardChoiceEvent(
+        player, cards,
         // onChoice
         card => {
-            player.hand.push(cards.splice(cards.indexOf(card), 1)[0]);
-            if (cards.length) {
-                var currentIndex = players.indexOf(player);
-                var nextIndex = (currentIndex + 1) % players.length;
-                var nextPlayer = players[nextIndex];
-                handleEmporio(step, players, nextPlayer, cards);
-            } else {
-                step.event = null;
-            }
+            player.hand.push(misc.remove(cards, card));
+            onResolved(cards.length ?
+                handleEmporio(players, misc.after(players, player), cards, onResolved) :
+                undefined
+            );
         },
         // onCancel
         undefined,
@@ -136,166 +124,123 @@ function handleEmporio(step, players, player, cards) {
     );
 }
 function Emporio(suit, rank) {
-    var id = 'emporio:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        // Card onPlay
-        step => {
-            step.player.hand.discard(this.id);
-            var alive = step.game.players.filter(p => p.alive);
-            var current = alive[alive.indexOf(step.player)];
-            var cards = step.phase.cards.draw(alive.length);
-            handleEmporio(step, alive, current, cards);
+    Card.call(this,
+        'emporio', suit, rank, Card.types.brown,
+        // Filter
+        () => true,
+        // onPlay
+        (game, cards, player, onResolved) => {
+            player.hand.discard(this.id);
+            var alive = game.players.filter(p => p.alive);
+            var current = alive[alive.indexOf(player)];
+            var cards = cards.draw(alive.length);
+            return handleEmporio(alive, current, cards, onResolved);
         }
     );
 }
+misc.extend(Card, Emporio);
 
-function getBangEveryoneEvent(game, player, cardFilter, onResolved) {
-    var composition = new events.ComposedEvent(
-        game.players
-            .filter(p => p.alive && p !== player)
-            .map(p => {
-                var delegate = new events.DelegateEvent(
-                    new events.CardChoiceEvent(
-                        game, p, p.hand.filter(cardFilter),
-                        // onChoice
-                        card => {
-                            p.hand.discard(card.id);
-                            delegate.event = null;
-                        },
-                        // onCancel
-                        () => delegate.event = p.damage(1, () => delegate.event = null)
-                    ),
-                    // onDelegate resolved
-                    () => composition.resolved(delegate)
+function getBangEveryoneEvent(players, player, responseType) {
+    var others = players.filter(p => p.alive && p !== player);
+    return new events.ComposedEvent(
+        onSubResolved => others.map(other => new events.CardTypeEvent(
+            other, responseType,
+            function(card) {
+                other.hand.discard(card.id);
+                onSubResolved(this);
+            },
+            function() {
+                return new events.DelegateEvent(
+                    onDelegateResolved => other.damage(1, onDelegateResolved),
+                    () => onSubResolved(this)
                 );
-                return delegate;
-            }),
-        // onComposition resolved
-        onResolved
+            }
+        )),
+        () => onResolved()
     );
-    return composition;
 }
 function Gatling(suit, rank) {
-    var id = 'gatling:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        step => {
-            step.player.hand.discard(this.id);
-            step.event = misc.merge(getBangEveryoneEvent(
-                step.game, step.player, c => c instanceof Mancato,
-                () => step.event = null
-            ), {
-                format: () => ({
-                    name: 'Gatling'
-                })
-            });
+    Card.call(this,
+        'gatling', suit, rank, Card.types.brown,
+        () => true,
+        (game, cards, player, onResolved) => {
+            player.hand.discard(this.id);
+            onResolved(getBangEveryoneEvent(game.players, player, Mancato));
         }
     );
 }
+misc.extend(Card, Gatling);
+
 function Indians(suit, rank) {
-    var id = 'indians:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        step => {
-            step.player.hand.discard(this.id);
-            step.event = misc.merge(getBangEveryoneEvent(
-                step.game, step.player, c => c instanceof Bang,
-                () => step.event = null
-            ), {
-                format: () => ({
-                    name: 'Indians'
-                })
-            });
+    Card.call(this,
+        'indians', suit, rank, Card.types.brown,
+        () => true,
+        (game, cards, player, onResolved) => {
+            player.hand.discard(this.id);
+            onResolved(getBangEveryoneEvent(game.players, player, Bang));
         }
     );
 }
+misc.extend(Card, Indians);
 
 function Panico(suit, rank) {
-    var id = 'panico:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        // Card onPlay
-        step => {
-            var delegate = new events.DelegateEvent(
-                new events.TargetEvent(
-                    step.game, step.player, false, step.player.stat('range'),
-                    // Target onTarget
-                    target => delegate.event = new events.CardChoiceEvent(
-                        step.game, step.player,
-                        target.equipped.concat(target.hand.length ? { id: 'hand'} : []),
-                        // CardChoice onChoice
-                        choice => {
-                            step.player.hand.discard(this.id);
-                            var card;
-                            if (choice.id === 'hand') card = misc.spliceRand(target.hand);
-                            else card = target.equipped.remove(choice.id);
-                            step.player.hand.push(card);
-                            delegate.event = null;
-                        },
-                        // CardChoice onCancel
-                        () => delegate.event = null
-                    ),
-                    // Target onCancel
-                    () => delegate.event = null
-                ),
-                // Delegate onResolved
-                () => step.event = null
-            );
-            step.event = delegate;
-        }
+    Card.call(this,
+        'panico', suit, rank, Card.types.brown,
+        () => true,
+        (game, cards, player, onResolved) => new events.TargetDistance(
+            game.players, player,
+            // onTarget; panicking someone
+            target => onResolved(new events.RemoveOtherCard(
+                player, target, true, true,
+                card => {
+                    player.hand.discard(this.id);
+                    player.hand.push(card);
+                    onResolved();
+                },
+                () => onResolved()
+            )),
+            // onCancel; the panico was not used
+            () => onResolved()
+        )
     );
 }
+misc.extend(Card, Panico);
 
 function CatBalou(suit, rank) {
-    var id = 'catbalou:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        // Card onPlay
-        step => {
-            var delegate = new events.DelegateEvent(
-                new events.TargetEvent(
-                    step.game, step.player, false, 1000,
-                    // Target onTarget
-                    target => delegate.event = new events.CardChoiceEvent(
-                        step.game, step.player,
-                        target.equipped.concat(target.hand.map((c, i) => ({ id: 'hand:' + i}))),
-                        // CardChoice onChoice
-                        card => {
-                            step.player.hand.discard(this.id);
-                            if (card.id.startsWith('hand')) {
-                                var index = card.id.substring('hand:'.length);
-                                target.hand.discard(target.hand[index].id);
-                            } else {
-                                target.equipped.discard(card.id);
-                            }
-                            delegate.event = null;
-                        },
-                        // CardChoice onCancel
-                        () => delegate.event = null
-                    ),
-                    // Target onCancel
-                    () => delegate.event = null
-                ),
-                // Delegate onResolved
-                () => step.event = null
-            );
-            step.event = delegate;
-        }
+    Card.call(this,
+        'catbalou', suit, rank, Card.types.brown,
+        () => true,
+        (game, cards, player, onResolved) => new events.TargetOthers(
+            game.players, player,
+            // onTarget; removing someone's card
+            target => onResolved(new events.RemoveOtherCard(
+                player, target, true, true,
+                card => {
+                    player.hand.discard(this.id);
+                    cards.discarded.push(card);
+                    onResolved();
+                },
+                // no choice; cancel
+                () => onResolved()
+            )),
+            // onCancel; the catbalou was not used
+            () => onResolved()
+        )
     );
 }
+misc.extend(Card, CatBalou);
 
-function handleDuel(step, source, target) {
-    step.event = events.CardChoiceEvent(
-        step.game, target, target.hand.filter(c => c instanceof Bang),
-        // onChoice
+function handleDuel(source, target, onResolved) {
+    return events.CardTypeEvent(
+        target, Bang,
+        // onChoice; duel is reversed
         card => {
             target.hand.discard(card.id);
-            handleDuel(step, target, source);
+            onResolved(handleDuel(target, source, onResolved));
         },
-        // onCancel
-        () => step.event = target.damage(1, () => step.event = null),
-        // format
+        // onCancel; target takes damage
+        () => onResolved(target.damage(1, onResolved)),
+        // format; who is banging who
         () => ({
             name: 'Duel',
             source: source.name,
@@ -304,65 +249,64 @@ function handleDuel(step, source, target) {
     );
 }
 function Duel(suit, rank) {
-    var id = 'duel:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown,
-        step => true,
-        step => {
-            step.event = new events.TargetEvent(
-                step.game, step.player, false, 1000,
-                // Target onTarget
-                target => {
-                    step.player.hand.discard(this.id);
-                    handleDuel(step, step.player, target);
-                },
-                // Target onCancel
-                () => step.event = null
-            );
-        }
+    Card.call(this,
+        'duel', suit, rank, Card.types.brown,
+        () => true,
+        // onPlay
+        (game, cards, player, onResolved) => new events.TargetOthers(
+            // onTarget
+            target => {
+                player.hand.discard(this.id);
+                onResolved(handleDuel(player, target, onResolved));
+            },
+            // onCancel; no card was used
+            () => onResolved()
+        )
     );
 }
+misc.extend(Card, Duel);
 
-function Equipment(id, suit, rank, slot, targetSrc, overrides) {
+function Equipment(name, suit, rank, slot, targetSrc, overrides) {
     this.slot = slot;
-    Card.call(this, id, suit, rank, Card.types.blue,
-        step => true,
-        step => targetSrc(step, target => {
-            step.player.hand.remove(this.id);
-            var current = target.equipped.find(c => c.slot === this.slot);
-            if (current) target.equipped.discard(current.id);
-            target.equipped.push(this);
-        })
+    Card.call(this,
+        name, suit, rank, Card.types.blue,
+        () => true,
+        (game, cards, player, onResolved) => targetSrc(
+            player, game.players,
+            // onTarget; applying equipment
+            target => {
+                player.hand.remove(this.id);
+                var current = target.equipped.find(c => c.slot === this.slot);
+                if (current) target.equipped.discard(current.id);
+                target.equipped.push(this);
+                onResolved();
+            },
+            () => onResolved()
+        )
     );
     misc.merge(this, overrides);
 }
-var targetSelf = (step, onResolved) => onResolved(step.player);
-var targetAny = (step, onResolved) => step.event = new events.TargetEvent(
-    step.game, step.player, true, 1000,
-    // onTarget
-    target => onResolved(target),
-    // onCancel
-    () => step.event = null
-);
+misc.extend(Card, Equipment);
 
 function Gun(name, suit, rank, overrides) {
-    var id = name + ':' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'weapon', targetSelf, overrides);
+    Equipment.call(this, name, suit, rank, 'weapon', targetSelf, overrides);
 }
+misc.extend(Card, Gun);
 
 function Mustang(suit, rank) {
-    var id = 'mustang:' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'mustang', targetSelf, {
+    Equipment.call(this, 'mustang', suit, rank, 'mustang', targetSelf, {
         distanceModifier: 1
     });
 }
+misc.extend(Card, Mustang);
 
 function Mirino(suit, rank) {
-    var id = 'mirino:' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'mirino', targetSelf, {
+    Equipment.call(this, 'mirino', suit, rank, 'mirino', targetSelf, {
         bangRangeModifier: 1,
         rangeModifier: 1
     });
 }
+misc.extend(Card, Mirino);
 
 function Barile() {
     var id = 'barile:' + suit + ':' + rank;
@@ -370,6 +314,7 @@ function Barile() {
         // TODO barile
     });
 }
+misc.extend(Card, Barile);
 
 function Prigione() {
     var id = 'prigione:' + suit + ':' + rank;
@@ -377,6 +322,7 @@ function Prigione() {
         // TODO prigione
     });
 }
+misc.extend(Card, Prigione);
 
 function Dynamite() {
     var id = 'dynamite:' + suit + ':' + rank;
@@ -384,6 +330,7 @@ function Dynamite() {
         // TODO dynamite
     });
 }
+misc.extend(Card, Dynamite);
 
 module.exports = {
     Bang: Bang,

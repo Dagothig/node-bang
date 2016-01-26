@@ -3,7 +3,6 @@ var log = aReq('server/log'),
     misc = aReq('server/misc');
 
 function Step(turn) {
-    log(this.constructor.name + 'ing');
     this.game = turn.game;
     this.phase = turn.phase;
     this.turn = turn;
@@ -15,11 +14,19 @@ Step.prototype = {
         return this.constructor.name;
     },
     format: function() {
-        return { name: this.name };
+        return {
+            name: this.name,
+            event: (this.event && this.event.format) ?
+                this.event.format() : undefined
+        };
     },
     start: function() {},
-    actionsFor: function(player) {},
-    handleAction: function(player) {},
+    actionsFor: function(player) {
+        if (this.event) return this.event.actionsFor(player);
+    },
+    handleAction: function(player) {
+        if (this.event) return this.event.handleAction(player, msg);
+    },
     end: function() {}
 };
 
@@ -52,12 +59,6 @@ function Play(turn) {
     this.bangs = 0;
 }
 misc.merge(Play.prototype, Step.prototype, {
-    format: function() {
-        return misc.merge(Step.prototype.format.call(this), {
-            event: this.event && this.event.format ?
-                this.event.format() : undefined
-        });
-    },
     actionsFor: function(player) {
         if (this.event) return this.event.actionsFor(player);
         else {
@@ -77,7 +78,10 @@ misc.merge(Play.prototype, Step.prototype, {
         if (msg.action === actions.endTurn) return this.turn.goToNextStep();
         if (msg.action === actions.play) {
             var card = this.player.hand.find(card => card.id === msg.arg);
-            if (card && card.filter(this)) return card.onPlay(this);
+            if (card && card.filter(this)) return this.event = card.onPlay(
+                this.game, this.phase.cards, this.player,
+                event => this.event = event
+            );
         }
     }
 });

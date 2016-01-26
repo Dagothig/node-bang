@@ -24,8 +24,9 @@ var types = {
     blue: 'blue'
 };
 
-function Card(id, suit, rank, type, filter, onPlay) {
-    this.id = id;
+function Card(name, suit, rank, type, filter, onPlay) {
+    this.id = name + ':' + suit + ':' + rank;
+    this.name = name;
     this.suit = suit;
     this.rank = rank;
     this.type = type;

@@ -16,6 +16,29 @@ function spliceRand(arr) {
     return arr.splice((Math.random() * arr.length)|0, 1)[0];
 }
 
+function remove(arr, e) {
+    var index = arr.indexOf(e);
+    if (index < 0 || index >= this.events.length) return;
+    return arr.splice(index, 1)[0];
+}
+
+function filterFrom(arr, e, step, filter) {
+    var i = arr.indexOf(e);
+    for (n = 1; n < arr.length; n++) {
+        var next = (i + n * step) % arr.length;
+        while (next < 0) next += arr.length;
+        if (!filter || filter(arr[next], next)) return arr[next];
+    }
+}
+after = (arr, e, filter) => filterFrom(arr, e, 1, filter);
+before = (arr, e, filter) => filterFrom(arr, e, -1, filter);
+
+function fromArrays() {
+    var arr = [];
+    Array.from(arguments).forEach(arg => Array.prototype.push.apply(arr, arg));
+    return arr;
+}
+
 function gen(f, c) {
     var arr = [];
     for (var i = 0; i < c; i++) arr.push(f(i));
@@ -53,6 +76,12 @@ function merge(to) {
     return to;
 }
 
+function extend(source, dest) {
+    dest.prototype = Object.create(source.prototype);
+    dest.prototype.constructor = dest;
+    merge.apply(this, Array.from(arguments).slice(1));
+}
+
 function bounded(value, min, max, minExclusive, maxExclusive) {
     return (minExclusive ? value > min : value >= min)
         && (maxExclusive ? value < max : value <= max);
@@ -62,11 +91,16 @@ module.exports = {
     shuffle: shuffle,
     swap: swap,
     spliceRand: spliceRand,
+    remove: remove,
+    after: after,
+    before: before,
+    fromArrays: fromArrays,
     gen: gen,
     strTimes: strTimes,
     prepad: prepad,
     postpad: postpad,
     simpleTime: simpleTime,
     merge: merge,
+    extend: extend,
     bounded: bounded
 };
