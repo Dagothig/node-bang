@@ -95,18 +95,6 @@ var RemoveOtherCard = (
     onCancel, format
 );
 
-var DelegateEvent = (onEvent, onResolved) => ({
-    _event: onEvent(this, event => this.event = event),
-    get event() { return this._event; },
-    set event(event) {
-        if (event) this._event = event;
-        else onResolved();
-    },
-    get actionsFor() { return this.event.actionsFor; },
-    get handleAction() { return this.event.handleAction; },
-    get format() { return this.event.format; }
-});
-
 var ComposedEvent = (elements, generator, onResolved) => {
     var event = {
         resolveEvent: function(i, newEvent) {
@@ -144,6 +132,5 @@ module.exports = {
     CardChoiceEvent: CardChoiceEvent,
     CardTypeEvent: CardTypeEvent,
     RemoveOtherCard: RemoveOtherCard,
-    DelegateEvent: DelegateEvent,
     ComposedEvent: ComposedEvent
 };
