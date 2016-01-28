@@ -40,10 +40,10 @@ var TargetOthers = (player, players, onTarget, onCancel, format) => TargetEvent(
 var TargetSelf = (player, players, onTarget, onCancel, format) => onTarget(player);
 
 var TargetRange = (player, players, range, onTarget, onCancel, format) => {
-    let alive = players.filter(p => p.alive && p !== player);
+    let alive = players.filter(p => p.alive);
     return TargetEvent(
         player,
-        alive.filter(p => player.distanceTo(alive, p) <= range),
+        alive.filter(p => player.distanceTo(alive, p) <= range).filter(p => p !== player),
         onTarget, onCancel, format
     );
 };
@@ -79,6 +79,22 @@ var CardTypeEvent = (player, cardType, onChoice, onCancel, format) => CardChoice
     player.hand.filter(c => c instanceof cardType),
     onChoice, onCancel, format
 );
+
+var CardDrawEvent = (player, cards, onDraw, onCancel, format) => ({
+    actionsFor: function(p) {
+        if (p !== player) return;
+        var acts = {};
+        acts[actions.draw] = [actions.draw];
+        if (onCancel) acts[actions.cancel] = [actions.cancel];
+        return acts;
+    },
+    handleAction: function(p, msg) {
+        if (p !== player) return;
+        if (msg.action === actions.draw) onDraw(cards.draw()[0]);
+        else if (onCancel && msg.action === actions.cancel) onCancel();
+    },
+    format: format
+});
 
 var RemoveOtherCard = (
     player, target, withHand, withEquipment, onChoice, onCancel, format
@@ -131,6 +147,7 @@ module.exports = {
     TargetDistance: TargetDistance,
     CardChoiceEvent: CardChoiceEvent,
     CardTypeEvent: CardTypeEvent,
+    CardDrawEvent: CardDrawEvent,
     RemoveOtherCard: RemoveOtherCard,
     ComposedEvent: ComposedEvent
 };

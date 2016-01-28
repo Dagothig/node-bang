@@ -117,7 +117,14 @@ var cards = [
     new Mustang(suits.hearts, ranks.three),
 
     new Mirino(suits.hearts, ranks.ace),
-    new Mirino(suits.hearts, ranks.two)
+    new Mirino(suits.hearts, ranks.two),
+
+    new Barile(suits.hearts, ranks.ace, suits.hearts),
+    new Barile(suits.hearts, ranks.two, suits.hearts),
+    new Barile(suits.hearts, ranks.three, suits.hearts),
+    new Barile(suits.hearts, ranks.four, suits.hearts),
+    new Barile(suits.hearts, ranks.five, suits.hearts),
+    new Barile(suits.hearts, ranks.six, suits.hearts)
 ];
 
 module.exports = cards;

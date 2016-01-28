@@ -37,7 +37,7 @@ Play
             Affect stats
         [[Mirino]]
             Affect stats
-        Barile
+        [[Barile]]
             On bang! draw to check; if good, ignore shot
         Jail
             On start of turn, draw; if good, discard; if bad, pass turn and discard

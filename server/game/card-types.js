@@ -15,13 +15,17 @@ function Bang(suit, rank) {
             target => {
                 step.player.hand.discard(this.id);
                 step.bangs++;
-                onResolved(events.CardTypeEvent(
-                    target, Mancato,
-                    // onCard; damage avoided
-                    card => onResolved(target.hand.discard(card.id)),
-                    // onCancel; damage goes through
-                    () => onResolved(target.damage(1, onResolved))
-                ));
+                target.onEvent('beforeBangResponse',
+                    [step, this, target],
+                    events.CardTypeEvent(
+                        target, Mancato,
+                        // onCard; damage avoided
+                        card => onResolved(target.hand.discard(card.id)),
+                        // onCancel; damage goes through
+                        () => onResolved(target.damage(1, onResolved))
+                    ),
+                    onResolved
+                );
             },
             // onCancel; no card was used
             () => onResolved()
@@ -301,25 +305,33 @@ function Mirino(suit, rank) {
 }
 misc.extend(Card, Mirino);
 
-function Barile() {
-    var id = 'barile:' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'barile', events.TargetSelf, {
-        // TODO barile
+function Barile(suit, rank, avoidSuit) {
+    Equipment.call(this, 'barile', suit, rank, 'barile', events.TargetSelf, {
+        avoidSuit: avoidSuit,
+        beforeBangResponse: function(step, card, target, onResolved, onSkip) {
+            return events.CardDrawEvent(
+                target, step.phase.cards,
+                card => {
+                    step.phase.cards.discarded.push(card);
+                    if (card.suit === this.avoidSuit) onSkip();
+                    else onResolved();
+                },
+                () => onResolved()
+            );
+        }
     });
 }
 misc.extend(Card, Barile);
 
-function Prigione() {
-    var id = 'prigione:' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'prigione', events.TargetAny, {
+function Prigione(suit, rank) {
+    Equipment.call(this, 'prigione', suit, rank, 'prigione', events.TargetAny, {
         // TODO prigione
     });
 }
 misc.extend(Card, Prigione);
 
-function Dynamite() {
-    var id = 'dynamite:' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'dynamite', events.TargetAny, {
+function Dynamite(suit, rank) {
+    Equipment.call(this, 'dynamite', suit, rank, 'dynamite', events.TargetAny, {
         // TODO dynamite
     });
 }

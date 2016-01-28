@@ -47,8 +47,8 @@ module.exports = new Phase('Playing', {
                 var card = this.remove(cardId);
                 if (card) cards.discarded.push(card);
             },
-            handlers: function(event) {
-                return this.filter(e => e[event]);
+            handlers: function(eventName) {
+                return this.filter(e => e[eventName]);
             }
         });
 
@@ -76,15 +76,33 @@ module.exports = new Phase('Playing', {
                 return obj;
             },
 
-            handlers: function(handler) {
+            onEvent: function(eventName, recurseArgs, following, onResolved) {
                 var handlers = [];
-                var charHandler = this.character[handler],
-                    roleHandler = this.role[handler],
-                    equippedHandlers = this.equipped.handlers(handler);
-                if (charHandler) handlers.push(charHandler);
-                if (roleHandler) handlers.push(roleHandler);
+                var charHandler = this.character[eventName],
+                    roleHandler = this.role[eventName],
+                    equippedHandlers = this.equipped.handlers(eventName);
+                if (charHandler) handlers.push(this.character);
+                if (roleHandler) handlers.push(this.role);
                 equippedHandlers.forEach(e => handlers.push(e));
-                return handlers;
+
+                handlers.reverse();
+
+                // This is sortah defined backwards:
+                // We need to build an array of arguments for the individual events we call
+                // but to do that, we need to define the onResolved that will be passed and
+                // that will recurse.
+                // However, to define that we need to define the function that will be called for
+                // the recursing. Luckily we can define this one as taking the args as a parameter,
+                // so this is where we don't need to pre-define things anymore
+                var handlePile = args => {
+                    var next = handlers.pop();
+                    onResolved(next ? next[eventName].apply(next, args) : following);
+                }
+                // on sub resolved; if it is given an event, it goes to it,
+                // otherwise, it proceeds with the remainder of the pile
+                recurseArgs.push(event => event ? onResolved(event) : handlePile(recurseArgs));
+                recurseArgs.push(onResolved);
+                return handlePile(recurseArgs);
             }
         });
 
