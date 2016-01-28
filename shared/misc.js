@@ -18,7 +18,7 @@ function spliceRand(arr) {
 
 function remove(arr, e) {
     var index = arr.indexOf(e);
-    if (index < 0 || index >= this.events.length) return;
+    if (index < 0 || index >= arr.length) return;
     return arr.splice(index, 1)[0];
 }
 
@@ -79,7 +79,7 @@ function merge(to) {
 function extend(source, dest) {
     dest.prototype = Object.create(source.prototype);
     dest.prototype.constructor = dest;
-    merge.apply(this, Array.from(arguments).slice(1));
+    merge.apply(this, [dest.prototype].concat(Array.from(arguments).slice(2)));
 }
 
 function bounded(value, min, max, minExclusive, maxExclusive) {

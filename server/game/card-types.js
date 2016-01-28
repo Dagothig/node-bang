@@ -9,12 +9,13 @@ function Bang(suit, rank) {
         // Filter
         step => step.bangs < step.player.stat('bangs'),
         // onPlay
-        (game, cards, player, onResolved) => new events.TargetBang(
-            game.players, player,
+        (step, onResolved) => events.TargetBang(
+            step.player, step.game.players,
             // onTarget; trying to bang someone
             target => {
-                player.hand.discard(this.id);
-                onResolved(new events.CardTypeEvent(
+                step.player.hand.discard(this.id);
+                step.bangs++;
+                onResolved(events.CardTypeEvent(
                     target, Mancato,
                     // onCard; damage avoided
                     card => onResolved(target.hand.discard(card.id)),
@@ -30,8 +31,7 @@ function Bang(suit, rank) {
 misc.extend(Card, Bang);
 
 function Mancato(suit, rank) {
-    var id = 'mancato:' + suit + ':' + rank;
-    Card.call(this, id, suit, rank, Card.types.brown);
+    Card.call(this, 'mancato', suit, rank, Card.types.brown);
 }
 misc.extend(Card, Mancato);
 
@@ -39,26 +39,23 @@ function Beer(suit, rank) {
     Card.call(this,
         'beer', suit, rank, Card.types.brown,
         () => true,
-        (game, cards, player, onResolved) => {
-            player.hand.discard(this.id);
-            player.heal(1);
-            onResolved();
+        (step, onResolved) => {
+            step.player.hand.discard(this.id);
+            step.player.heal(1);
         }
     );
 }
 misc.extend(Card, Beer);
-
-Beer.getDeathEvent = (game, player, onResult) => new events.CardTypeEvent(
+Beer.getDeathEvent = (player, onResolved) => events.CardTypeEvent(
     player, Beer,
     // onChoice
     card => {
         player.hand.discard(card.id);
         player.heal(1);
-        if (player.alive) onResult();
-        else game.onGameUpdate();
+        onResolved();
     },
     // onCancel
-    () => onResult(),
+    () => onResolved(),
     // format
     () => ({
         name: 'Dying',
@@ -70,18 +67,17 @@ function Saloon(suit, rank) {
     var id = 'saloon:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown,
         () => true,
-        (game, cards, player, onResolved) => {
-            player.hand.discard(this.id);
-            game.players
+        (step, onResolved) => {
+            step.player.hand.discard(this.id);
+            step.game.players
                 .filter(p => p.alive)
                 .forEach(p => p.heal(1));
-            onResolved();
         }
     );
 }
 misc.extend(Card, Saloon);
 
-function handleDrawCard(player, card, amount, onResolved) {
+function handleDrawCard(player, card, amount) {
     player.hand.discard(card.id);
     player.hand.drawFromPile(amount);
 }
@@ -89,7 +85,7 @@ function Stagecoach(suit, rank) {
     var id = 'stagecoach:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown,
         () => true,
-        (game, cards, player, onResolved) => handleDrawCard(player, this, 2, onResolved)
+        (step, onResolved) => handleDrawCard(step.player, this, 2)
     );
 }
 misc.extend(Card, Stagecoach);
@@ -97,7 +93,7 @@ function WellsFargo(suit, rank) {
     var id = 'wellsfargo:' + suit + ':' + rank;
     Card.call(this, id, suit, rank, Card.types.brown,
         () => true,
-        (game, cards, player, onResolved) => handleDrawCard(player, this, 3, onResolved)
+        (step, onResolved) => handleDrawCard(step.player, this, 3)
     );
 }
 misc.extend(Card, WellsFargo);
@@ -129,33 +125,29 @@ function Emporio(suit, rank) {
         // Filter
         () => true,
         // onPlay
-        (game, cards, player, onResolved) => {
-            player.hand.discard(this.id);
-            var alive = game.players.filter(p => p.alive);
-            var current = alive[alive.indexOf(player)];
-            var cards = cards.draw(alive.length);
+        (step, onResolved) => {
+            step.player.hand.discard(this.id);
+            var alive = step.game.players.filter(p => p.alive);
+            var current = alive[alive.indexOf(step.player)];
+            var cards = step.phase.cards.draw(alive.length);
             return handleEmporio(alive, current, cards, onResolved);
         }
     );
 }
 misc.extend(Card, Emporio);
 
-function getBangEveryoneEvent(players, player, responseType) {
+function getBangEveryoneEvent(players, player, responseType, onResolved) {
     var others = players.filter(p => p.alive && p !== player);
-    return new events.ComposedEvent(
-        onSubResolved => others.map(other => new events.CardTypeEvent(
+    return events.ComposedEvent(
+        players.filter(p => p.alive && p !== player),
+        (other, onSubResolved) => events.CardTypeEvent(
             other, responseType,
-            function(card) {
+            card => {
                 other.hand.discard(card.id);
-                onSubResolved(this);
+                onSubResolved();
             },
-            function() {
-                return new events.DelegateEvent(
-                    onDelegateResolved => other.damage(1, onDelegateResolved),
-                    () => onSubResolved(this)
-                );
-            }
-        )),
+            () => onSubResolved(other.damage(1, onSubResolved))
+        ),
         () => onResolved()
     );
 }
@@ -163,9 +155,9 @@ function Gatling(suit, rank) {
     Card.call(this,
         'gatling', suit, rank, Card.types.brown,
         () => true,
-        (game, cards, player, onResolved) => {
-            player.hand.discard(this.id);
-            onResolved(getBangEveryoneEvent(game.players, player, Mancato));
+        (step, onResolved) => {
+            step.player.hand.discard(this.id);
+            return getBangEveryoneEvent(step.game.players, step.player, Mancato, onResolved);
         }
     );
 }
@@ -175,9 +167,9 @@ function Indians(suit, rank) {
     Card.call(this,
         'indians', suit, rank, Card.types.brown,
         () => true,
-        (game, cards, player, onResolved) => {
-            player.hand.discard(this.id);
-            onResolved(getBangEveryoneEvent(game.players, player, Bang));
+        (step, onResolved) => {
+            step.player.hand.discard(this.id);
+            return getBangEveryoneEvent(step.game.players, step.player, Bang, onResolved);
         }
     );
 }
@@ -187,14 +179,14 @@ function Panico(suit, rank) {
     Card.call(this,
         'panico', suit, rank, Card.types.brown,
         () => true,
-        (game, cards, player, onResolved) => new events.TargetDistance(
-            game.players, player,
+        (step, onResolved) => events.TargetDistance(
+            step.player, step.game.players,
             // onTarget; panicking someone
-            target => onResolved(new events.RemoveOtherCard(
-                player, target, true, true,
+            target => onResolved(events.RemoveOtherCard(
+                step.player, target, true, true,
                 card => {
-                    player.hand.discard(this.id);
-                    player.hand.push(card);
+                    step.player.hand.discard(this.id);
+                    step.player.hand.push(card);
                     onResolved();
                 },
                 () => onResolved()
@@ -210,14 +202,14 @@ function CatBalou(suit, rank) {
     Card.call(this,
         'catbalou', suit, rank, Card.types.brown,
         () => true,
-        (game, cards, player, onResolved) => new events.TargetOthers(
-            game.players, player,
+        (step, onResolved) => events.TargetOthers(
+            step.player, step.game.players,
             // onTarget; removing someone's card
-            target => onResolved(new events.RemoveOtherCard(
-                player, target, true, true,
+            target => onResolved(events.RemoveOtherCard(
+                step.player, target, true, true,
                 card => {
-                    player.hand.discard(this.id);
-                    cards.discarded.push(card);
+                    step.player.hand.discard(this.id);
+                    step.phase.cards.discarded.push(card);
                     onResolved();
                 },
                 // no choice; cancel
@@ -253,11 +245,12 @@ function Duel(suit, rank) {
         'duel', suit, rank, Card.types.brown,
         () => true,
         // onPlay
-        (game, cards, player, onResolved) => new events.TargetOthers(
+        (step, onResolved) => events.TargetOthers(
+            step.player, step.game.players,
             // onTarget
             target => {
-                player.hand.discard(this.id);
-                onResolved(handleDuel(player, target, onResolved));
+                step.player.hand.discard(this.id);
+                onResolved(handleDuel(step.player, target, onResolved));
             },
             // onCancel; no card was used
             () => onResolved()
@@ -271,11 +264,11 @@ function Equipment(name, suit, rank, slot, targetSrc, overrides) {
     Card.call(this,
         name, suit, rank, Card.types.blue,
         () => true,
-        (game, cards, player, onResolved) => targetSrc(
-            player, game.players,
+        (step, onResolved) => targetSrc(
+            step.player, step.game.players,
             // onTarget; applying equipment
             target => {
-                player.hand.remove(this.id);
+                step.player.hand.remove(this.id);
                 var current = target.equipped.find(c => c.slot === this.slot);
                 if (current) target.equipped.discard(current.id);
                 target.equipped.push(this);
@@ -289,19 +282,19 @@ function Equipment(name, suit, rank, slot, targetSrc, overrides) {
 misc.extend(Card, Equipment);
 
 function Gun(name, suit, rank, overrides) {
-    Equipment.call(this, name, suit, rank, 'weapon', targetSelf, overrides);
+    Equipment.call(this, name, suit, rank, 'weapon', events.TargetSelf, overrides);
 }
 misc.extend(Card, Gun);
 
 function Mustang(suit, rank) {
-    Equipment.call(this, 'mustang', suit, rank, 'mustang', targetSelf, {
+    Equipment.call(this, 'mustang', suit, rank, 'mustang', events.TargetSelf, {
         distanceModifier: 1
     });
 }
 misc.extend(Card, Mustang);
 
 function Mirino(suit, rank) {
-    Equipment.call(this, 'mirino', suit, rank, 'mirino', targetSelf, {
+    Equipment.call(this, 'mirino', suit, rank, 'mirino', events.TargetSelf, {
         bangRangeModifier: 1,
         rangeModifier: 1
     });
@@ -310,7 +303,7 @@ misc.extend(Card, Mirino);
 
 function Barile() {
     var id = 'barile:' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'barile', targetSelf, {
+    Equipment.call(this, id, suit, rank, 'barile', events.TargetSelf, {
         // TODO barile
     });
 }
@@ -318,7 +311,7 @@ misc.extend(Card, Barile);
 
 function Prigione() {
     var id = 'prigione:' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'prigione', targetAny, {
+    Equipment.call(this, id, suit, rank, 'prigione', events.TargetAny, {
         // TODO prigione
     });
 }
@@ -326,7 +319,7 @@ misc.extend(Card, Prigione);
 
 function Dynamite() {
     var id = 'dynamite:' + suit + ':' + rank;
-    Equipment.call(this, id, suit, rank, 'dynamite', targetAny, {
+    Equipment.call(this, id, suit, rank, 'dynamite', events.TargetAny, {
         // TODO dynamite
     });
 }

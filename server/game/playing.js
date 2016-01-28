@@ -91,17 +91,15 @@ module.exports = new Phase('Playing', {
         // Life third: it's used in the hand limit calculations
         misc.merge(player, {
             life: player.stat('life'),
-            damage: function(amount, onResult) {
+            damage: function(amount, onResolved) {
                 this.life -= amount;
-                if (this.dead) return cardTypes.Beer.getDeathEvent(
-                    game, player,
-                    () => {
+                if (this.dead) return cardTypes.Beer.getDeathEvent(player,
+                    event => {
                         if (player.dead && player === phase.turn.player) throw 'Need to handle player death during turn';
                         phase.checkForEnd(game);
-                        onResult();
+                        onResolved();
                     }
                 );
-                else onResult();
             },
             heal: function(amount) {
                 this.life = Math.min(this.life + amount, this.stat('life'));

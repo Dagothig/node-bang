@@ -25,32 +25,34 @@ var TargetEvent = (player, targets, onTarget, onCancel, format) => ({
     format: format
 });
 
-var TargetAny = (player, players, onTarget, onCancel, format) => new TargetEvent(
+var TargetAny = (player, players, onTarget, onCancel, format) => TargetEvent(
     player,
     players.filter(p => p.alive),
     onTarget, onCancel, format
 );
 
-var TargetOthers = (player, players, onTarget, format) => new TargetEvent(
+var TargetOthers = (player, players, onTarget, onCancel, format) => TargetEvent(
     player,
     players.filter(p => p.alive && p !== player),
     onTarget, onCancel, format
 );
 
-var TargetRange = (player, players, range, onTarget, format) => {
+var TargetSelf = (player, players, onTarget, onCancel, format) => onTarget(player);
+
+var TargetRange = (player, players, range, onTarget, onCancel, format) => {
     let alive = players.filter(p => p.alive && p !== player);
-    return new TargetEvent(
+    return TargetEvent(
         player,
         alive.filter(p => player.distanceTo(alive, p) <= range),
         onTarget, onCancel, format
     );
 };
 
-var TargetBang = (player, players, onTarget, format) =>
-    TargetRange(player, players, player.stat('bangRange'), onTarget, format);
+var TargetBang = (player, players, onTarget, onCancel, format) =>
+    TargetRange(player, players, player.stat('bangRange'), onTarget, onCancel, format);
 
-var TargetDistance = (player, players, onTarget, format) =>
-    TargetRange(player, players, player.stat('distance'), onTarget, format);
+var TargetDistance = (player, players, onTarget, onCancel, format) =>
+    TargetRange(player, players, player.stat('distance'), onTarget, onCancel, format);
 
 var CardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
     actionsFor: function(p) {
@@ -72,7 +74,7 @@ var CardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
     format: format
 });
 
-var CardTypeEvent = (player, cardType, onChoice, onCancel, format) => new CardChoiceEvent(
+var CardTypeEvent = (player, cardType, onChoice, onCancel, format) => CardChoiceEvent(
     player,
     player.hand.filter(c => c instanceof cardType),
     onChoice, onCancel, format
@@ -80,9 +82,9 @@ var CardTypeEvent = (player, cardType, onChoice, onCancel, format) => new CardCh
 
 var RemoveOtherCard = (
     player, target, withHand, withEquipment, onChoice, onCancel, format
-) => new CardChoiceEvent(
+) => CardChoiceEvent(
     player,
-    misc.FromArrays(
+    misc.fromArrays(
         (withHand && target.hand.length) ? { id: 'hand' } : [],
         withEquipment ? target.equipped : []
     ),
@@ -94,7 +96,7 @@ var RemoveOtherCard = (
 );
 
 var DelegateEvent = (onEvent, onResolved) => ({
-    _event: onEvent(event => this.event = event),
+    _event: onEvent(this, event => this.event = event),
     get event() { return this._event; },
     set event(event) {
         if (event) this._event = event;
@@ -105,27 +107,37 @@ var DelegateEvent = (onEvent, onResolved) => ({
     get format() { return this.event.format; }
 });
 
-var ComposedEvent = (elements, eventFunc, onResolved) => ({
-    events: eventsFunc((oldEvent, newEvent) => {
-        misc.remove(this.events, oldEvent);
-        if (newEvent) this.events.push(newEvent);
-        if (!this.events.length) onResolved();
-    }),
-    actionsFor: function(p) {
-        return this.events.reduce((a, e) => misc.merge(a, e.actionsFor(p)), {});
-    },
-    handleAction: function(p, msg) {
-        return this.events.map(e => e.handleAction(p, msg));
-    },
-    format: function() {
-        return this.events.reduce((f, e) => misc.merge(f, e.format()), {});
-    }
-});
+var ComposedEvent = (elements, generator, onResolved) => {
+    var event = {
+        resolveEvent: function(i, newEvent) {
+            this.events[i] = newEvent;
+            if (!this.events.filter(e => e).length) onResolved();
+        },
+        actionsFor: function(p) {
+            return this.events.reduce(
+                (a, e) => e ? misc.merge(a, e.actionsFor(p)) : a,
+                {}
+            );
+        },
+        handleAction: function(p, msg) {
+            return this.events.map(e => e ? e.handleAction(p, msg) : undefined);
+        },
+        format: function() {
+            return this.events.reduce(
+                (f, e) => (e && e.format) ? misc.merge(f, e.format()) : f,
+                {}
+            );
+        }
+    };
+    event.events = elements.map((e, i) => generator(e, n => event.resolveEvent(i, n)));
+    return event;
+};
 
 module.exports = {
     TargetEvent: TargetEvent,
     TargetAny: TargetAny,
     TargetOthers: TargetOthers,
+    TargetSelf: TargetSelf,
     TargetRange: TargetRange,
     TargetBang: TargetBang,
     TargetDistance: TargetDistance,
@@ -134,4 +146,4 @@ module.exports = {
     RemoveOtherCard: RemoveOtherCard,
     DelegateEvent: DelegateEvent,
     ComposedEvent: ComposedEvent
-}
+};

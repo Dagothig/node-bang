@@ -78,10 +78,8 @@ misc.merge(Play.prototype, Step.prototype, {
         if (msg.action === actions.endTurn) return this.turn.goToNextStep();
         if (msg.action === actions.play) {
             var card = this.player.hand.find(card => card.id === msg.arg);
-            if (card && card.filter(this)) return this.event = card.onPlay(
-                this.game, this.phase.cards, this.player,
-                event => this.event = event
-            );
+            if (card && card.filter(this))
+                return this.event = card.onPlay(this, event => this.event = event);
         }
     }
 });
