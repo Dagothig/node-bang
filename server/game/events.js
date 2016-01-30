@@ -80,7 +80,7 @@ var CardTypeEvent = (player, cardType, onChoice, onCancel, format) => CardChoice
     onChoice, onCancel, format
 );
 
-var CardDrawEvent = (player, cards, onDraw, onCancel, format) => ({
+var CardsDrawEvent = (player, cards, amount, onDraw, onCancel, format) => ({
     actionsFor: function(p) {
         if (p !== player) return;
         var acts = {};
@@ -90,11 +90,13 @@ var CardDrawEvent = (player, cards, onDraw, onCancel, format) => ({
     },
     handleAction: function(p, msg) {
         if (p !== player) return;
-        if (msg.action === actions.draw) onDraw(cards.draw()[0]);
+        if (msg.action === actions.draw) onDraw(cards.draw(amount));
         else if (onCancel && msg.action === actions.cancel) onCancel();
     },
     format: format
 });
+var CardDrawEvent = (player, cards, onDraw, onCancel, format) =>
+    CardsDrawEvent(player, cards, 1, cards => onDraw(cards[0]), onCancel, format);
 
 var RemoveOtherCard = (
     player, target, withHand, withEquipment, onChoice, onCancel, format
@@ -147,6 +149,7 @@ module.exports = {
     TargetDistance: TargetDistance,
     CardChoiceEvent: CardChoiceEvent,
     CardTypeEvent: CardTypeEvent,
+    CardsDrawEvent: CardsDrawEvent,
     CardDrawEvent: CardDrawEvent,
     RemoveOtherCard: RemoveOtherCard,
     ComposedEvent: ComposedEvent

@@ -1,12 +1,14 @@
 var log = aReq('server/log'),
     actions = aReq('server/actions'),
-    misc = aReq('server/misc');
+    misc = aReq('server/misc'),
+    events = aReq('server/game/events');
 
 function Step(turn) {
     this.game = turn.game;
     this.phase = turn.phase;
     this.turn = turn;
     this.player = turn.player;
+    this.defaultOnResolve = event => this.event = event;
 }
 // Specifically overriding step prototype so it doesn't have a constructor
 Step.prototype = {
@@ -24,7 +26,7 @@ Step.prototype = {
     actionsFor: function(player) {
         if (this.event) return this.event.actionsFor(player);
     },
-    handleAction: function(player) {
+    handleAction: function(player, msg) {
         if (this.event) return this.event.handleAction(player, msg);
     },
     end: function() {}
@@ -32,27 +34,20 @@ Step.prototype = {
 
 function Draw(turn) {
     Step.call(this, turn);
-    this.draw = 0;
-}
-misc.merge(Draw.prototype, Step.prototype, {
-    actionsFor: function(player) {
-        if (this.player !== player) return {};
-        if (this.draw >= this.player.stat('draw')) return {};
-        var acts = {};
-        acts[actions.draw] = ['pile'];
-        return acts;
-    },
-    handleAction: function(player, msg) {
-        if (this.player !== player) return;
-        if (msg.action === actions.draw) {
-            if (msg.arg === 'pile') {
-                this.player.hand.drawFromPile(1);
-                this.draw++;
-            }
+    this.regularDraw = events.CardsDrawEvent(
+        this.player, this.phase.cards, 2,
+        cards => {
+            Array.prototype.push.apply(this.player.hand, cards);
+            this.turn.goToNextStep();
         }
-        if (this.draw >= this.player.stat('draw')) this.turn.goToNextStep();
-    }
-});
+    );
+    this.player.handleEvent('beforeDraw',
+        [this],
+        this.regularDraw,
+        event => event ? this.defaultOnResolve(event) : this.turn.goToNextStep()
+    )
+}
+misc.extend(Step, Draw);
 
 function Play(turn) {
     Step.call(this, turn);
@@ -79,7 +74,7 @@ misc.merge(Play.prototype, Step.prototype, {
         if (msg.action === actions.play) {
             var card = this.player.hand.find(card => card.id === msg.arg);
             if (card && card.filter(this))
-                return this.event = card.onPlay(this, event => this.event = event);
+                return card.onPlay(this, this.defaultOnResolve);
         }
     }
 });

@@ -1,18 +1,25 @@
+var misc = aReq('server/misc');
+
 var ranks = {
-    ace: 'ace',
-    two: 'two',
-    three: 'three',
-    four: 'four',
-    five: 'five',
-    six: 'six',
-    seven: 'seven',
-    eight: 'eight',
-    nine: 'nine',
-    ten: 'ten',
-    jack: 'jack',
-    queen: 'queen',
-    king: 'king'
-}
+    ace: 1,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+    seven: 7,
+    eight: 8,
+    nine: 9,
+    ten: 10,
+    jack: 11,
+    queen: 12,
+    king: 13
+};
+var rankValues = {};
+Object.keys(ranks).forEach(rank => {
+    rankValues[rank] = ranks[rank];
+    ranks[rank] = rank;
+});
 var suits = {
     spades: 'spades',
     clovers: 'clovers',
@@ -35,8 +42,15 @@ function Card(name, suit, rank, type, filter, onPlay) {
 }
 Object.assign(Card, {
     ranks: ranks,
+    rankValues: rankValues,
     suits: suits,
-    types: types
+    types: types,
+    rankWithin: function(rank, min, max) {
+        return misc.bounded(
+            rankValues[rank],
+            rankValues[min],
+            rankValues[max]
+        );
+    }
 });
-
 module.exports = Card;

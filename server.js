@@ -34,5 +34,5 @@ var io = require('socket.io')(server),
 login.addHandlers(lobby, game);
 
 // Listen on port
-var port = process.env.PORT || 8081;
+var port = process.env.PORT || 8080;
 server.listen(port, () => log('Listening on port', port));

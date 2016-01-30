@@ -76,7 +76,7 @@ module.exports = new Phase('Playing', {
                 return obj;
             },
 
-            onEvent: function(eventName, recurseArgs, following, onResolved) {
+            handleEvent: function(eventName, recurseArgs, onFollowing, onResolved) {
                 var handlers = [];
                 var charHandler = this.character[eventName],
                     roleHandler = this.role[eventName],
@@ -87,37 +87,30 @@ module.exports = new Phase('Playing', {
 
                 handlers.reverse();
 
-                // This is sortah defined backwards:
-                // We need to build an array of arguments for the individual events we call
-                // but to do that, we need to define the onResolved that will be passed and
-                // that will recurse.
-                // However, to define that we need to define the function that will be called for
-                // the recursing. Luckily we can define this one as taking the args as a parameter,
-                // so this is where we don't need to pre-define things anymore
-                var handlePile = args => {
+                var handlePile = handlePile = args => {
                     var next = handlers.pop();
-                    onResolved(next ? next[eventName].apply(next, args) : following);
+                    if (next) next[eventName].apply(next, args);
+                    else onFollowing();
                 }
-                // on sub resolved; if it is given an event, it goes to it,
-                // otherwise, it proceeds with the remainder of the pile
                 recurseArgs.push(event => event ? onResolved(event) : handlePile(recurseArgs));
                 recurseArgs.push(onResolved);
-                return handlePile(recurseArgs);
+                handlePile(recurseArgs);
             }
         });
 
         // Life third: it's used in the hand limit calculations
         misc.merge(player, {
             life: player.stat('life'),
-            damage: function(amount, onResolved) {
+            handleDamage: function(amount, onResolved) {
                 this.life -= amount;
-                if (this.dead) return cardTypes.Beer.getDeathEvent(player,
+                if (this.dead) onResolved(cardTypes.Beer.getDeathEvent(player,
                     event => {
-                        if (player.dead && player === phase.turn.player) throw 'Need to handle player death during turn';
+                        if (player.dead && player === phase.turn.player)
+                            phase.goToNextTurn(game);
                         phase.checkForEnd(game);
                         onResolved();
                     }
-                );
+                ));
             },
             heal: function(amount) {
                 this.life = Math.min(this.life + amount, this.stat('life'));
@@ -166,10 +159,10 @@ module.exports = new Phase('Playing', {
             delete p.distanceTo;
             delete p.stats;
 
-            delete p.onEvent;
+            delete p.handleEvent;
 
             delete p.life;
-            delete p.damage;
+            delete p.handleDamage;
             delete p.heal;
             delete p.dead;
             delete p.alive;
