@@ -3,8 +3,8 @@ var ui = require('./ui'),
 
 module.exports = function(onMessage) {
     var element = ui.one('#lobby'),
-        usersList = ui.one(element, '.users .list'),
-        messagesList = ui.one(element, '.messages .list'),
+        usersList = ui.one(element, '.users'),
+        messagesList = ui.one(element, '.messages'),
         messageForm = ui.one(element, 'form'),
         message = ui.one(messageForm, '[name=message]');
 

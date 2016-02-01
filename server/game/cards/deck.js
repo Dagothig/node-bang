@@ -1,28 +1,36 @@
-var Card = aReq('server/game/card'),
-    cardTypes = aReq('server/game/card-types');
+var Card = aReq('server/game/cards/card');
 
 var suits = Card.suits, ranks = Card.ranks;
 
-var Bang = cardTypes.Bang,
-    Mancato = cardTypes.Mancato,
-    Beer = cardTypes.Beer,
-    Saloon = cardTypes.Saloon,
-    Stagecoach = cardTypes.Stagecoach,
-    WellsFargo = cardTypes.WellsFargo,
-    Emporio = cardTypes.Emporio,
-    Gatling = cardTypes.Gatling,
-    Indians = cardTypes.Indians,
-    Panico = cardTypes.Panico,
-    CatBalou = cardTypes.CatBalou,
-    Duel = cardTypes.Duel,
-    Gun = cardTypes.Gun,
-    Mustang = cardTypes.Mustang,
-    Mirino = cardTypes.Mirino,
-    Barile = cardTypes.Barile,
-    Prigione = cardTypes.Prigione,
-    Dynamite = cardTypes.Dynamite;
+var attacking = aReq('server/game/cards/attacking'),
+    simpleEquipment = aReq('server/game/cards/simple-equipment'),
+    healing = aReq('server/game/cards/healing'),
+    drawing = aReq('server/game/cards/drawing');
 
-var cards = [
+var Bang = attacking.Bang,
+    Mancato = attacking.Mancato,
+    Gatling = attacking.Gatling,
+    Indians = attacking.Indians,
+    Beer = healing.Beer,
+    Saloon = healing.Saloon,
+    Stagecoach = drawing.Stagecoach,
+    WellsFargo = drawing.WellsFargo,
+    Emporio = aReq('server/game/cards/emporio'),
+    Panico = aReq('server/game/cards/panico'),
+    CatBalou = aReq('server/game/cards/cat-balou'),
+    Duel = aReq('server/game/cards/duel'),
+    Volcanic = simpleEquipment.Volcanic,
+    Schofield = simpleEquipment.Schofield,
+    Remington = simpleEquipment.Remington,
+    Carabine = simpleEquipment.Carabine,
+    Winchester = simpleEquipment.Winchester,
+    Mustang = simpleEquipment.Mustang,
+    Mirino = simpleEquipment.Mirino,
+    Barile = aReq('server/game/cards/barile'),
+    Prigione = aReq('server/game/cards/prigione'),
+    Dynamite = aReq('server/game/cards/dynamite');
+
+var deck = [
     new Bang(suits.diamonds, ranks.ace),
     new Bang(suits.diamonds, ranks.two),
     new Bang(suits.diamonds, ranks.three),
@@ -101,16 +109,16 @@ var cards = [
     new Duel(suits.hearts, ranks.three),
     new Duel(suits.hearts, ranks.four),
 
-    new Gun('volcanic', suits.hearts, ranks.ace, { bangsModifier: 1000 }),
-    new Gun('volcanic', suits.hearts, ranks.two, { bangsModifier: 1000 }),
-    new Gun('schofield', suits.hearts, ranks.three, { bangRangeModifier: 1 }),
-    new Gun('schofield', suits.hearts, ranks.four, { bangRangeModifier: 1 }),
-    new Gun('remington', suits.hearts, ranks.five, { bangRangeModifier: 2 }),
-    new Gun('remington', suits.hearts, ranks.six, { bangRangeModifier: 2 }),
-    new Gun('carabine', suits.hearts, ranks.seven, { bangRangeModifier: 3 }),
-    new Gun('carabine', suits.hearts, ranks.eight, { bangRangeModifier: 3 }),
-    new Gun('winchester', suits.hearts, ranks.nine, { bangRangeModifier: 4 }),
-    new Gun('winchester', suits.hearts, ranks.ten, { bangRangeModifier: 4 }),
+    new Volcanic(suits.hearts, ranks.ace),
+    new Volcanic(suits.hearts, ranks.two),
+    new Schofield(suits.hearts, ranks.three),
+    new Schofield(suits.hearts, ranks.four),
+    new Remington(suits.hearts, ranks.five),
+    new Remington(suits.hearts, ranks.six),
+    new Carabine(suits.hearts, ranks.seven),
+    new Carabine(suits.hearts, ranks.eight),
+    new Winchester(suits.hearts, ranks.nine),
+    new Winchester(suits.hearts, ranks.ten),
 
     new Mustang(suits.hearts, ranks.ace),
     new Mustang(suits.hearts, ranks.two),
@@ -134,4 +142,4 @@ var cards = [
     new Dynamite(suits.hearts, ranks.four, suits.hearts, ranks.ace, ranks.ten)
 ];
 
-module.exports = cards;
+module.exports = deck;

@@ -22,7 +22,7 @@ module.exports = function(onLogin) {
         password: password,
 
         handleAuth: function handleAuth(msg) {
-            formError.innerText = msg ? msg.reason : '';
+            formError.innerHTML = msg ? msg.reason : '';
         }
     };
 };

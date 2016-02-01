@@ -34,16 +34,17 @@ Step.prototype = {
 
 function Draw(turn) {
     Step.call(this, turn);
-    this.regularDraw = events.CardsDrawEvent(
-        this.player, this.phase.cards, 2,
-        cards => {
-            Array.prototype.push.apply(this.player.hand, cards);
-            this.turn.goToNextStep();
-        }
-    );
-    this.player.handleEvent('beforeDraw',
-        [this],
-        this.regularDraw,
+    this.player.handleEvent(
+        'beforeDraw', [this],
+        // onFollowing
+        () => this.defaultOnResolve(events.CardsDrawEvent(
+            this.player, this.phase.cards, 2,
+            cards => {
+                Array.prototype.push.apply(this.player.hand, cards);
+                this.turn.goToNextStep();
+            }
+        )),
+        // onResolved
         event => event ? this.defaultOnResolve(event) : this.turn.goToNextStep()
     )
 }
@@ -74,7 +75,7 @@ misc.merge(Play.prototype, Step.prototype, {
         if (msg.action === actions.play) {
             var card = this.player.hand.find(card => card.id === msg.arg);
             if (card && card.filter(this))
-                return card.onPlay(this, this.defaultOnResolve);
+                return card.handlePlay(this, this.defaultOnResolve);
         }
     }
 });

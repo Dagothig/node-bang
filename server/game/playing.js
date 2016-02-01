@@ -4,7 +4,6 @@ var misc = aReq('server/misc'),
 
     stats = aReq('server/game/stats'),
     roles = aReq('server/game/roles'),
-    cardTypes = aReq('server/game/card-types'),
 
     Phase = aReq('server/game/phase'),
     CardPile = aReq('server/game/card-pile'),
@@ -24,7 +23,7 @@ module.exports = new Phase('Playing', {
     },
 
     begin: function(game) {
-        this.cards = new CardPile(aReq('server/game/cards'));
+        this.cards = new CardPile(aReq('server/game/cards/deck'));
         game.players.forEach(p => this.extendPlayer(game, p));
         this.goToNextTurn(game);
     },
@@ -90,7 +89,8 @@ module.exports = new Phase('Playing', {
                 var handlePile = handlePile = args => {
                     var next = handlers.pop();
                     if (next) next[eventName].apply(next, args);
-                    else onFollowing();
+                    else if(onFollowing) onFollowing();
+                    else onResolved();
                 }
                 recurseArgs.push(event => event ? onResolved(event) : handlePile(recurseArgs));
                 recurseArgs.push(onResolved);
@@ -101,17 +101,6 @@ module.exports = new Phase('Playing', {
         // Life third: it's used in the hand limit calculations
         misc.merge(player, {
             life: player.stat('life'),
-            handleDamage: function(amount, onResolved) {
-                this.life -= amount;
-                if (this.dead) onResolved(cardTypes.Beer.getDeathEvent(player,
-                    event => {
-                        if (player.dead && player === phase.turn.player)
-                            phase.goToNextTurn(game);
-                        phase.checkForEnd(game);
-                        onResolved();
-                    }
-                ));
-            },
             heal: function(amount) {
                 this.life = Math.min(this.life + amount, this.stat('life'));
             },
@@ -162,7 +151,6 @@ module.exports = new Phase('Playing', {
             delete p.handleEvent;
 
             delete p.life;
-            delete p.handleDamage;
             delete p.heal;
             delete p.dead;
             delete p.alive;
@@ -209,20 +197,10 @@ module.exports = new Phase('Playing', {
             hand: {
                 // TODO: format cards properly
                 cards: player === other ?
-                    other.hand.map(card => ({
-                        id: card.id,
-                        rank: card.rank,
-                        suit: card.suit,
-                        type: card.type
-                    })) :
+                    other.hand.map(card => card.format()) :
                     other.hand.length
             },
-            equipment: other.equipped.map(card => ({
-                id: card.id,
-                rank: card.rank,
-                suit: card.suit,
-                type: card.type
-            })),
+            equipment: other.equipped.map(card => card.format()),
             life: other.life,
             stats: other.stats(),
             distance: player.distanceTo(game.players, other)

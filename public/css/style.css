@@ -52,6 +52,23 @@ html, body {
     box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.5) inset;
 }
 
+.tree-root {
+    font-size: 90%;
+}
+.tree-root ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.tree-root li:first-child {
+    margin-top: 0;
+}
+.tree-root ul ul {
+    padding-left: 1em;
+    padding-bottom: 1em;
+}
+
 /* === [FLEX] === */
 .flex {
     display: flex;
@@ -65,10 +82,10 @@ html, body {
 .flex.right {
     justify-content: flex-end;
 }
-.flex .center {
+.flex>.center {
     align-self: center;
 }
-.flex .bottom {
+.flex>.bottom {
     align-self: flex-end;
 }
 
@@ -78,8 +95,10 @@ html, body {
 .flex.vertical-reverse {
     flex-direction: column-reverse;
 }
-.flex.vertical>.grow-1, .flex.vertical>.grow-2,
-.flex.vertical-reverse>.grow-1, .flex.vertical-reverse>.grow-2 {
+.flex.vertical>.grow-1,
+.flex.vertical>.grow-2,
+.flex.vertical-reverse>.grow-1,
+.flex.vertical-reverse>.grow-2 {
     height: 0;
 }
 
@@ -200,6 +219,7 @@ textarea {
 #lobby .title {
     padding: 0.5rem 1rem;
     font-size: 1rem;
+    background-color: #fff;
 }
 #lobby .list {
     overflow: auto;
@@ -230,6 +250,9 @@ textarea {
 }
 #lobby .list em::after {
     content: "]";
+}
+#lobby form {
+    background-color: #fff;
 }
 
 /* === [LOADER] === */

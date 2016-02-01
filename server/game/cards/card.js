@@ -31,15 +31,25 @@ var types = {
     blue: 'blue'
 };
 
-function Card(name, suit, rank, type, filter, onPlay) {
+function Card(name, suit, rank, type) {
     this.id = name + ':' + suit + ':' + rank;
     this.name = name;
     this.suit = suit;
     this.rank = rank;
     this.type = type;
-    this.filter = filter || () => false;
-    this.onPlay = onPlay;
 }
+Card.prototype.filter = function(step) { return true; };
+Card.prototype.handlePlay = function(step, onResolved) {};
+misc.merge(Card.prototype, {
+    filter: function(step) { return true; },
+    handlePlay: function(step, onResolved) {},
+    format: function() { return {
+        id: this.id,
+        rank: this.rank,
+        suit: this.suit,
+        type: this.type
+    };}
+});
 Object.assign(Card, {
     ranks: ranks,
     rankValues: rankValues,

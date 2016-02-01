@@ -10,7 +10,10 @@ var log = aReq('server/log'),
 
 function handleAuth(io, users, socket, msg) {
     msg.name = validator.escape(msg.name).replace(/[\s]/g, '');
-    if (!msg.name) return;
+    if (!msg.name || !msg.name.length) {
+        socket.emit(msgs.auth, { reason: strings.authValidation });
+        return;
+    }
 
     var user;
     if (msg.token) {

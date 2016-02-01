@@ -43,16 +43,11 @@ var TargetRange = (player, players, range, onTarget, onCancel, format) => {
     let alive = players.filter(p => p.alive);
     return TargetEvent(
         player,
-        alive.filter(p => player.distanceTo(alive, p) <= range).filter(p => p !== player),
+        alive.filter(p => player.distanceTo(alive, p) <= range)
+            .filter(p => p !== player),
         onTarget, onCancel, format
     );
 };
-
-var TargetBang = (player, players, onTarget, onCancel, format) =>
-    TargetRange(player, players, player.stat('bangRange'), onTarget, onCancel, format);
-
-var TargetDistance = (player, players, onTarget, onCancel, format) =>
-    TargetRange(player, players, player.stat('distance'), onTarget, onCancel, format);
 
 var CardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
     actionsFor: function(p) {
@@ -74,7 +69,8 @@ var CardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
     format: format
 });
 
-var CardTypeEvent = (player, cardType, onChoice, onCancel, format) => CardChoiceEvent(
+var CardTypeEvent = (player, cardType, onChoice, onCancel, format) =>
+CardChoiceEvent(
     player,
     player.hand.filter(c => c instanceof cardType),
     onChoice, onCancel, format
@@ -103,10 +99,10 @@ var RemoveOtherCard = (
 ) => CardChoiceEvent(
     player,
     misc.fromArrays(
-        (withHand && target.hand.length) ? { id: 'hand' } : [],
+        (withHand && target.hand.length) ? [{ id: 'hand' }] : [],
         withEquipment ? target.equipped : []
     ),
-    card => onChoice(choice.id === 'hand' ?
+    choice => onChoice(choice.id === 'hand' ?
         misc.spliceRand(target.hand) :
         target.equipped.remove(choice.id)
     ),
@@ -115,6 +111,7 @@ var RemoveOtherCard = (
 
 var ComposedEvent = (elements, generator, onResolved) => {
     var event = {
+        events: new Array(elements.length),
         resolveEvent: function(i, newEvent) {
             this.events[i] = newEvent;
             if (!this.events.filter(e => e).length) onResolved();
@@ -135,7 +132,7 @@ var ComposedEvent = (elements, generator, onResolved) => {
             );
         }
     };
-    event.events = elements.map((e, i) => generator(e, n => event.resolveEvent(i, n)));
+    elements.forEach((e, i) => generator(e, n => event.resolveEvent(i, n)));
     return event;
 };
 
@@ -145,8 +142,6 @@ module.exports = {
     TargetOthers: TargetOthers,
     TargetSelf: TargetSelf,
     TargetRange: TargetRange,
-    TargetBang: TargetBang,
-    TargetDistance: TargetDistance,
     CardChoiceEvent: CardChoiceEvent,
     CardTypeEvent: CardTypeEvent,
     CardsDrawEvent: CardsDrawEvent,

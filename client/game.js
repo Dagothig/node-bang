@@ -29,9 +29,9 @@ module.exports = function(onJoin, onGame, onAction) {
 
         handleJoining: function(current, msg) {
             var users = msg ? msg.users : null;
-            tagPreError.innerText = msg.reason ? msg.reason : '';
+            tagPreError.innerHTML = msg.reason ? msg.reason : '';
             tagPreJoin.checked = !!users.find((user) => misc.isCurrent(current, user));
-            tagPreCount.innerText =
+            tagPreCount.innerHTML =
                 users.reduce((acc, user) => acc + 1, 0) +
                 " / " +
                 consts.minPlayers + "-" + consts.maxPlayers;
