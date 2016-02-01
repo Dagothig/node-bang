@@ -10,9 +10,10 @@ misc.extend(Card, Equipment, {
         var formatted = misc.merge(Card.prototype.format.apply(this, arguments), {
             slot: this.slot
         });
-        Object.keys(this)
-            .filter(k => k.endsWith('Modifier'))
-            .forEach(k => formatted[k] = this[k]);
+        for (var key in this) {
+            if (!key.endsWith('Modifier')) continue;
+            formatted[key] = this[key];
+        }
         return formatted;
     },
     handlePlay: function(step, onResolved) {

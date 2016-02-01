@@ -203,7 +203,7 @@ module.exports = new Phase('Playing', {
             equipment: other.equipped.map(card => card.format()),
             life: other.life,
             stats: other.stats(),
-            distance: player.distanceTo(game.players, other)
+            distance: player ? player.distanceTo(game.players, other) : undefined
         });
     },
 

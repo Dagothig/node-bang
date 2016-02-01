@@ -3,6 +3,11 @@ var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc'),
     handles = aReq('server/game/cards/handles');
 
+var handleBang = (step, card, target, onResolved) =>
+    handles.attack('Bang', step, card, target, Mancato, onResolved);
+var handleIndians = (step, card, target, onResolved) =>
+    handles.attack('Indians', step, card, target, Bang, onResolved);
+
 function Bang(suit, rank) {
     Card.call(this, 'bang', suit, rank, Card.types.brown);
 }
@@ -15,7 +20,7 @@ misc.extend(Card, Bang, {
             target => {
                 step.player.hand.discard(this.id);
                 step.bangs++;
-                handles.bang(step, this, target, onResolved);
+                handleBang(step, this, target, onResolved);
             },
             // onCancel; no card was used
             () => onResolved()
@@ -38,7 +43,7 @@ misc.extend(Card, Gatling, {
         step.player.hand.discard(this.id);
         onResolved(events.ComposedEvent(
             step.game.players.filter(p => p.alive && p !== step.player),
-            (other, onSubResolved) => handles.bang(step, this, other, onSubResolved),
+            (other, onSubResolved) => handleBang(step, this, other, onSubResolved),
             onResolved
         ));
     }
@@ -52,7 +57,7 @@ misc.extend(Card, Indians, {
         step.player.hand.discard(this.id);
         onResolved(events.ComposedEvent(
             step.game.players.filter(p => p.alive && p !== step.player),
-            (other, onSubRes) => handles.indians(step, this, other, onSubRes),
+            (other, onSubRes) => handleIndians(step, this, other, onSubRes),
             onResolved
         ));
     }

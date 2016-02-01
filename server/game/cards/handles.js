@@ -61,15 +61,9 @@ target.handleEvent(
     )),
     onResolved
 );
-var handleBang = (step, card, target, onResolved) =>
-    handleAttack('Bang', step, card, target, Mancato, onResolved);
-var handleIndians = (step, card, target, onResolved) =>
-    handleAttack('Indians', step, card, target, Bang, onResolved);
 
 module.exports = {
     death: handleDeath,
     damage: handleDamage,
-    attack: handleAttack,
-    bang: handleBang,
-    indians: handleIndians
+    attack: handleAttack
 };

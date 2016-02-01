@@ -10,7 +10,7 @@ module.exports = function(onLogin) {
     element.onsubmit = function() {
         name.value = name.value.trim();
         onLogin(name.value, password.value);
-        password.value = '';
+        //password.value = '';
         return false;
     };
 

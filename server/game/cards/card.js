@@ -43,12 +43,14 @@ Card.prototype.handlePlay = function(step, onResolved) {};
 misc.merge(Card.prototype, {
     filter: function(step) { return true; },
     handlePlay: function(step, onResolved) {},
-    format: function() { return {
-        id: this.id,
-        rank: this.rank,
-        suit: this.suit,
-        type: this.type
-    };}
+    format: function() {
+        return {
+            id: this.id,
+            rank: this.rank,
+            suit: this.suit,
+            type: this.type
+        };
+    }
 });
 Object.assign(Card, {
     ranks: ranks,

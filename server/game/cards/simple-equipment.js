@@ -5,30 +5,35 @@ var Card = aReq('server/game/cards/card'),
 
 // === Guns === //
 
-function Volcanic(suit, rank) {
-    Equipment.call(this, 'volcanic', suit, rank, 'weapon');
+function Gun(name, suit, rank) {
+    Equipment.call(this, name, suit, rank, 'weapon');
 }
-misc.extend(Equipment, Volcanic, { bangsModifier: 1000 });
+misc.extend(Equipment, Gun, { getTarget: events.TargetSelf });
+
+function Volcanic(suit, rank) {
+    Gun.call(this, 'volcanic', suit, rank);
+}
+misc.extend(Gun, Volcanic, { bangsModifier: 1000 });
 
 function Schofield(suit, rank) {
-    Equipment.call(this, 'schofield', suit, rank, 'weapon');
+    Gun.call(this, 'schofield', suit, rank);
 }
-misc.extend(Equipment, Schofield, { bangRangeModifier: 1 });
+misc.extend(Gun, Schofield, { bangRangeModifier: 1 });
 
 function Remington(suit, rank) {
-    Equipment.call(this, 'remington', suit, rank, 'weapon');
+    Gun.call(this, 'remington', suit, rank);
 }
-misc.extend(Equipment, Remington, { bangRangeModifier: 2 });
+misc.extend(Gun, Remington, { bangRangeModifier: 2 });
 
 function Carabine(suit, rank) {
-    Equipment.call(this, 'carabine', suit, rank, 'weapon');
+    Gun.call(this, 'carabine', suit, rank);
 }
-misc.extend(Equipment, Remington, { bangRangeModifier: 3 });
+misc.extend(Gun, Carabine, { bangRangeModifier: 3 });
 
 function Winchester(suit, rank) {
-    Equipment.call(this, 'winchester', suit, rank, 'weapon');
+    Gun.call(this, 'winchester', suit, rank);
 }
-misc.extend(Equipment, Remington, { bangRangeModifier: 4 });
+misc.extend(Gun, Winchester, { bangRangeModifier: 4 });
 
 // === Others === //
 
@@ -50,6 +55,7 @@ misc.extend(Equipment, Mirino, {
 });
 
 module.exports = {
+    Gun: Gun,
     Volcanic: Volcanic,
     Schofield: Schofield,
     Remington: Remington,

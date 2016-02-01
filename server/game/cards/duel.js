@@ -1,7 +1,8 @@
 var Card = aReq('server/game/cards/card'),
     events = aReq('server/game/events'),
     misc = aReq('server/misc'),
-    handles = aReq('server/game/cards/handles');
+    handles = aReq('server/game/cards/handles'),
+    Bang = aReq('server/game/cards/attacking').Bang;
 
 function Duel(suit, rank) {
     Card.call(this, 'duel', suit, rank, Card.types.brown);

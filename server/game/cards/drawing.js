@@ -11,12 +11,14 @@ function handleDrawCard(step, card, amount) {
         card: this.id
     });
 }
+
 function Stagecoach(suit, rank) {
     Card.call(this, 'stagecoach', suit, rank, Card.types.brown);
 }
 misc.extend(Card, Stagecoach, {
     handlePlay: function(step, onResolved) { handleDrawCard(step, this, 2); }
 });
+
 function WellsFargo(suit, rank) {
     Card.call(this, 'wellsfargo', suit, rank, Card.types.brown);
 }

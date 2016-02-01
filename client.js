@@ -105,3 +105,7 @@ socket.on(msgs.game, function(msg) {
     ongoingGame = msg;
     game.handleGame(msg, user);
 });
+
+socket.on(msgs.event, function(msg) {
+    console.log('received', msgs.event, msg);
+});

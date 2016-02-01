@@ -1,3 +1,5 @@
+'use strict';
+
 var misc = aReq('server/misc'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),
@@ -20,10 +22,19 @@ module.exports = new Phase('Role pick', {
         if (game.players.length >= 6) r.push(roles.outlaw);
         if (game.players.length >= 7) r.push(roles.deputy);
         if (game.players.length >= 8) r.push(roles.outlaw);
-        game.players.forEach((player) => {
+        var sheriffIndex;
+        game.players.forEach((player, i) => {
             player.role = misc.spliceRand(r);
+            if (player.role === roles.sheriff) sheriffIndex = i;
             log(player.user.name, 'is', player.role.name);
         });
+
+        // Once the roles have been assigned,
+        // let's recut the players array so it starts with the sheriff
+        game.players = misc.fromArrays(
+            game.players.slice(sheriffIndex, game.players.length),
+            game.players.slice(0, sheriffIndex)
+        );
 
         this.remainingTime = consts.rolePickMaxTime;
         this.remainingInterval = setInterval(() => {

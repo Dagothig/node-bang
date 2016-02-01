@@ -1,3 +1,5 @@
+'use strict';
+
 var misc = aReq('server/misc'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),
@@ -42,7 +44,7 @@ misc.merge(Game.prototype, {
                         name: other.character.name
                     } : undefined,
                     role: other.role ? {
-                        name: player === other || player.dead ?
+                        name: player === other || other.dead ?
                             other.role.name :
                             other.role.publicName
                     } : undefined,
