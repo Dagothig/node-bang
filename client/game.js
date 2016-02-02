@@ -55,6 +55,7 @@ module.exports = function(onJoin, onGame, onAction) {
                 if (game.turn && game.turn.step && game.turn.step.event)
                     this.handleEvent(game.turn.step.event);
             } else {
+                gameEvents.length = 0;
                 ui.hide(tagGame);
                 ui.show(tagPre);
             }

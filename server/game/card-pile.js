@@ -22,6 +22,9 @@ misc.merge(CardPile.prototype, {
         }
         return cards;
     },
+    push: function push() {
+        this._backing.push.apply(this._backing, arguments);
+    },
     get length() { return this._backing.length; }
 });
 

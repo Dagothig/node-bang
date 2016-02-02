@@ -5,10 +5,11 @@ var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc');
 
 var handleEvent = (eventName, players, recurseArgs, onFollowing, onResolved) => {
-    let handlers = misc.fromArrays(players.map(p => p.handlers(eventName)));
+    let handlers = [];
+    players.forEach(p => handlers.push.apply(handlers, p.handlers(eventName)));
     handlers.reverse();
 
-    let handlePile = handlePile = args => {
+    let handlePile = args => {
         let next = handlers.pop();
         if (next) next[eventName].apply(next, args);
         else if(onFollowing) onFollowing();

@@ -1,3 +1,5 @@
+'use strict';
+
 var misc = aReq('server/misc'),
     actions = aReq('server/actions'),
     Character = aReq('server/game/character'),
@@ -32,9 +34,9 @@ var characters = [
         }
     }),
 
-    new Character("Calamity Janet", {
+    /*new Character("Calamity Janet", {
 
-    }),
+    }),*/
 
     new Character("El Gringo", {
         lifeModifier: -1,
@@ -99,7 +101,7 @@ var characters = [
 
             onResolved(events.cardsDrawEvent(
                 step.player, step.phase.cards, 3,
-                cards => events.cardChoiceEvent(
+                cards => onResolved(events.cardChoiceEvent(
                     step.player, cards,
                     card => {
                         misc.remove(cards, card);
@@ -107,14 +109,14 @@ var characters = [
                         onSkip();
                     },
                     undefined
-                )
+                ))
             ));
         }
     }),
 
-    new Character("Lucky Duke", {
+    /*new Character("Lucky Duke", {
 
-    }),
+    }),*/
 
     new Character("Paul Regret", {
         lifeModifier: -1,
@@ -140,7 +142,13 @@ var characters = [
                         if (msg.arg === 'pile') onResolved();
                         else if (msg.arg === 'discarded') {
                             p.hand.drawFromPile();
-                            p.hand.push(step.phase.cards.discarded.pop());
+                            let card = step.phase.cards.discarded.pop();
+                            p.hand.push(card);
+                            step.game.onGameEvent({
+                                name: 'Draw',
+                                player: player.name,
+                                card: card.format()
+                            });
                             onSkip();
                         }
                     }
@@ -154,17 +162,17 @@ var characters = [
         rangeModifider: 1
     }),
 
-    new Character("Sid Ketchum", {
+    /*new Character("Sid Ketchum", {
 
-    }),
+    }),*/
 
-    new Character("Slab the Killer", {
+    /*new Character("Slab the Killer", {
 
-    }),
+    }),*/
 
-    new Character("Suzy Lafayette", {
+    /*new Character("Suzy Lafayette", {
 
-    }),
+    }),*/
 
     new Character("Vulture Sam", {
         dying: function(step, killer, player, amount, onResolved, onSkip) {

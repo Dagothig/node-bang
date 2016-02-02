@@ -45,10 +45,14 @@ module.exports = new Phase('Playing', {
             },
             discard: function(cardId) {
                 var card = this.remove(cardId);
-                if (card) cards.discarded.push(card);
-            },
-            handlers: function(eventName) {
-                return this.filter(e => e[eventName]);
+                if (card) {
+                    cards.discarded.push(card);
+                    game.onGameEvent({
+                        name: 'Discard',
+                        player: player.name,
+                        card: card.format()
+                    });
+                }
             }
         });
 
@@ -80,12 +84,9 @@ module.exports = new Phase('Playing', {
 
             handlers: function(eventName) {
                 var handlers = [];
-                var charHandler = this.character[eventName],
-                    roleHandler = this.role[eventName],
-                    equippedHandlers = this.equipped.handlers(eventName);
-                if (charHandler) handlers.push(this.character);
-                if (roleHandler) handlers.push(this.role);
-                equippedHandlers.forEach(e => handlers.push(e));
+                if (this.character[eventName]) handlers.push(this.character);
+                if (this.role[eventName]) handlers.push(this.role);
+                this.equipped.forEach(e => e[eventName] && handlers.push(e));
 
                 return handlers;
             }
@@ -118,7 +119,14 @@ module.exports = new Phase('Playing', {
             },
             discard: function(cardId) {
                 var card = this.remove(cardId);
-                if (card) cards.discarded.push(card);
+                if (card) {
+                    cards.discarded.push(card);
+                    game.onGameEvent({
+                        name: 'Discard',
+                        player: player.name,
+                        card: card.format()
+                    });
+                }
             },
 
             get cardMax() {
