@@ -3,10 +3,17 @@
 var misc = aReq('server/misc'),
     actions = aReq('server/actions'),
     Character = aReq('server/game/character'),
-    events = aReq('server/game/events'),
+
     Card = aReq('server/game/cards/card'),
     suits = Card.suits,
-    Barile = aReq('server/game/cards/barile');
+
+    events = aReq('server/game/events'),
+    handles = aReq('server/game/cards/handles'),
+
+    Barile = aReq('server/game/cards/barile'),
+    attacking = aReq('server/game/cards/attacking'),
+    Bang = attacking.Bang,
+    Mancato = attacking.Mancato;
 
 var characters = [
     new Character("Bart Cassidy", {
@@ -93,7 +100,7 @@ var characters = [
                     });
                     onSkip();
                 },
-                () => onResolved()
+                () => this.beforeDraw(step, onResolved, onSkip)
             ));
         }
     }),
@@ -181,9 +188,45 @@ var characters = [
 
     }),*/
 
-    /*new Character("Slab the Killer", {
+    new Character("Slab the Killer", {
+        beforeBangResponse: function(step, card, target, onResolved, onSkip) {
+            if (step.player.character !== this) return onResolved();
+            if (!(card instanceof Bang)) return onResolved();
 
-    }),*/
+            let onCancel = () =>
+                handles.damage(step, step.player, target, 1, onSkip);
+
+            let format = () => ({
+                name: 'Bang',
+                source: step.player.name,
+                target: target.name,
+                card: card.format()
+            });
+
+            onResolved(events.cardTypeEvent(
+                target, Mancato,
+                // onCard; we ask for another Mancato that isn't the first one
+                card1 => onResolved(events.cardChoiceEvent(
+                    target,
+                    target.hand.filter(c => c instanceof Mancato && c !== card1),
+                    card2 => {
+                        target.hand.discard(card1.id);
+                        target.hand.discard(card2.id);
+                        step.game.onGameEvent({
+                            name: 'Avoid',
+                            what: name,
+                            source: step.player.name,
+                            target: target.name,
+                            cards: [card1.format(), card2.format()]
+                        });
+                        onSkip();
+                    },
+                    onCancel, format
+                )),
+                onCancel, format
+            ));
+        }
+    }),
 
     /*new Character("Suzy Lafayette", {
 
@@ -192,7 +235,7 @@ var characters = [
     new Character("Vulture Sam", {
         beforeDeath: function(step, killer, player, amount, onResolved, onSkip) {
             // If vulture sam is actually the one dying, then his power can't trigger
-            if (player.character === this) onResolved();
+            if (player.character === this) return onResolved();
 
             let sam = step.game.players.find(p => p.character === this);
 
