@@ -4,7 +4,7 @@ var log = aReq('server/log'),
     actions = aReq('server/actions'),
     misc = aReq('server/misc');
 
-var TargetEvent = (player, targets, onTarget, onCancel, format) => ({
+var targetEvent = (player, targets, onTarget, onCancel, format) => ({
     actionsFor: function(p) {
         if (p !== player) return {};
         var acts = {};
@@ -25,23 +25,17 @@ var TargetEvent = (player, targets, onTarget, onCancel, format) => ({
     format: format
 });
 
-var TargetAny = (player, players, onTarget, onCancel, format) => TargetEvent(
-    player,
-    players.filter(p => p.alive),
-    onTarget, onCancel, format
-);
-
-var TargetOthers = (player, players, onTarget, onCancel, format) => TargetEvent(
+var targetOthers = (player, players, onTarget, onCancel, format) => targetEvent(
     player,
     players.filter(p => p.alive && p !== player),
     onTarget, onCancel, format
 );
 
-var TargetSelf = (player, players, onTarget, onCancel, format) => onTarget(player);
+var targetSelf = (player, players, onTarget, onCancel, format) => onTarget(player);
 
-var TargetRange = (player, players, range, onTarget, onCancel, format) => {
+var targetRange = (player, players, range, onTarget, onCancel, format) => {
     let alive = players.filter(p => p.alive);
-    return TargetEvent(
+    return targetEvent(
         player,
         alive.filter(p => player.distanceTo(alive, p) <= range)
             .filter(p => p !== player),
@@ -49,7 +43,7 @@ var TargetRange = (player, players, range, onTarget, onCancel, format) => {
     );
 };
 
-var CardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
+var cardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
     actionsFor: function(p) {
         if (p !== player) return {};
         var acts = {};
@@ -69,14 +63,14 @@ var CardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
     format: format
 });
 
-var CardTypeEvent = (player, cardType, onChoice, onCancel, format) =>
-CardChoiceEvent(
+var cardTypeEvent = (player, cardType, onChoice, onCancel, format) =>
+cardChoiceEvent(
     player,
     player.hand.filter(c => c instanceof cardType),
     onChoice, onCancel, format
 );
 
-var CardsDrawEvent = (player, cards, amount, onDraw, onCancel, format) => ({
+var cardsDrawEvent = (player, cards, amount, onDraw, onCancel, format) => ({
     actionsFor: function(p) {
         if (p !== player) return;
         var acts = {};
@@ -91,12 +85,12 @@ var CardsDrawEvent = (player, cards, amount, onDraw, onCancel, format) => ({
     },
     format: format
 });
-var CardDrawEvent = (player, cards, onDraw, onCancel, format) =>
-    CardsDrawEvent(player, cards, 1, cards => onDraw(cards[0]), onCancel, format);
+var cardDrawEvent = (player, cards, onDraw, onCancel, format) =>
+    cardsDrawEvent(player, cards, 1, cards => onDraw(cards[0]), onCancel, format);
 
-var RemoveOtherCard = (
+var removeOtherCard = (
     player, target, withHand, withEquipment, onChoice, onCancel, format
-) => CardChoiceEvent(
+) => cardChoiceEvent(
     player,
     misc.fromArrays(
         (withHand && target.hand.length) ? [{ id: 'hand' }] : [],
@@ -109,7 +103,7 @@ var RemoveOtherCard = (
     onCancel, format
 );
 
-var ComposedEvent = (elements, generator, onResolved) => {
+var composedEvent = (elements, generator, onResolved) => {
     var event = {
         events: new Array(elements.length),
         resolveEvent: function(i, newEvent) {
@@ -137,15 +131,14 @@ var ComposedEvent = (elements, generator, onResolved) => {
 };
 
 module.exports = {
-    TargetEvent: TargetEvent,
-    TargetAny: TargetAny,
-    TargetOthers: TargetOthers,
-    TargetSelf: TargetSelf,
-    TargetRange: TargetRange,
-    CardChoiceEvent: CardChoiceEvent,
-    CardTypeEvent: CardTypeEvent,
-    CardsDrawEvent: CardsDrawEvent,
-    CardDrawEvent: CardDrawEvent,
-    RemoveOtherCard: RemoveOtherCard,
-    ComposedEvent: ComposedEvent
+    targetEvent: targetEvent,
+    targetOthers: targetOthers,
+    targetSelf: targetSelf,
+    targetRange: targetRange,
+    cardChoiceEvent: cardChoiceEvent,
+    cardTypeEvent: cardTypeEvent,
+    cardsDrawEvent: cardsDrawEvent,
+    cardDrawEvent: cardDrawEvent,
+    removeOtherCard: removeOtherCard,
+    composedEvent: composedEvent
 };

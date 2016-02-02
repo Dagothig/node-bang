@@ -40,7 +40,8 @@ module.exports = new Phase('Playing', {
             },
             remove: function(cardId) {
                 var index = this.indexOf(this.find(card => card.id === cardId));
-                return (index >= 0 && index < this.length) ? this.splice(index, 1)[0] : null;
+                return (index >= 0 && index < this.length) ?
+                    this.splice(index, 1)[0] : null;
             },
             discard: function(cardId) {
                 var card = this.remove(cardId);
@@ -60,13 +61,15 @@ module.exports = new Phase('Playing', {
                     + (this.equipped.stat(modifier)|0);
             },
             stat: function(name) {
-                if (stats[name] === undefined) throw 'Stat ' + name + ' does not exist';
+                if (stats[name] === undefined)
+                    throw 'Stat ' + name + ' does not exist';
                 return stats[name] + this.modifier(name);
             },
 
             distanceTo: function(players, to) {
                 var dist = Math.abs(players.indexOf(this) - players.indexOf(to));
-                return Math.min(dist, players.length - dist) + to.modifier('distance');
+                dist = Math.min(dist, players.length - dist);
+                return dist + to.modifier('distance');
             },
 
             stats: function() {
@@ -92,7 +95,10 @@ module.exports = new Phase('Playing', {
                     else if(onFollowing) onFollowing();
                     else onResolved();
                 }
-                recurseArgs.push(event => event ? onResolved(event) : handlePile(recurseArgs));
+                recurseArgs.push(event => event ?
+                    onResolved(event) :
+                    handlePile(recurseArgs)
+                );
                 recurseArgs.push(onResolved);
                 handlePile(recurseArgs);
             }
@@ -116,11 +122,12 @@ module.exports = new Phase('Playing', {
         var cards = this.cards;
         player.hand = misc.merge(cards.draw(player.stat('initCards')), {
             drawFromPile: function(amount) {
-                cards.draw(amount).forEach(card => this.push(card));
+                cards.draw(amount||1).forEach(card => this.push(card));
             },
             remove: function(cardId) {
                 var index = this.indexOf(this.find(card => card.id === cardId));
-                return (index >= 0 && index < this.length) ? this.splice(index, 1)[0] : null;
+                return (index >= 0 && index < this.length) ?
+                    this.splice(index, 1)[0] : null;
             },
             discard: function(cardId) {
                 var card = this.remove(cardId);
@@ -183,11 +190,7 @@ module.exports = new Phase('Playing', {
             },
             cards: {
                 pile: this.cards.length,
-                discard: this.cards.discarded.map(card => ({
-                    id : card.id,
-                    rank: card.rank,
-                    suit: card.suit
-                }))
+                discard: this.cards.discarded.map(card => card.format())
             }
         });
     },
@@ -223,7 +226,8 @@ module.exports = new Phase('Playing', {
                 game.end();
             }
         }
-        // If no outlaws and no renegades have won, then the sheriff and deputies have won
+        // If no outlaws and no renegades have won,
+        // then the sheriff and deputies have won
         else if (!(aliveCount.outlaw + aliveCount.renegade)) {
             game.end();
         }

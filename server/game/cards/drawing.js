@@ -8,7 +8,7 @@ function handleDrawCard(step, card, amount) {
         name: 'Draw',
         player: step.player.name,
         amount: amount,
-        card: this.id
+        card: card.format()
     });
 }
 

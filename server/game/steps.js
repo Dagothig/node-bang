@@ -34,18 +34,25 @@ Step.prototype = {
 
 function Draw(turn) {
     Step.call(this, turn);
+    this.defaultOnResolve = event ? (this.event = event) : this.turn.goToNextStep();
     this.player.handleEvent(
         'beforeDraw', [this],
         // onFollowing
-        () => this.defaultOnResolve(events.CardsDrawEvent(
+        () => this.defaultOnResolve(events.cardsDrawEvent(
             this.player, this.phase.cards, 2,
             cards => {
                 Array.prototype.push.apply(this.player.hand, cards);
-                this.turn.goToNextStep();
+                event.handleEvent(
+                    'afterDraw', [this, cards],
+                    // onFollowing
+                    () => this.turn.goToNextStep(),
+                    // onResolved
+                    this.defaultOnResolve
+                );
             }
         )),
         // onResolved
-        event => event ? this.defaultOnResolve(event) : this.turn.goToNextStep()
+        this.defaultOnResolve
     )
 }
 misc.extend(Step, Draw);

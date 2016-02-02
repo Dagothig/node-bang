@@ -7,10 +7,10 @@ function Panico(suit, rank) {
 }
 misc.extend(Card, Panico, {
     handlePlay: function(step, onResolved) {
-        onResolved(events.TargetRange(
+        onResolved(events.targetRange(
             step.player, step.game.players, step.player.stat('range'),
             // onTarget; panicking someone
-            target => onResolved(events.RemoveOtherCard(
+            target => onResolved(events.removeOtherCard(
                 step.player, target, true, true,
                 card => this.handleCard(step, target, card, onResolved),
                 // onCancel; the panico was not used

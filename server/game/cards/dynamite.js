@@ -16,9 +16,9 @@ misc.extend(Equipment, Dynamite, {
             boomSuit: this.boomSuit
         });
     },
-    getTarget: events.TargetSelf,
+    getTarget: events.targetSelf,
     beforeDraw: function(step, onResolved, onSkip) {
-        onResolved(events.CardDrawEvent(
+        onResolved(events.cardDrawEvent(
             step.player, step.phase.cards,
             card => this.handleCard(step, card, onResolved, onSkip),
             // Cannot cancel this draw

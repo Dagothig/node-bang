@@ -8,7 +8,7 @@ var Card = aReq('server/game/cards/card'),
 function Gun(name, suit, rank) {
     Equipment.call(this, name, suit, rank, 'weapon');
 }
-misc.extend(Equipment, Gun, { getTarget: events.TargetSelf });
+misc.extend(Equipment, Gun, { getTarget: events.targetSelf });
 
 function Volcanic(suit, rank) {
     Gun.call(this, 'volcanic', suit, rank);
@@ -41,7 +41,7 @@ function Mustang(suit, rank) {
     Equipment.call(this, 'mustang', suit, rank, 'mustang');
 }
 misc.extend(Equipment, Mustang, {
-    getTarget: events.TargetSelf,
+    getTarget: events.targetSelf,
     distanceModifier: 1
 });
 
@@ -49,7 +49,7 @@ function Mirino(suit, rank) {
     Equipment.call(this, 'mirino', suit, rank, 'mirino');
 }
 misc.extend(Equipment, Mirino, {
-    getTarget: events.TargetSelf,
+    getTarget: events.targetSelf,
     bangRangeModifier: 1,
     rangeModifier: 1
 });

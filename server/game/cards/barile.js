@@ -13,16 +13,22 @@ misc.extend(Equipment, Barile, {
             avoidSuit: this.avoidSuit
         });
     },
-    getTarget: events.TargetSelf,
+    getTarget: events.targetSelf,
     beforeBangResponse: function(step, card, target, onResolved, onSkip) {
-        onResolved(events.CardDrawEvent(
+        onResolved(events.cardDrawEvent(
             target, step.phase.cards,
             card => {
                 step.phase.cards.discarded.push(card);
                 if (card.suit === this.avoidSuit) onSkip();
                 else onResolved();
             },
-            () => onResolved()
+            () => onResolved(),
+            () => ({
+                name: 'Barile',
+                source: step.player.name,
+                target: target.name,
+                barile: this.format()
+            })
         ));
     }
 });

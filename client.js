@@ -108,4 +108,5 @@ socket.on(msgs.game, function(msg) {
 
 socket.on(msgs.event, function(msg) {
     console.log('received', msgs.event, msg);
+    game.handleEvent(msg);
 });

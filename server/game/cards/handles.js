@@ -2,8 +2,16 @@ var Card = aReq('server/game/cards/card'),
     events = aReq('server/game/events'),
     misc = aReq('server/misc');
 
-var handleDeath = (step, killer, player, onResolved) => {
-    onResolved(player.alive ? undefined : events.CardTypeEvent(
+var handleDeath = (step, killer, player, amount, onResolved) => {
+    if (player.alive) {
+        target.handleEvent('afterDamage',
+            [step, killer, player, amount],
+            undefined, onResolved
+        );
+        return;
+    }
+
+    onResolved(events.cardTypeEvent(
         player, Beer,
         card => {
             card.handlePlay(step, onResolved);
@@ -29,14 +37,17 @@ var handleDamage = (step, source, target, amount, onResolved) => {
         target: target.name,
         amount: amount
     });
-    if (target.dead) handleDeath(step, source, target, onResolved);
-    else onResolved();
+    if (target.dead) handleDeath(step, source, target, amount, onResolved);
+    else target.handleEvent(
+        'afterDamage', [step, source, target, amount],
+        undefined, onResolved
+    );
 };
 
 var handleAttack = (name, step, card, target, avoidCardType, onResolved) =>
 target.handleEvent(
     'before' + name + 'Response', [step, card, target],
-    () => onResolved(events.CardTypeEvent(
+    () => onResolved(events.cardTypeEvent(
         target, avoidCardType,
         // onCard; damage avoided
         card => {
@@ -45,7 +56,7 @@ target.handleEvent(
                 what: name,
                 source: step.player.name,
                 target: target.name,
-                card: card.id
+                card: card.format()
             });
             target.hand.discard(card.id);
             onResolved();
@@ -56,7 +67,7 @@ target.handleEvent(
             name: name,
             source: step.player.name,
             target: target.name,
-            card: card.id
+            card: card.format()
         })
     )),
     onResolved

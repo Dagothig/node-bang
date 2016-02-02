@@ -9,7 +9,7 @@ function Duel(suit, rank) {
 }
 misc.extend(Card, Duel, {
     handlePlay: function(step, onResolved) {
-        onResolved(events.TargetOthers(
+        onResolved(events.targetOthers(
             step.player, step.game.players,
             // onTarget
             target => {
@@ -21,7 +21,7 @@ misc.extend(Card, Duel, {
         ));
     },
     handleDuel: function(step, source, target, onResolved) {
-        onResolved(events.CardTypeEvent(
+        onResolved(events.cardTypeEvent(
             target, Bang,
             // onChoice; duel is reversed
             card => {

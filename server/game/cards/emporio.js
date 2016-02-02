@@ -20,7 +20,7 @@ misc.extend(Card, Emporio, {
             onResolved();
             return;
         }
-        onResolved(events.CardChoiceEvent(
+        onResolved(events.cardChoiceEvent(
             player, cards,
             // onChoice
             card => {
