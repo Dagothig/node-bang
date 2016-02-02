@@ -25,6 +25,11 @@ misc.extend(Card, Equipment, {
                 var current = target.equipped.find(c => c.slot === this.slot);
                 if (current) target.equipped.discard(current.id);
                 target.equipped.push(this);
+                step.game.onGameEvent({
+                    name: 'Equipped',
+                    player: target.name,
+                    card: this.format()
+                });
                 onResolved();
             },
             () => onResolved()

@@ -15,6 +15,8 @@ misc.extend(Equipment, Barile, {
     },
     getTarget: events.targetSelf,
     beforeBangResponse: function(step, card, target, onResolved, onSkip) {
+        if (!target.equipped.find(c => c === this)) return onResolved();
+
         onResolved(events.cardDrawEvent(
             target, step.phase.cards,
             card => {

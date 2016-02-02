@@ -18,6 +18,8 @@ misc.extend(Equipment, Dynamite, {
     },
     getTarget: events.targetSelf,
     beforeDraw: function(step, onResolved, onSkip) {
+        if (!step.player.equipped.find(c => c === this)) return onResolved();
+
         onResolved(events.cardDrawEvent(
             step.player, step.phase.cards,
             card => this.handleCard(step, card, onResolved, onSkip),

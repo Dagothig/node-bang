@@ -25,6 +25,11 @@ misc.extend(Card, Emporio, {
             // onChoice
             card => {
                 player.hand.push(misc.remove(cards, card));
+                step.game.onGameEvent({
+                    name: 'Draw',
+                    player: player.name,
+                    card: card.format()
+                });
                 let next = misc.after(players, player);
                 this.handleEmporio(players, next, cards, onResolved);
             },

@@ -2,11 +2,14 @@ var ui = require('./ui'),
     misc = require('./misc'),
     consts = require('../shared/consts');
 
+var gameEvents = [];
+
 module.exports = function(onJoin, onGame, onAction) {
     var tagGame = ui.one('#game'),
         tagExtra = ui.one(tagGame, '#extra'),
         tagPlayers = ui.one(tagGame, '#players'),
         tagActions = ui.one(tagGame, '#actions'),
+        tagEvents = ui.one(tagGame, '#events'),
 
         tagPre = ui.one('#pre-game'),
         tagPreForm = ui.one(tagPre, 'form'),
@@ -49,11 +52,18 @@ module.exports = function(onJoin, onGame, onAction) {
                 });
                 this.display(tagPlayers, game && game.players);
                 this.displayActions(game && game.actions);
+                if (game.turn && game.turn.step && game.turn.step.event)
+                    this.handleEvent(game.turn.step.event);
             } else {
                 ui.hide(tagGame);
                 ui.show(tagPre);
             }
             onGame(game);
+        },
+
+        handleEvent: function(msg) {
+            gameEvents.push(msg);
+            this.display(tagEvents, gameEvents);
         },
 
         display: function(tag, obj) {

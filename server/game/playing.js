@@ -78,7 +78,7 @@ module.exports = new Phase('Playing', {
                 return obj;
             },
 
-            handleEvent: function(eventName, recurseArgs, onFollowing, onResolved) {
+            handlers: function(eventName) {
                 var handlers = [];
                 var charHandler = this.character[eventName],
                     roleHandler = this.role[eventName],
@@ -87,20 +87,7 @@ module.exports = new Phase('Playing', {
                 if (roleHandler) handlers.push(this.role);
                 equippedHandlers.forEach(e => handlers.push(e));
 
-                handlers.reverse();
-
-                var handlePile = handlePile = args => {
-                    var next = handlers.pop();
-                    if (next) next[eventName].apply(next, args);
-                    else if(onFollowing) onFollowing();
-                    else onResolved();
-                }
-                recurseArgs.push(event => event ?
-                    onResolved(event) :
-                    handlePile(recurseArgs)
-                );
-                recurseArgs.push(onResolved);
-                handlePile(recurseArgs);
+                return handlers;
             }
         });
 
@@ -154,8 +141,6 @@ module.exports = new Phase('Playing', {
             delete p.stat;
             delete p.distanceTo;
             delete p.stats;
-
-            delete p.handleEvent;
 
             delete p.life;
             delete p.heal;

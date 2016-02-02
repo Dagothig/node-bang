@@ -1,10 +1,52 @@
+'use strict';
+
 var Card = aReq('server/game/cards/card'),
     events = aReq('server/game/events'),
     misc = aReq('server/misc');
 
-var handleDeath = (step, killer, player, amount, onResolved) => {
+var handleEvent = (eventName, players, recurseArgs, onFollowing, onResolved) => {
+    let handlers = misc.fromArrays(players.map(p => p.handlers(eventName)));
+    handlers.reverse();
+
+    let handlePile = handlePile = args => {
+        let next = handlers.pop();
+        if (next) next[eventName].apply(next, args);
+        else if(onFollowing) onFollowing();
+        else onResolved();
+    }
+    recurseArgs.push(event => event ?
+        onResolved(event) :
+        handlePile(recurseArgs)
+    );
+    recurseArgs.push(onResolved);
+    handlePile(recurseArgs);
+};
+
+var handleDead = (step, killer, player, amount, onResolved) => {
+    handleEvent('beforeDeath',
+        step.game.players.filter(p => p.alive),
+        [step, killer, player, amount],
+        () => {
+            let discarded = step.phase.card.discarded;
+
+            discarded.push.apply(discarded, player.hand);
+            player.hand.length = 0;
+
+            discarded.push.apply(discarded, player.equipped);
+            player.equipped.length = 0;
+
+            if (player === step.player) step.phase.goToNextTurn(step.game);
+            else onResolved();
+            step.phase.checkForEnd(step.game);
+        },
+        onResolved
+    );
+}
+
+var handleDying = (step, killer, player, amount, onResolved) => {
     if (player.alive) {
-        target.handleEvent('afterDamage',
+        handleEvent('afterDamage',
+            step.game.players.filter(p => p.alive),
             [step, killer, player, amount],
             undefined, onResolved
         );
@@ -13,15 +55,14 @@ var handleDeath = (step, killer, player, amount, onResolved) => {
 
     onResolved(events.cardTypeEvent(
         player, Beer,
+        // When a beer is played, we check if we are dying again
         card => {
             card.handlePlay(step, onResolved);
-            handleDeath(step, killer, player, onResolved);
+            handleDying(step, killer, player, onResolved);
         },
-        () => {
-            if (player === step.player) step.phase.goToNextTurn(step.game);
-            else onResolved();
-            step.phase.checkForEnd(step.game);
-        },
+        // Player didn't drink beer; they are dead
+        () => handleDead(step, killer, player, amount, onResolved),
+        // Format
         () => ({
             name: 'Dying',
             player: player.name,
@@ -37,16 +78,18 @@ var handleDamage = (step, source, target, amount, onResolved) => {
         target: target.name,
         amount: amount
     });
-    if (target.dead) handleDeath(step, source, target, amount, onResolved);
-    else target.handleEvent(
-        'afterDamage', [step, source, target, amount],
+    if (target.dead) handleDying(step, source, target, amount, onResolved);
+    else handleEvent('afterDamage',
+        step.game.players.filter(p => p.alive),
+        [step, source, target, amount],
         undefined, onResolved
     );
 };
 
 var handleAttack = (name, step, card, target, avoidCardType, onResolved) =>
-target.handleEvent(
-    'before' + name + 'Response', [step, card, target],
+handleEvent('before' + name + 'Response',
+    step.game.players.filter(p => p.alive),
+    [step, card, target],
     () => onResolved(events.cardTypeEvent(
         target, avoidCardType,
         // onCard; damage avoided
@@ -74,7 +117,9 @@ target.handleEvent(
 );
 
 module.exports = {
-    death: handleDeath,
+    event: handleEvent,
+    dead: handleDead,
+    dying: handleDying,
     damage: handleDamage,
     attack: handleAttack
 };

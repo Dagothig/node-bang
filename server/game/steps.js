@@ -1,7 +1,8 @@
 var log = aReq('server/log'),
     actions = aReq('server/actions'),
     misc = aReq('server/misc'),
-    events = aReq('server/game/events');
+    events = aReq('server/game/events'),
+    handles = aReq('server/game/cards/handles');
 
 function Step(turn) {
     this.game = turn.game;
@@ -38,15 +39,17 @@ function Draw(turn) {
         (this.event = event) :
         this.turn.goToNextStep();
 
-    this.player.handleEvent(
-        'beforeDraw', [this],
+    handles.event('beforeDraw',
+        this.game.players.filter(p => p.alive),
+        [this],
         // onFollowing
         () => this.defaultOnResolve(events.cardsDrawEvent(
             this.player, this.phase.cards, 2,
             cards => {
                 Array.prototype.push.apply(this.player.hand, cards);
-                event.handleEvent(
-                    'afterDraw', [this, cards],
+                handles.event('afterDraw',
+                    this.game.players.filter(p => p.alive),
+                    [this, cards],
                     // onFollowing
                     () => this.turn.goToNextStep(),
                     // onResolved
