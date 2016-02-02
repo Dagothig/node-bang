@@ -34,7 +34,10 @@ Step.prototype = {
 
 function Draw(turn) {
     Step.call(this, turn);
-    this.defaultOnResolve = event ? (this.event = event) : this.turn.goToNextStep();
+    this.defaultOnResolve = event => event ?
+        (this.event = event) :
+        this.turn.goToNextStep();
+
     this.player.handleEvent(
         'beforeDraw', [this],
         // onFollowing

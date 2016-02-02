@@ -98,10 +98,15 @@ var characters = [
 
     new Character("Pedro Ramirez", {
         beforeDraw: function(step, onResolved, onSkip) {
+            if (!step.phase.cards.discarded.length) {
+                onResolved();
+                return;
+            }
+
             onResolved({
                 actionsFor: function(p) {
                     if (p !== step.player) return {};
-                    var acts = {}
+                    var acts = {};
                     acts[actions.draw] = ['pile', 'discarded'];
                     return acts;
                 },
@@ -111,7 +116,7 @@ var characters = [
                         if (msg.arg === 'pile') onResolved();
                         else if (msg.arg === 'discarded') {
                             p.hand.drawFromPile();
-                            p.hand.push(step.game.cards.discarded.pop());
+                            p.hand.push(step.phase.cards.discarded.pop());
                             onSkip();
                         }
                     }
