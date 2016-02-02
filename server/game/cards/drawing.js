@@ -4,12 +4,6 @@ var Card = aReq('server/game/cards/card'),
 function handleDrawCard(step, card, amount) {
     step.player.hand.discard(card.id);
     step.player.hand.drawFromPile(amount);
-    step.game.onGameEvent({
-        name: 'Draw',
-        player: step.player.name,
-        amount: amount,
-        card: card.format()
-    });
 }
 
 function Stagecoach(suit, rank) {

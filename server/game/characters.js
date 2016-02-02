@@ -22,14 +22,14 @@ var characters = [
             if (step.player.character !== this) return onResolved();
 
             let second = cards[1];
-            if (second.suit === suits.hearts || second.suit === suits.diamonds) {
-                step.player.hand.drawFromPile();
-            }
             step.game.onGameEvent({
-                name: 'Draw',
+                name: 'Drew',
                 player: step.player.name,
                 card: second.format()
             });
+            if (second.suit === suits.hearts || second.suit === suits.diamonds) {
+                step.player.hand.drawFromPile();
+            }
             onResolved();
         }
     }),
@@ -140,20 +140,22 @@ var characters = [
                     if (p !== step.player) return;
                     if (msg.action === actions.draw) {
                         if (msg.arg === 'pile') onResolved();
-                        else if (msg.arg === 'discarded') {
-                            p.hand.drawFromPile();
-                            let card = step.phase.cards.discarded.pop();
-                            p.hand.push(card);
-                            step.game.onGameEvent({
-                                name: 'Draw',
-                                player: player.name,
-                                card: card.format()
-                            });
-                            onSkip();
-                        }
+                        else if (msg.arg === 'discarded')
+                            this.handleDrawDiscard(step, onResolved, onSkip);
                     }
                 }
             });
+        },
+        handleDrawDiscard: function(step, onResolved, onSkip) {
+            step.player.hand.drawFromPile();
+            let card = step.phase.cards.discarded.pop();
+            ste.player.hand.push(card);
+            step.game.onGameEvent({
+                name: 'Draw',
+                player: step.player.name,
+                card: card.format()
+            });
+            onSkip();
         }
     }),
 

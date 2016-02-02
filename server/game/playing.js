@@ -111,6 +111,11 @@ module.exports = new Phase('Playing', {
         player.hand = misc.merge(cards.draw(player.stat('initCards')), {
             drawFromPile: function(amount) {
                 cards.draw(amount||1).forEach(card => this.push(card));
+                game.onGameEvent({
+                    name: 'Draw',
+                    player: player.name,
+                    amount: amount
+                });
             },
             remove: function(cardId) {
                 var index = this.indexOf(this.find(card => card.id === cardId));
@@ -170,9 +175,8 @@ module.exports = new Phase('Playing', {
     },
 
     handleDisconnect: function(game, player) {
-        player.life = 0;
+        this.turn.handleDisconnect(player);
         this.checkForEnd(game);
-        throw 'Checking for end is insufficient: need to make it drop players from events and such';
     },
 
     format: function(game, player, formatted) {

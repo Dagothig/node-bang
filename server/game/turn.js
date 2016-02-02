@@ -31,6 +31,9 @@ misc.merge(Turn.prototype, {
     handleAction: function(player, msg) {
         if (!this.step) return;
         this.step.handleAction(player, msg);
+    },
+    handleDisconnect: function(player) {
+        throw "Lolcakes told me I lied";
     }
 });
 Turn.steps = aReq('server/game/steps');
