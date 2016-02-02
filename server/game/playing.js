@@ -114,7 +114,7 @@ module.exports = new Phase('Playing', {
                 game.onGameEvent({
                     name: 'Draw',
                     player: player.name,
-                    amount: amount
+                    amount: amount||1
                 });
             },
             remove: function(cardId) {

@@ -2,7 +2,9 @@
 
 var Card = aReq('server/game/cards/card'),
     events = aReq('server/game/events'),
-    misc = aReq('server/misc');
+    misc = aReq('server/misc'),
+    healing = aReq('server/game/cards/healing'),
+    Beer = healing.Beer;
 
 var handleEvent = (eventName, players, recurseArgs, onFollowing, onResolved) => {
     let handlers = [];
@@ -28,7 +30,7 @@ var handleDead = (step, killer, player, amount, onResolved) => {
         step.game.players.filter(p => p.alive),
         [step, killer, player, amount],
         () => {
-            let discarded = step.phase.card.discarded;
+            let discarded = step.phase.cards.discarded;
 
             discarded.push.apply(discarded, player.hand);
             player.hand.length = 0;
@@ -95,6 +97,7 @@ handleEvent('before' + name + 'Response',
         target, avoidCardType,
         // onCard; damage avoided
         card => {
+            target.hand.discard(card.id);
             step.game.onGameEvent({
                 name: 'Avoid',
                 what: name,
@@ -102,7 +105,6 @@ handleEvent('before' + name + 'Response',
                 target: target.name,
                 card: card.format()
             });
-            target.hand.discard(card.id);
             onResolved();
         },
         // onCancel; damage goes through

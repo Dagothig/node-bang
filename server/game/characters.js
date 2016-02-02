@@ -47,7 +47,13 @@ var characters = [
             if (source) {
                 let card = misc.spliceRand(source.hand);
                 if (card) target.hand.push(card);
+                step.game.onGameEvent({
+                    name: 'Steal',
+                    thief: target.name,
+                    player: source.name
+                });
             }
+
             onResolved();
         }
     }),
@@ -56,6 +62,7 @@ var characters = [
         beforeDraw: function(step, onResolved, onSkip) {
             if (step.player.character !== this) return onResolved();
 
+            let self = this;
             onResolved({
                 actionsFor: function(p) {
                     if (p !== step.player) return {};
@@ -68,16 +75,22 @@ var characters = [
                     if (msg.action !== actions.draw) return;
                     if (msg.arg === 'pile') onResolved();
                     else if (msg.arg === 'player')
-                        this.handleSteal(step, onResolved, onSkip);
+                        self.handleSteal(step, onResolved, onSkip);
                 }
             });
         },
         handleSteal: function(step, onResolved, onSkip) {
-            onResolved(events.targetOthers(
-                step.player, step.game.players,
+            onResolved(events.targetEvent(
+                step.player, step.game.players
+                    .filter(p => p !== step.player && p.alive && p.hand.length),
                 target => {
                     step.player.hand.push(misc.spliceRand(target.hand));
                     step.player.hand.drawFromPile();
+                    step.game.onGameEvent({
+                        name: 'Steal',
+                        thief: step.player.name,
+                        player: target.name
+                    });
                     onSkip();
                 },
                 () => onResolved()
@@ -129,6 +142,7 @@ var characters = [
             if (step.player.character !== this) return onResolved();
             if (!step.phase.cards.discarded.length) return onResolved();
 
+            let self = this;
             onResolved({
                 actionsFor: function(p) {
                     if (p !== step.player) return {};
@@ -138,18 +152,17 @@ var characters = [
                 },
                 handleAction: function(p, msg) {
                     if (p !== step.player) return;
-                    if (msg.action === actions.draw) {
-                        if (msg.arg === 'pile') onResolved();
-                        else if (msg.arg === 'discarded')
-                            this.handleDrawDiscard(step, onResolved, onSkip);
-                    }
+                    if (msg.action !== actions.draw) return;
+                    if (msg.arg === 'pile') onResolved();
+                    else if (msg.arg === 'discarded')
+                        self.handleDrawDiscard(step, onResolved, onSkip);
                 }
             });
         },
         handleDrawDiscard: function(step, onResolved, onSkip) {
             step.player.hand.drawFromPile();
             let card = step.phase.cards.discarded.pop();
-            ste.player.hand.push(card);
+            step.player.hand.push(card);
             step.game.onGameEvent({
                 name: 'Draw',
                 player: step.player.name,
@@ -177,7 +190,7 @@ var characters = [
     }),*/
 
     new Character("Vulture Sam", {
-        dying: function(step, killer, player, amount, onResolved, onSkip) {
+        beforeDeath: function(step, killer, player, amount, onResolved, onSkip) {
             // If vulture sam is actually the one dying, then his power can't trigger
             if (player.character === this) onResolved();
 

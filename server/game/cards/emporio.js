@@ -13,9 +13,9 @@ misc.extend(Card, Emporio, {
         var alive = step.game.players.filter(p => p.alive);
         var current = alive[alive.indexOf(step.player)];
         var cards = step.phase.cards.draw(alive.length);
-        this.handleEmporio(alive, current, cards, onResolved);
+        this.handleEmporio(step, alive, current, cards, onResolved);
     },
-    handleEmporio: function(players, player, cards, onResolved) {
+    handleEmporio: function(step, players, player, cards, onResolved) {
         if (!cards.length) {
             onResolved();
             return;
@@ -31,7 +31,7 @@ misc.extend(Card, Emporio, {
                     card: card.format()
                 });
                 let next = misc.after(players, player);
-                this.handleEmporio(players, next, cards, onResolved);
+                this.handleEmporio(step, players, next, cards, onResolved);
             },
             // onCancel
             undefined,

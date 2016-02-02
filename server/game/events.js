@@ -72,7 +72,7 @@ cardChoiceEvent(
 
 var cardsDrawEvent = (player, cards, amount, onDraw, onCancel, format) => ({
     actionsFor: function(p) {
-        if (p !== player) return;
+        if (p !== player) return {};
         var acts = {};
         acts[actions.draw] = [actions.draw];
         if (onCancel) acts[actions.cancel] = [actions.cancel];

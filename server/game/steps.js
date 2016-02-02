@@ -47,6 +47,11 @@ function Draw(turn) {
             this.player, this.phase.cards, 2,
             cards => {
                 Array.prototype.push.apply(this.player.hand, cards);
+                this.game.onGameEvent({
+                    name: 'Draw',
+                    player: this.player.name,
+                    amount: 2
+                });
                 handles.event('afterDraw',
                     this.game.players.filter(p => p.alive),
                     [this, cards],
