@@ -21,8 +21,8 @@ misc.extend(Card, Panico, {
         ));
     },
     handleCard: function(step, target, card, onResolved) {
-        step.player.hand.discard(this.id);
         step.player.hand.push(card);
+        step.player.hand.discard(this.id);
         step.game.onGameEvent({
             name: 'Panico',
             thief: step.player.name,

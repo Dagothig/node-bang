@@ -1,9 +1,15 @@
 var Role = aReq('server/game/role');
 
-var roles = {
+var roles;
+roles = {
     sheriff: new Role("Sheriff", "Sheriff", {
         lifeModifier: 1,
-        initCardsModifier: 1
+        initCardsModifier: 1,
+        afterDeath: function(step, killer, player, amount, onResolved, onSkip) {
+            if (killer.role === this && player.role === roles.deputy)
+                killer.hand.discard();
+            onResolved();
+        }
     }),
     deputy: new Role("Deputy", "Unknown", {}),
     outlaw: new Role("Outlaw", "Unknown", {}),

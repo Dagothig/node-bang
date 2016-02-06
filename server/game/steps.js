@@ -64,37 +64,43 @@ function Draw(turn) {
         )),
         // onResolved
         this.defaultOnResolve
-    )
+    );
 }
 misc.extend(Step, Draw);
 
 function Play(turn) {
     Step.call(this, turn);
     this.bangs = 0;
+    this.defaultOnResolve = event => event ?
+        (this.event = event) : this.handleAfterPlay();
+    this.handleBeforePlay();
 }
 misc.merge(Play.prototype, Step.prototype, {
-    actionsFor: function(player) {
-        if (this.event) return this.event.actionsFor(player);
-        else {
-            if (this.player !== player) return {};
-            var acts = {};
-            acts[actions.endTurn] = [actions.endTurn];
-            acts[actions.play] = this.player.hand
-                .filter(card => card.filter(this))
-                .map(card => card.id);
-            return acts;
-        }
+    handleBeforePlay: function() {
+        handles.event('beforePlay',
+            this.game.players.filter(p => p.alive),
+            [this],
+            // onFollowing
+            () => this.defaultOnResolve(events.cardChoiceEvent(
+                this.player, this.player.hand.filter(c => c.filter(this)),
+                // onPlay
+                card => card.handlePlay(this, this.defaultOnResolve),
+                // onCancel
+                () => this.turn.goToNextStep()
+            )),
+            // onResolved
+            this.defaultOnResolve
+        );
     },
-    handleAction: function(player, msg) {
-        if (this.event) return this.event.handleAction(player, msg);
-
-        if (this.player !== player) return;
-        if (msg.action === actions.endTurn) return this.turn.goToNextStep();
-        if (msg.action === actions.play) {
-            var card = this.player.hand.find(card => card.id === msg.arg);
-            if (card && card.filter(this))
-                return card.handlePlay(this, this.defaultOnResolve);
-        }
+    handleAfterPlay: function() {
+        handles.event('afterPlay',
+            this.game.players.filter(p => p.alive),
+            [this],
+            // onFollowing
+            () => this.handleBeforePlay(),
+            // onResolved
+            this.defaultOnResolve
+        );
     }
 });
 

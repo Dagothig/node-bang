@@ -79,7 +79,7 @@ function merge(to) {
 function extend(source, dest) {
     dest.prototype = Object.create(source.prototype);
     dest.prototype.constructor = dest;
-    merge.apply(this, [dest.prototype].concat(Array.from(arguments).slice(2)));
+    return merge.apply(this, [dest.prototype].concat(Array.from(arguments).slice(2)));
 }
 
 function bounded(value, min, max, minExclusive, maxExclusive) {

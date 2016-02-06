@@ -1,3 +1,5 @@
+'use strict';
+
 var misc = aReq('server/misc'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),
@@ -87,6 +89,7 @@ module.exports = new Phase('Playing', {
                 if (this.character[eventName]) handlers.push(this.character);
                 if (this.role[eventName]) handlers.push(this.role);
                 this.equipped.forEach(e => e[eventName] && handlers.push(e));
+                handlers.sort((handlers, i) => handlers.priority|0);
 
                 return handlers;
             }
@@ -122,7 +125,22 @@ module.exports = new Phase('Playing', {
                 return (index >= 0 && index < this.length) ?
                     this.splice(index, 1)[0] : null;
             },
+            removeRand: function() {
+                return misc.spliceRand(this);
+            },
             discard: function(cardId) {
+                if (!arguments.length) {
+                    let discarded = this.slice();
+                    this.length = 0;
+                    cards.discarded.push.apply(cards.discarded, discarded);
+                    game.onGameEvent({
+                        name: 'Discard',
+                        player: player.name,
+                        cards: discarded.map(c => c.format())
+                    });
+                    return;
+                }
+
                 var card = this.remove(cardId);
                 if (card) {
                     cards.discarded.push(card);

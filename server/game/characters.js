@@ -184,9 +184,38 @@ var characters = [
         rangeModifider: 1
     }),
 
-    /*new Character("Sid Ketchum", {
-
-    }),*/
+    new Character("Sid Ketchum", {
+        healCard: { id: 'heal' },
+        beforePlay: function(step, onResolved, onSkip) {
+            if (step.player.character !== this) return onResolved();
+            onResolved(events.cardChoiceEvent(step.player,
+                misc.fromArrays(step.player.hand.filter, [this.healCard]),
+                // onPlay
+                card => card === 'heal' ?
+                    this.handleHeal(step, onResolved, onSkip) :
+                    card.handlePlay(step, onSkip),
+                // onCancel
+                () => onSkip()
+            ));
+        },
+        handleHeal: function(step, onResolved, onSkip) {
+            let onFinished() = onResolved(this.beforePlay(step, onResolved, onSkip))
+            onResolved(events.cardChoiceEvent(step.player,
+                step.player.hand,
+                card1 => onResolved(events.cardChoiceEvent(step.player,
+                    step.player.hand.filter(c => c !== card1),
+                    card2 => {
+                        step.player.hand.discard(card1.id);
+                        step.player.hand.discard(card2.id);
+                        step.player.heal(1);
+                        onFinished();
+                    },
+                    onFinished
+                )),
+                onFinished
+            ));
+        }
+    }),
 
     new Character("Slab the Killer", {
         beforeBangResponse: function(step, card, target, onResolved, onSkip) {
@@ -228,9 +257,14 @@ var characters = [
         }
     }),
 
-    /*new Character("Suzy Lafayette", {
+    new Character("Suzy Lafayette", {
+        afterPlay: function(step, onResolved, onSkip) {
+            let suzy = step.game.players.find(p => p.character === this);
 
-    }),*/
+            if (!suzy.hand.length) suzy.hand.drawFromPile();
+            onResolved();
+        }
+    }),
 
     new Character("Vulture Sam", {
         beforeDeath: function(step, killer, player, amount, onResolved, onSkip) {

@@ -97,7 +97,7 @@ var removeOtherCard = (
         withEquipment ? target.equipped : []
     ),
     choice => onChoice(choice.id === 'hand' ?
-        misc.spliceRand(target.hand) :
+        target.hand.removeRand() :
         target.equipped.remove(choice.id)
     ),
     onCancel, format

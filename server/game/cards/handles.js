@@ -27,7 +27,7 @@ var handleEvent = (eventName, players, recurseArgs, onFollowing, onResolved) => 
 
 var handleDead = (step, killer, player, amount, onResolved) => {
     handleEvent('beforeDeath',
-        step.game.players.filter(p => p.alive),
+        step.game.players.filter(p => p.alive || p === player),
         [step, killer, player, amount],
         () => {
             let discarded = step.phase.cards.discarded;
@@ -38,9 +38,16 @@ var handleDead = (step, killer, player, amount, onResolved) => {
             discarded.push.apply(discarded, player.equipped);
             player.equipped.length = 0;
 
-            if (player === step.player) step.phase.goToNextTurn(step.game);
-            else onResolved();
-            step.phase.checkForEnd(step.game);
+            handleEvent('afterDeath',
+                step.game.players.filter(p => p.alive || p === player),
+                [step, killer, player, amount],
+                () => {
+                    if (player === step.player) step.phase.goToNextTurn(step.game);
+                    else onResolved();
+                    step.phase.checkForEnd(step.game);
+                },
+                onResolved
+            );
         },
         onResolved
     );
