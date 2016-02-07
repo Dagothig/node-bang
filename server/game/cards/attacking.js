@@ -14,7 +14,7 @@ function Bang(suit, rank) {
 misc.extend(Card, Bang, {
     filter: function(step) { return step.bangs < step.player.stat('bangs'); },
     handlePlay: function(step, onResolved) {
-        onResolved(events.targetRange(
+        onResolved(events('targetRange')(
             step.player, step.game.players, step.player.stat('bangRange'),
             // onTarget; trying to bang someone
             target => {
@@ -41,7 +41,7 @@ function Gatling(suit, rank) {
 misc.extend(Card, Gatling, {
     handlePlay: function(step, onResolved) {
         step.player.hand.discard(this.id);
-        onResolved(events.composedEvent(
+        onResolved(events('composed')(
             step.game.players.filter(p => p.alive && p !== step.player),
             (other, onSubResolved) => handleBang(step, this, other, onSubResolved),
             onResolved
@@ -55,7 +55,7 @@ function Indians(suit, rank) {
 misc.extend(Card, Indians, {
     handlePlay: function(step, onResolved) {
         step.player.hand.discard(this.id);
-        onResolved(events.composedEvent(
+        onResolved(events('composed')(
             step.game.players.filter(p => p.alive && p !== step.player),
             (other, onSubRes) => handleIndians(step, this, other, onSubRes),
             onResolved

@@ -63,12 +63,14 @@ var cardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
     format: format
 });
 
-var cardTypeEvent = (player, cardType, onChoice, onCancel, format) =>
+var cardTypesEvent = (player, cardTypes, onChoice, onCancel, format) =>
 cardChoiceEvent(
     player,
-    player.hand.filter(c => c instanceof cardType),
+    player.hand.filter(c => cardTypes.find(cardType => c instanceof cardType)),
     onChoice, onCancel, format
 );
+var cardTypeEvent = (player, cardType, onChoice, onCancel, format) =>
+cardTypesEvent(player, [cardType], onChoice, onCancel, format);
 
 var cardsDrawEvent = (player, cards, amount, onDraw, onCancel, format) => ({
     actionsFor: function(p) {
@@ -129,16 +131,33 @@ var composedEvent = (elements, generator, onResolved) => {
     elements.forEach((e, i) => generator(e, n => event.resolveEvent(i, n)));
     return event;
 };
+var delegate = () => ({
+    get actionsFor() {
+        return this.event.actionsFor;
+    },
+    get handleAction() {
+        return this.event.handleAction;
+    },
+    get format() {
+        return this.event.format;
+    }
+});
 
-module.exports = {
-    targetEvent: targetEvent,
+var events = (eventName, player) => {
+    if (player && player.character[eventName]) return player.character[eventName];
+    return events.raw[eventName];
+}
+events.raw = {
+    target: targetEvent,
     targetOthers: targetOthers,
     targetSelf: targetSelf,
     targetRange: targetRange,
-    cardChoiceEvent: cardChoiceEvent,
-    cardTypeEvent: cardTypeEvent,
-    cardsDrawEvent: cardsDrawEvent,
-    cardDrawEvent: cardDrawEvent,
+    cardChoice: cardChoiceEvent,
+    cardType: cardTypeEvent,
+    cardsDraw: cardsDrawEvent,
+    cardDraw: cardDrawEvent,
     removeOtherCard: removeOtherCard,
-    composedEvent: composedEvent
+    composed: composedEvent,
+    delegate: delegate
 };
+module.exports = events;

@@ -18,7 +18,7 @@ misc.extend(Equipment, Prigione, {
             maxRank: this.maxRank
         });
     },
-    getTarget: (player, players, onTarget, onCancel, format) => events.targetEvent(
+    getTarget: (player, players, onTarget, onCancel, format) => events('target')(
         player,
         players.filter(p => p.alive && p.role !== roles.sheriff),
         onTarget, onCancel, format
@@ -26,7 +26,7 @@ misc.extend(Equipment, Prigione, {
     beforeDraw: function(step, onResolved, onSkip) {
         if (!step.player.equipped.find(c => c === this)) return onResolved();
 
-        onResolved(events.cardDrawEvent(
+        onResolved(events('cardDraw', step.player)(
             step.player, step.phase.cards,
             card => this.handleCard(step, card, onResolved, onSkip),
             // Cannot cancel this draw

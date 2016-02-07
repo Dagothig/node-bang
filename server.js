@@ -1,3 +1,5 @@
+'use strict';
+
 require('./global');
 
 var log = aReq('server/log'),

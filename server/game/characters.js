@@ -87,7 +87,7 @@ var characters = [
             });
         },
         handleSteal: function(step, onResolved, onSkip) {
-            onResolved(events.targetEvent(
+            onResolved(events('target')(
                 step.player, step.game.players
                     .filter(p => p !== step.player && p.alive && p.hand.length),
                 target => {
@@ -119,9 +119,9 @@ var characters = [
         beforeDraw: function(step, onResolved, onSkip) {
             if (step.player.character !== this) return onResolved();
 
-            onResolved(events.cardsDrawEvent(
+            onResolved(events('cardsDraw')(
                 step.player, step.phase.cards, 3,
-                cards => onResolved(events.cardChoiceEvent(
+                cards => onResolved(events('cardChoice')(
                     step.player, cards,
                     card => {
                         misc.remove(cards, card);
@@ -134,9 +134,28 @@ var characters = [
         }
     }),
 
-    /*new Character("Lucky Duke", {
+    new Character("Lucky Duke", {
+        cardDraw: function(player, cards, onDraw, onCancel, format) {
+            if (player.character !== this)
+                return events('cardDraw')(player, cards, onDraw, onCancel, format);
 
-    }),*/
+            let delegate = events('delegate');
+            delegate.event = events('cardsDraw')(
+                player, cards, 2,
+                choices => delegate.event = events('cardChoiceEvent')(
+                    player, choices,
+                    card => {
+                        misc.remove(choices, card);
+                        cards.discarded.push.apply(cards.discarded, choices);
+                        onDraw(card);
+                    },
+                    undefined, format
+                ),
+                onCancel, format
+            );
+            return delegate;
+        }
+    }),
 
     new Character("Paul Regret", {
         lifeModifier: -1,
@@ -188,7 +207,7 @@ var characters = [
         healCard: { id: 'heal' },
         beforePlay: function(step, onResolved, onSkip) {
             if (step.player.character !== this) return onResolved();
-            onResolved(events.cardChoiceEvent(step.player,
+            onResolved(events('cardChoice')(step.player,
                 misc.fromArrays(step.player.hand.filter, [this.healCard]),
                 // onPlay
                 card => card === 'heal' ?
@@ -200,9 +219,9 @@ var characters = [
         },
         handleHeal: function(step, onResolved, onSkip) {
             let onFinished() = onResolved(this.beforePlay(step, onResolved, onSkip))
-            onResolved(events.cardChoiceEvent(step.player,
+            onResolved(events('cardChoice')(step.player,
                 step.player.hand,
-                card1 => onResolved(events.cardChoiceEvent(step.player,
+                card1 => onResolved(events('cardChoice')(step.player,
                     step.player.hand.filter(c => c !== card1),
                     card2 => {
                         step.player.hand.discard(card1.id);
@@ -232,10 +251,10 @@ var characters = [
                 card: card.format()
             });
 
-            onResolved(events.cardTypeEvent(
+            onResolved(events('cardType')(
                 target, Mancato,
                 // onCard; we ask for another Mancato that isn't the first one
-                card1 => onResolved(events.cardChoiceEvent(
+                card1 => onResolved(events('cardChoice')(
                     target,
                     target.hand.filter(c => c instanceof Mancato && c !== card1),
                     card2 => {
@@ -279,9 +298,7 @@ var characters = [
             sam.hand.push.apply(sam.hand, player.equipped);
             player.equipped.length = 0;
 
-            if (player === step.player) step.phase.goToNextTurn(step.game);
-            else onSkip();
-            step.phase.checkForEnd(step.game);
+            handles.afterDeath(step, killer, player, amount, onSkip);
         }
     }),
 

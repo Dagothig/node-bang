@@ -25,33 +25,34 @@ var handleEvent = (eventName, players, recurseArgs, onFollowing, onResolved) => 
     handlePile(recurseArgs);
 };
 
-var handleDead = (step, killer, player, amount, onResolved) => {
-    handleEvent('beforeDeath',
-        step.game.players.filter(p => p.alive || p === player),
-        [step, killer, player, amount],
-        () => {
-            let discarded = step.phase.cards.discarded;
+var handleAfterDeath = (step, killer, player, amount, onResolved) =>
+handleEvent('afterDeath',
+    step.game.players.filter(p => p.alive || p === player),
+    [step, killer, player, amount],
+    () => {
+        if (player === step.player) step.phase.goToNextTurn(step.game);
+        else onResolved();
+        step.phase.checkForEnd(step.game);
+    },
+    onResolved
+);
+var handleBeforeDeath = (step, killer, player, amount, onResolved) =>
+handleEvent('beforeDeath',
+    step.game.players.filter(p => p.alive || p === player),
+    [step, killer, player, amount],
+    () => {
+        let discarded = step.phase.cards.discarded;
 
-            discarded.push.apply(discarded, player.hand);
-            player.hand.length = 0;
+        discarded.push.apply(discarded, player.hand);
+        player.hand.length = 0;
 
-            discarded.push.apply(discarded, player.equipped);
-            player.equipped.length = 0;
+        discarded.push.apply(discarded, player.equipped);
+        player.equipped.length = 0;
 
-            handleEvent('afterDeath',
-                step.game.players.filter(p => p.alive || p === player),
-                [step, killer, player, amount],
-                () => {
-                    if (player === step.player) step.phase.goToNextTurn(step.game);
-                    else onResolved();
-                    step.phase.checkForEnd(step.game);
-                },
-                onResolved
-            );
-        },
-        onResolved
-    );
-}
+        handleAfterDeath(step, killer, player, amount, onResolved);
+    },
+    onResolved
+);
 
 var handleDying = (step, killer, player, amount, onResolved) => {
     if (player.alive) {
@@ -63,7 +64,7 @@ var handleDying = (step, killer, player, amount, onResolved) => {
         return;
     }
 
-    onResolved(events.cardTypeEvent(
+    onResolved(events('cardType')(
         player, Beer,
         // When a beer is played, we check if we are dying again
         card => {
@@ -71,7 +72,7 @@ var handleDying = (step, killer, player, amount, onResolved) => {
             handleDying(step, killer, player, onResolved);
         },
         // Player didn't drink beer; they are dead
-        () => handleDead(step, killer, player, amount, onResolved),
+        () => handleBeforeDeath(step, killer, player, amount, onResolved),
         // Format
         () => ({
             name: 'Dying',
@@ -100,7 +101,7 @@ var handleAttack = (name, step, card, target, avoidCardType, onResolved) =>
 handleEvent('before' + name + 'Response',
     step.game.players.filter(p => p.alive),
     [step, card, target],
-    () => onResolved(events.cardTypeEvent(
+    () => onResolved(events('cardType')(
         target, avoidCardType,
         // onCard; damage avoided
         card => {
@@ -128,7 +129,8 @@ handleEvent('before' + name + 'Response',
 
 module.exports = {
     event: handleEvent,
-    dead: handleDead,
+    beforeDeath: handleBeforeDeath,
+    afterDeath: handleAfterDeath,
     dying: handleDying,
     damage: handleDamage,
     attack: handleAttack

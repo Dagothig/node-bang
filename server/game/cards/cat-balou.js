@@ -7,10 +7,10 @@ function CatBalou(suit, rank) {
 }
 misc.extend(Card, CatBalou, {
     handlePlay: function(step, onResolved) {
-        onResolved(events.targetOthers(
+        onResolved(events('targetOthers')(
             step.player, step.game.players,
             // onTarget; removing someone's card
-            target => onResolved(events.removeOtherCard(
+            target => onResolved(events('removeOtherCard')(
                 step.player, target, true, true,
                 card => {
                     step.player.hand.discard(this.id);

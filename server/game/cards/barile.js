@@ -13,11 +13,11 @@ misc.extend(Equipment, Barile, {
             avoidSuit: this.avoidSuit
         });
     },
-    getTarget: events.targetSelf,
+    getTarget: events('targetSelf'),
     beforeBangResponse: function(step, card, target, onResolved, onSkip) {
         if (!target.equipped.find(c => c === this)) return onResolved();
 
-        onResolved(events.cardDrawEvent(
+        onResolved(events('cardDraw', target)(
             target, step.phase.cards,
             card => {
                 step.phase.cards.discarded.push(card);

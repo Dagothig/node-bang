@@ -43,7 +43,7 @@ function Draw(turn) {
         this.game.players.filter(p => p.alive),
         [this],
         // onFollowing
-        () => this.defaultOnResolve(events.cardsDrawEvent(
+        () => this.defaultOnResolve(events('cardsDraw')(
             this.player, this.phase.cards, 2,
             cards => {
                 Array.prototype.push.apply(this.player.hand, cards);
@@ -81,7 +81,7 @@ misc.merge(Play.prototype, Step.prototype, {
             this.game.players.filter(p => p.alive),
             [this],
             // onFollowing
-            () => this.defaultOnResolve(events.cardChoiceEvent(
+            () => this.defaultOnResolve(events('cardChoice')(
                 this.player, this.player.hand.filter(c => c.filter(this)),
                 // onPlay
                 card => card.handlePlay(this, this.defaultOnResolve),
