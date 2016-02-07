@@ -40,8 +40,7 @@ function Draw(turn) {
         this.turn.goToNextStep();
 
     handles.event('beforeDraw',
-        this.game.players.filter(p => p.alive),
-        [this],
+        this.game.players.filter(p => p.alive), [this],
         // onFollowing
         () => this.defaultOnResolve(events('cardsDraw')(
             this.player, this.phase.cards, 2,
@@ -78,8 +77,7 @@ function Play(turn) {
 misc.merge(Play.prototype, Step.prototype, {
     handleBeforePlay: function() {
         handles.event('beforePlay',
-            this.game.players.filter(p => p.alive),
-            [this],
+            this.game.players.filter(p => p.alive), [this],
             // onFollowing
             () => this.defaultOnResolve(events('cardChoice')(
                 this.player, this.player.hand.filter(c => c.filter(this)),
@@ -94,8 +92,7 @@ misc.merge(Play.prototype, Step.prototype, {
     },
     handleAfterPlay: function() {
         handles.event('afterPlay',
-            this.game.players.filter(p => p.alive),
-            [this],
+            this.game.players.filter(p => p.alive), [this],
             // onFollowing
             () => this.handleBeforePlay(),
             // onResolved

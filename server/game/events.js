@@ -44,23 +44,31 @@ var targetRange = (player, players, range, onTarget, onCancel, format) => {
 };
 
 var cardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
+    player: player,
+    cards: cards,
+    onChoice: onChoice,
+    onCancel: onCancel,
     actionsFor: function(p) {
-        if (p !== player) return {};
+        if (p !== this.player) return {};
         var acts = {};
-        acts[actions.play] = cards.map(c => c.id);
-        if (onCancel) acts[actions.cancel] = [actions.cancel];
+        acts[actions.play] = this.cards.map(c => c.id);
+        if (this.onCancel) acts[actions.cancel] = [actions.cancel];
         return acts;
     },
     handleAction: function(p, msg) {
-        if (p !== player) return;
+        if (p !== this.player) return;
         if (msg.action === actions.play) {
-            var card = cards.find(c => c.id === msg.arg);
-            if (card) onChoice(card);
-        } else if (onCancel && msg.action === actions.cancel) {
-            onCancel();
+            var card = this.cards.find(c => c.id === msg.arg);
+            if (card) this.onChoice(card);
+        } else if (this.onCancel && msg.action === actions.cancel) {
+            this.onCancel();
         }
     },
-    format: format
+    format: format,
+    filterCards: function(filter) {
+        this.cards = this.cards.filter(filter);
+        return this;
+    }
 });
 
 var cardTypesEvent = (player, cardTypes, onChoice, onCancel, format) =>
@@ -144,8 +152,13 @@ var delegate = () => ({
 });
 
 var events = (eventName, player) => {
-    if (player && player.character[eventName]) return player.character[eventName];
-    return events.raw[eventName];
+    // Since we want to return a function that behaves as if called on the proper
+    // object and since lambdas cannot reference the arguments object, then we must
+    // create a function to delegate the call on the proper object
+    if (player && player.character[eventName]) return function() {
+        return player.character[eventName].apply(player.character, arguments);
+    }
+    else return events.raw[eventName];
 }
 events.raw = {
     target: targetEvent,

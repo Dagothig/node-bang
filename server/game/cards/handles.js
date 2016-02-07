@@ -64,7 +64,7 @@ var handleDying = (step, killer, player, amount, onResolved) => {
         return;
     }
 
-    onResolved(events('cardType')(
+    onResolved(events('cardType', player)(
         player, Beer,
         // When a beer is played, we check if we are dying again
         card => {
@@ -101,7 +101,7 @@ var handleAttack = (name, step, card, target, avoidCardType, onResolved) =>
 handleEvent('before' + name + 'Response',
     step.game.players.filter(p => p.alive),
     [step, card, target],
-    () => onResolved(events('cardType')(
+    () => onResolved(events('cardType', target)(
         target, avoidCardType,
         // onCard; damage avoided
         card => {

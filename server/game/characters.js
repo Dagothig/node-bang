@@ -41,9 +41,31 @@ var characters = [
         }
     }),
 
-    /*new Character("Calamity Janet", {
-
-    }),*/
+    new Character("Calamity Janet", {
+        cardType: function(player, cardType, onChoice, onCancel, format) {
+            return events('cardTypes')(
+                player,
+                (player.character === this &&
+                (cardType === Mancato || cardType === Bang)) ?
+                [Bang, Mancato] : [cardType],
+                onChoice, onCancel, format
+            );
+        },
+        beforePlay: function(step, onResolved, onSkip) {
+            if (step.player.character !== this) return onResolved();
+            onResolved(events('cardChoice')(step.player,
+                step.player.hand.filter(c =>
+                    c instanceof Mancato ? Bang.filter.call(c) : c.filter()
+                ),
+                // onPlay
+                card => card instanceof Mancato ?
+                    Bang.handlePlay.call(card, step, onSkip),
+                    card.handlePlay(step, onSkip)
+                // onCancel
+                () => onSkip()
+            ));
+        }
+    }),
 
     new Character("El Gringo", {
         lifeModifier: -1,
@@ -208,9 +230,12 @@ var characters = [
         beforePlay: function(step, onResolved, onSkip) {
             if (step.player.character !== this) return onResolved();
             onResolved(events('cardChoice')(step.player,
-                misc.fromArrays(step.player.hand.filter, [this.healCard]),
+                misc.fromArrays(
+                    step.player.hand.filter(c => c.filter(this)),
+                    [this.healCard]
+                ),
                 // onPlay
-                card => card === 'heal' ?
+                card => card === this.healCard ?
                     this.handleHeal(step, onResolved, onSkip) :
                     card.handlePlay(step, onSkip),
                 // onCancel
@@ -251,12 +276,11 @@ var characters = [
                 card: card.format()
             });
 
-            onResolved(events('cardType')(
+            onResolved(events('cardType', target)(
                 target, Mancato,
                 // onCard; we ask for another Mancato that isn't the first one
-                card1 => onResolved(events('cardChoice')(
-                    target,
-                    target.hand.filter(c => c instanceof Mancato && c !== card1),
+                card1 => onResolved(events('cardType', target)(
+                    target, Mancato,
                     card2 => {
                         target.hand.discard(card1.id);
                         target.hand.discard(card2.id);
@@ -270,7 +294,7 @@ var characters = [
                         onSkip();
                     },
                     onCancel, format
-                )),
+                ).filterCards(c => c !== card1)),
                 onCancel, format
             ));
         }

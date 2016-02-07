@@ -21,7 +21,7 @@ misc.extend(Card, Duel, {
         ));
     },
     handleDuel: function(step, source, target, onResolved) {
-        onResolved(events('cardType')(
+        onResolved(events('cardType', target)(
             target, Bang,
             // onChoice; duel is reversed
             card => {
