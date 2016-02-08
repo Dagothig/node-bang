@@ -1,7 +1,7 @@
 'use strict';
 
 var Character = aReq('server/game/characters/character'),
-    handles = aReq('server/game/cards/handles');
+    handles = aReq('server/game/handles');
 
 module.exports = new Character("Vulture Sam", {
     beforeDeath: function(step, killer, player, amount, onResolved, onSkip) {

@@ -1,7 +1,7 @@
 var Card = aReq('server/game/cards/card'),
     events = aReq('server/game/events'),
     misc = aReq('server/misc'),
-    handles = aReq('server/game/cards/handles');
+    handles = aReq('server/game/handles');
 
 var handleBang = (step, card, target, onResolved) =>
     handles.attack('Bang', step, card, target, Mancato, onResolved);

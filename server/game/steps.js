@@ -2,7 +2,7 @@ var log = aReq('server/log'),
     actions = aReq('server/actions'),
     misc = aReq('server/misc'),
     events = aReq('server/game/events'),
-    handles = aReq('server/game/cards/handles');
+    handles = aReq('server/game/handles');
 
 function Step(turn) {
     this.game = turn.game;
