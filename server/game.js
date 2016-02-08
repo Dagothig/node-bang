@@ -119,5 +119,8 @@ module.exports = (io, users) => ({
             }
             io.emit(msgs.joining, formattedJoining(users));
         }
+    },
+    onError: (user, socket, err) => {
+        if (game) game.end();
     }
 });

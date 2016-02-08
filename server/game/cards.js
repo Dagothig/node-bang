@@ -30,7 +30,7 @@ var Bang = attacking.Bang,
     Prigione = aReq('server/game/cards/prigione'),
     Dynamite = aReq('server/game/cards/dynamite');
 
-var deck = [
+var cards = [
     new Bang(suits.diamonds, ranks.ace),
     new Bang(suits.diamonds, ranks.two),
     new Bang(suits.diamonds, ranks.three),
@@ -142,4 +142,4 @@ var deck = [
     new Dynamite(suits.hearts, ranks.four, suits.hearts, ranks.ace, ranks.ten)
 ];
 
-module.exports = deck;
+module.exports = cards;

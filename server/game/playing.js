@@ -25,7 +25,7 @@ module.exports = new Phase('Playing', {
     },
 
     begin: function(game) {
-        this.cards = new CardPile(aReq('server/game/cards/deck'));
+        this.cards = new CardPile(aReq('server/game/cards'));
         game.players.forEach(p => this.extendPlayer(game, p));
         this.goToNextTurn(game);
     },
