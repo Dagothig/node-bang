@@ -14,4 +14,4 @@ module.exports = [
     'suzy-lafayette',
     'vulture-sam',
     'willy-the-kid'
-].map(name => 'server/game/characters/' + name);
+].map(name => aReq('server/game/characters/' + name));

@@ -2,6 +2,7 @@
 
 var misc = aReq('server/misc'),
     Character = aReq('server/game/characters/character'),
+    Card = aReq('server/game/cards/card'),
     suits = Card.suits,
     Barile = aReq('server/game/cards/barile');
 
