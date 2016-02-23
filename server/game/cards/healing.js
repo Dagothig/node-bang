@@ -13,6 +13,7 @@ misc.extend(Card, Beer, {
             player: step.player.name,
             card: this.id
         });
+        onResolved();
     }
 });
 
@@ -30,6 +31,7 @@ misc.extend(Card, Saloon, {
             player: step.player.name,
             card: this.id
         });
+        onResolved();
     }
 });
 
