@@ -3,7 +3,7 @@ module.exports = {
     confirm: "confirm",
     draw: "draw",
     discard: "discard",
-    play: "play",
+    choose: "choose",
     target: "target",
     cancel: "cancel",
     endTurn: "endTurn"

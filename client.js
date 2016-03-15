@@ -1,9 +1,9 @@
 var msgs = require('./shared/messages.js'),
-    ui = require('./client/ui.js');
+    ui = require('./client/ui.js'),
+    misc = require('./client/misc.js');
 
 var socket = io(),
     user,
-    ongoingGame,
     users;
 
 var roots = ui.many('body>*'),
@@ -28,15 +28,21 @@ var lobby = require('./client/lobby.js')(
         });
     }
 );
+var menu = require('./client/menu.js')(
+    function onDisconnect() {
+        if (confirm('Are you certain you want to disconnect?')) {
+            localStorage.removeItem('name');
+            localStorage.removeItem('token');
+            window.location.reload();
+        }
+    }
+);
 var game = require('./client/game.js')(
     function onJoin(joining) {
         socket.emit(msgs.joining, {
             token: user.token,
             joining: joining
         });
-    },
-    function onGame(game) {
-        ongoingGame = game;
     },
     function onAction(action, arg) {
         socket.emit(msgs.action, {
@@ -61,13 +67,27 @@ socket.on(msgs.alert, function(msg) {
     console.log('received', msgs.alert, msg);
     alert(msg);
 });
+socket.on(msgs.reload, function(msg) {
+    console.log('received', msgs.alert, msg);
+    window.location.reload();
+});
 socket.on(msgs.auth, function(msg) {
     console.log('received', msgs.auth, msg);
+    localStorage.removeItem('name');
+    localStorage.removeItem('token');
+    if (!user) {
+        var name = localStorage.getItem('name');
+        var token = localStorage.getItem('token');
+        if (name && token) user = { name: name, token: token };
+    }
     if (user) {
         socket.emit(msgs.auth, {
             name: user.name,
             token: user.token
         });
+        user = null;
+        localStorage.removeItem('name');
+        localStorage.removeItem('token');
     } else {
         login.handleAuth(msg);
         ui.hide(roots);
@@ -85,6 +105,8 @@ socket.on(msgs.user, function(msg) {
         ui.show(connectedContainer);
     }
     user = msg;
+    localStorage.setItem('name', msg && msg.name);
+    localStorage.setItem('token', msg && msg.token);
     lobby.handleUsers(user, users);
 });
 socket.on(msgs.users, function(msg) {
@@ -102,7 +124,6 @@ socket.on(msgs.joining, function(msg) {
 });
 socket.on(msgs.game, function(msg) {
     console.log('received', msgs.game, msg);
-    ongoingGame = msg;
     game.handleGame(msg, user);
 });
 

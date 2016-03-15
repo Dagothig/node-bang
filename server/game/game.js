@@ -1,6 +1,7 @@
 'use strict';
 
-var misc = aReq('server/misc'),
+var crypto = require('crypto'),
+    misc = aReq('server/misc'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),
 
@@ -8,6 +9,7 @@ var misc = aReq('server/misc'),
     CharacterPick = aReq('server/game/character-pick');
 
 function Game(users, onGameUpdate, onGameEvent, onGameEnd) {
+    this.identifier = crypto.randomBytes(48).toString('hex');
     this.onGameUpdate = onGameUpdate;
     this.onGameEvent = onGameEvent;
     this.onGameEnd = onGameEnd;
@@ -37,6 +39,7 @@ misc.merge(Game.prototype, {
     formatted: function(user) {
         var game = this, player = this.findPlayer(user);
         return this.phase.format(game, user, {
+            identifier: this.identifier,
             players: this.players.map(other =>
                 this.phase.formatPlayer(game, player, other, {
                     name: other.user.name,

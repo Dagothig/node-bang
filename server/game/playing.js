@@ -193,6 +193,7 @@ module.exports = new Phase('Playing', {
     },
 
     handleDisconnect: function(game, player) {
+        player.life = 0;
         this.turn.handleDisconnect(player);
         this.checkForEnd(game);
     },
@@ -230,7 +231,7 @@ module.exports = new Phase('Playing', {
         var aliveCount = {};
         Object.keys(roles).forEach(key => aliveCount[key] = 0);
         alive.forEach(p => aliveCount[p.role.key]++);
-        // If the sheriff is dead, then either a renegade or the outlaws have won
+            // If the sheriff is dead, then either a renegade or the outlaws have won
         if (!aliveCount.sheriff) {
             // If there is one alive and it's a renegade; they have won
             if (alive.length === 1 && alive[0].role === roles.renegade) {

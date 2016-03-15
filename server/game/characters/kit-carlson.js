@@ -16,8 +16,7 @@ module.exports = new Character("Kit Carlson", {
                     misc.remove(cards, card);
                     step.phase.cards.push(card);
                     onSkip();
-                },
-                undefined
+                }
             ))
         ));
     }

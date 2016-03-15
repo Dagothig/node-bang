@@ -6,12 +6,13 @@ module.exports = {
     disconnectTimeout: seconds(5),
     minPasswordLength: 4,
 
-    minPlayers: 4,//4, TODO put back the proper amount
+    minPlayers: 4,
     maxPlayers: 8,
-    gameStartTimer: 2,//10,
-    characterChoices: 2,
-    characterPickMaxTime: 0,//60
-    rolePickMaxTime: 0,//10
+    gameStartTimer: 0,//10,
+    characterChoices: 1,//2,
+    characterPickMaxTime: 0,//60,
+    rolePickMaxTime: 0,//10,
+    eventMaxTime: 60,
 
     initCardMax: 5,
     lifeMax: 4,

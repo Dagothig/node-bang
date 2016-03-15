@@ -73,7 +73,7 @@ var cards = [
     new Mancato(suits.clovers, ranks.king),
     new Mancato(suits.clovers, ranks.queen),
     new Mancato(suits.clovers, ranks.ace),
-    
+
     new Beer(suits.hearts, ranks.six),
     new Beer(suits.hearts, ranks.seven),
     new Beer(suits.hearts, ranks.eight),
@@ -129,7 +129,6 @@ var cards = [
     new Barile(suits.spades, ranks.king, suits.hearts),
     new Barile(suits.spades, ranks.queen, suits.hearts),
 
-//prigione should always release on hearts suit, so this is a duck tape fix :D
     new Prigione(suits.hearts, ranks.four, suits.hearts, ranks.two, ranks.ace),
     new Prigione(suits.spades, ranks.jack, suits.hearts, ranks.two, ranks.ace),
     new Prigione(suits.spades, ranks.queen, suits.hearts, ranks.two, ranks.ace),

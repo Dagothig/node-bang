@@ -4,7 +4,7 @@ var ui = require('./ui'),
 
 var gameEvents = [];
 
-module.exports = function(onJoin, onGame, onAction) {
+module.exports = function(onJoin, onAction) {
     var tagGame = ui.one('#game'),
         tagExtra = ui.one(tagGame, '#extra'),
         tagPlayers = ui.one(tagGame, '#players'),
@@ -59,7 +59,13 @@ module.exports = function(onJoin, onGame, onAction) {
                 ui.hide(tagGame);
                 ui.show(tagPre);
             }
-            onGame(game);
+
+            if (!game || !this.game || game.identifier !== this.game.identifier) {
+                gameEvents.length = 0;
+                this.display(tagEvents, gameEvents);
+            }
+
+            this.game = game;
         },
 
         handleEvent: function(msg) {

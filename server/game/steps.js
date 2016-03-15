@@ -9,10 +9,13 @@ function Step(turn) {
     this.phase = turn.phase;
     this.turn = turn;
     this.player = turn.player;
-    this.defaultOnResolve = event => this.event = event;
+    this.event = null;
+    this.onResolved = event => event ?
+        (this.event = event) :
+        this.turn.goToNextStep();
 }
-// Specifically overriding step prototype so it doesn't have a constructor
 Step.prototype = {
+    constructor: Step,
     get name() {
         return this.constructor.name;
     },
@@ -33,16 +36,21 @@ Step.prototype = {
     end: function() {}
 };
 
-function Draw(turn) {
-    Step.call(this, turn);
-    this.defaultOnResolve = event => event ?
-        (this.event = event) :
-        this.turn.goToNextStep();
-
-    handles.event('beforeDraw',
-        this.game.players.filter(p => p.alive), [this],
-        // onFollowing
-        () => this.defaultOnResolve(events('cardsDraw')(
+function Draw(turn) { Step.call(this, turn); }
+Draw.prototype = misc.merge(Object.create(Step.prototype), {
+    constructor: Draw,
+    start: function() { this.handleBeforeDraw(); },
+    handleBeforeDraw: function() {
+        handles.event('beforeDraw',
+            this.game.players.filter(p => p.alive), [this],
+            // onFollowing
+            () => this.handleDraw(),
+            // onResolved
+            this.onResolved
+        );
+    },
+    handleDraw: function() {
+        this.onResolved(events('cardsDraw')(
             this.player, this.phase.cards, 2,
             cards => {
                 Array.prototype.push.apply(this.player.hand, cards);
@@ -51,43 +59,45 @@ function Draw(turn) {
                     player: this.player.name,
                     amount: 2
                 });
-                handles.event('afterDraw',
-                    this.game.players.filter(p => p.alive),
-                    [this, cards],
-                    // onFollowing
-                    () => this.turn.goToNextStep(),
-                    // onResolved
-                    this.defaultOnResolve
-                );
+                this.handleAfterDraw(cards);
             }
-        )),
-        // onResolved
-        this.defaultOnResolve
-    );
-}
-misc.extend(Step, Draw);
+        ));
+    },
+    handleAfterDraw: function(cards) {
+        handles.event('afterDraw',
+            this.game.players.filter(p => p.alive), [this, cards],
+            // onFollowing
+            () => this.turn.goToNextStep(),
+            // onResolved
+            this.onResolved
+        );
+    }
+});
 
 function Play(turn) {
     Step.call(this, turn);
     this.bangs = 0;
-    this.defaultOnResolve = event => event ?
-        (this.event = event) : this.handleAfterPlay();
-    this.handleBeforePlay();
+    this.baseOnResolved = this.onResolved;
+    this.onResolved = event => event ?
+        (this.event = event) :
+        this.handleAfterPlay();
 }
-misc.merge(Play.prototype, Step.prototype, {
+Play.prototype = misc.merge(Object.create(Step.prototype), {
+    constructor: Play,
+    start: function() { this.handleBeforePlay(); },
     handleBeforePlay: function() {
         handles.event('beforePlay',
             this.game.players.filter(p => p.alive), [this],
             // onFollowing
-            () => this.defaultOnResolve(events('cardChoice')(
+            () => this.onResolved(events('cardChoice')(
                 this.player, this.player.hand.filter(c => c.filter(this)),
                 // onPlay
-                card => card.handlePlay(this, this.defaultOnResolve),
+                card => card.handlePlay(this, this.onResolved),
                 // onCancel
                 () => this.turn.goToNextStep()
             )),
             // onResolved
-            this.defaultOnResolve
+            this.onResolved
         );
     },
     handleAfterPlay: function() {
@@ -96,29 +106,24 @@ misc.merge(Play.prototype, Step.prototype, {
             // onFollowing
             () => this.handleBeforePlay(),
             // onResolved
-            this.defaultOnResolve
+            this.onResolved
         );
     }
 });
 
-function Discard(turn) {
-    Step.call(this, turn);
-}
-misc.merge(Discard.prototype, Step.prototype, {
+function Discard(turn) { Step.call(this, turn); }
+Discard.prototype = misc.merge(Object.create(Step.prototype), {
+    constructor: Discard,
     start: function() {
         if (!this.player.hand.isTooLarge) this.turn.goToNextStep();
-    },
-    actionsFor: function(player) {
-        if (this.player !== player) return {};
-        if (!this.player.hand.isTooLarge) return {};
-        var acts = {};
-        acts[actions.discard] = this.player.hand.map(card => card.id);
-        return acts;
-    },
-    handleAction: function(player, msg) {
-        if (this.player !== player) return;
-        if (msg.action === actions.discard) this.player.hand.discard(msg.arg);
-        if (!this.player.hand.isTooLarge) this.turn.goToNextStep();
+        else this.onResolved(events('cardChoice')(
+            this.player, this.player.hand,
+            // onDiscard
+            card => {
+                this.player.hand.discard(card.id);
+                this.start();
+            }
+        ));
     }
 });
 

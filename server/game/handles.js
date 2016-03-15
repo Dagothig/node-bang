@@ -12,7 +12,10 @@ var handleEvent = (eventName, players, recurseArgs, onFollowing, onResolved) => 
     handlers.reverse();
 
     let handlePile = args => {
+        console.log('handlePile', args);
         let next = handlers.pop();
+        console.log('handlers', handlers);
+        console.log('next', next);
         if (next) next[eventName].apply(next, args);
         else if(onFollowing) onFollowing();
         else onResolved();

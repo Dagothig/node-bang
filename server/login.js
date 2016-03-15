@@ -9,6 +9,11 @@ var log = aReq('server/log'),
     listeners = [];
 
 function handleAuth(io, users, socket, msg) {
+    if (!msg) {
+        socket.emit(msgs.auth);
+        return;
+    }
+
     msg.name = validator.escape(msg.name).replace(/[\s]/g, '');
     if (!msg.name || !msg.name.length) {
         socket.emit(msgs.auth, { reason: strings.authValidation });
@@ -18,16 +23,15 @@ function handleAuth(io, users, socket, msg) {
     var user;
     if (msg.token) {
         var existing = users.findForName(msg.name);
-        var isExisting = existing && existing.token === msg.token;
         if (existing && existing.token === msg.token) {
             user = existing;
         } else {
-            socket.emit(msgs.user, null);
+            socket.emit(msgs.auth, { reason: strings.authToken });
             return;
         }
     }
 
-    if (!msg.password || msg.password.length < consts.minPasswordLength) {
+    if (!user && (!msg.password || msg.password.length < consts.minPasswordLength)) {
         socket.emit(msgs.auth, { reason: strings.authValidation });
         return;
     }

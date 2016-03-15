@@ -8,9 +8,10 @@ module.exports = new Character("Sid Ketchum", {
     healCard: { id: 'heal' },
     beforePlay: function(step, onResolved, onSkip) {
         if (step.player.character !== this) return onResolved();
-        onResolved(events('cardChoice')(step.player,
+        onResolved(events('cardChoice')(
+            step.player,
             misc.fromArrays(
-                step.player.hand.filter(c => c.filter(this)),
+                step.player.hand.filter(c => c.filter(step)),
                 [this.healCard]
             ),
             // onPlay
@@ -18,14 +19,16 @@ module.exports = new Character("Sid Ketchum", {
                 this.handleHeal(step, onResolved, onSkip) :
                 card.handlePlay(step, onSkip),
             // onCancel
-            () => onSkip()
+            () => step.turn.goToNextStep()
         ));
     },
     handleHeal: function(step, onResolved, onSkip) {
-        let onFinished = onResolved(this.beforePlay(step, onResolved, onSkip));
-        onResolved(events('cardChoice')(step.player,
+        let onFinished = () => this.beforePlay(step, onResolved, onSkip);
+        onResolved(events('cardChoice')(
+            step.player,
             step.player.hand,
-            card1 => onResolved(events('cardChoice')(step.player,
+            card1 => onResolved(events('cardChoice')(
+                step.player,
                 step.player.hand.filter(c => c !== card1),
                 card2 => {
                     step.player.hand.discard(card1.id);

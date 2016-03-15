@@ -2,7 +2,9 @@
 
 var log = aReq('server/log'),
     actions = aReq('server/actions'),
-    misc = aReq('server/misc');
+    misc = aReq('server/misc'),
+    Event = aReq('server/game/event'),
+    Choice = aReq('server/game/choice');
 
 var targetEvent = (player, targets, onTarget, onCancel, format) => ({
     actionsFor: function(p) {
@@ -51,13 +53,13 @@ var cardChoiceEvent = (player, cards, onChoice, onCancel, format) => ({
     actionsFor: function(p) {
         if (p !== this.player) return {};
         var acts = {};
-        acts[actions.play] = this.cards.map(c => c.id);
+        acts[actions.choose] = this.cards.map(c => c.id);
         if (this.onCancel) acts[actions.cancel] = [actions.cancel];
         return acts;
     },
     handleAction: function(p, msg) {
         if (p !== this.player) return;
-        if (msg.action === actions.play) {
+        if (msg.action === actions.choose) {
             var card = this.cards.find(c => c.id === msg.arg);
             if (card) this.onChoice(card);
         } else if (this.onCancel && msg.action === actions.cancel) {
@@ -151,7 +153,7 @@ var delegate = () => ({
     }
 });
 
-var events = (eventName, player) => {
+var events = misc.merge((eventName, player) => {
     // Since we want to return a function that behaves as if called on the proper
     // object and since lambdas cannot reference the arguments object, then we must
     // create a function to delegate the call on the proper object
@@ -159,18 +161,39 @@ var events = (eventName, player) => {
         return player.character[eventName].apply(player.character, arguments);
     }
     else return events.raw[eventName];
-}
-events.raw = {
-    target: targetEvent,
-    targetOthers: targetOthers,
-    targetSelf: targetSelf,
-    targetRange: targetRange,
-    cardChoice: cardChoiceEvent,
-    cardType: cardTypeEvent,
-    cardsDraw: cardsDrawEvent,
-    cardDraw: cardDrawEvent,
-    removeOtherCard: removeOtherCard,
-    composed: composedEvent,
-    delegate: delegate
-};
+}, {
+    raw: {
+        target: targetEvent,
+        targetOthers: targetOthers,
+        targetSelf: targetSelf,
+        targetRange: targetRange,
+        cardChoice: cardChoiceEvent,
+        cardType: cardTypeEvent,
+        cardsDraw: cardsDrawEvent,
+        cardDraw: cardDrawEvent,
+        removeOtherCard: removeOtherCard,
+        composed: composedEvent,
+        delegate: delegate
+    },
+    start: (event) => {
+        event.timer = setInterval(() => {
+            event.end();
+        }, 1000);
+    },
+    end: (event) => {
+        if (event.timer) clearTimeout(event.timer);
+    },
+    handleDefault: (event, p) => {
+        let acts = event.actionsFor(p);
+
+        let action = acts[actions.cancel] ?
+            actions.cancel :
+            misc.spliceRand(Object.keys(acts));
+
+        event.handleAction(p, {
+            action: action,
+            arg: misc.spliceArg(acts[action])}
+        );
+    }
+});
 module.exports = events;

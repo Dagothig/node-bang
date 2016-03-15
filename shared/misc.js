@@ -12,6 +12,9 @@ function swap(arr, i1, i2) {
     arr[i2] = obj;
 }
 
+function rand(arr) {
+    return arr[(Math.random() * arr.length)|0];
+}
 function spliceRand(arr) {
     return arr.splice((Math.random() * arr.length)|0, 1)[0];
 }
@@ -56,6 +59,9 @@ function prepad(str, length, pad) {
 function postpad(str, length, pad) {
     return str + strTimes(pad, length - (str + '').length);
 }
+function capitalize(str) {
+    return str[0] + str.substring(1);
+}
 
 function simpleTime(time) {
     time = time || new Date();
@@ -79,7 +85,8 @@ function merge(to) {
 function extend(source, dest) {
     dest.prototype = Object.create(source.prototype);
     dest.prototype.constructor = dest;
-    return merge.apply(this, [dest.prototype].concat(Array.from(arguments).slice(2)));
+    var args = [dest.prototype].concat(Array.from(arguments).slice(2));
+    return merge.apply(this, args);
 }
 
 function bounded(value, min, max, minExclusive, maxExclusive) {
@@ -90,6 +97,7 @@ function bounded(value, min, max, minExclusive, maxExclusive) {
 module.exports = {
     shuffle: shuffle,
     swap: swap,
+    rand: rand,
     spliceRand: spliceRand,
     remove: remove,
     after: after,
@@ -99,6 +107,7 @@ module.exports = {
     strTimes: strTimes,
     prepad: prepad,
     postpad: postpad,
+    capitalize: capitalize,
     simpleTime: simpleTime,
     merge: merge,
     extend: extend,

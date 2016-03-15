@@ -4,7 +4,8 @@ require('./global');
 
 var log = aReq('server/log'),
     warn = aReq('server/warn'),
-    misc = aReq('server/misc');
+    misc = aReq('server/misc'),
+    msgs = aReq('shared/messages');
 
 // Setup the server itself
 var http = require('http'),
@@ -36,5 +37,22 @@ var io = require('socket.io')(server),
 login.addHandlers(lobby, game);
 
 // Listen on port
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || 80;
 server.listen(port, () => log('Listening on port', port));
+
+var stdin = process.openStdin();
+stdin.setEncoding('utf8');
+stdin.on('data', cmd => {
+    cmd = cmd.replace(/\s/g, '');
+    if (!cmd.length) return;
+    switch(cmd) {
+        case 'reload':
+            log('Reloading...');
+            io.emit(msgs.reload, true);
+            break;
+        case 'exit':
+            process.exit();
+        default:
+            warn('Command unknown', '"' + cmd + '"');
+    }
+});

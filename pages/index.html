@@ -29,7 +29,7 @@
                         <label class="grow-1" for="join">Participate</label>
                         <span class="grow-1 center">
                             <input id="join" type="checkbox" name="join" />
-                            <label for="join" class="check fa fa-check"></span>
+                            <label for="join" class="check fa fa-check"></label>
                         </span>
                     </div>
                 </form>
@@ -45,6 +45,16 @@
                     <span class="margin"></span>
                     <input value="Send" type="submit" />
                 </form>
+            </div>
+            <div id="menu" class="top left absolute full-width full-height pass-through">
+                <input id="menu-btn" type="checkbox" name="menu" />
+                <label for="menu-btn" class="check fa fa-bars absolute top right clickable"></label>
+                <div class="container top right absolute clickable full-height flex vertical">
+                    <div class="title flex horizontal">Menu</div>
+                    <div class="list grow-1 flex-vertical">
+                        <div><a id="disconnect" href="#">Disconnect</a></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="login" class="hidden root-bg absolute full-width full-height flex vertical">

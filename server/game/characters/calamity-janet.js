@@ -12,9 +12,9 @@ module.exports = new Character("Calamity Janet", {
     cardType: function(player, cardType, onChoice, onCancel, format) {
         return events('cardTypes')(
             player,
-            (player.character === this &&
-            (cardType === Mancato || cardType === Bang)) ?
-            [Bang, Mancato] : [cardType],
+            (player.character === this
+                && (cardType === Mancato || cardType === Bang)
+            ) ? [Bang, Mancato] : [cardType],
             onChoice, onCancel, format
         );
     },

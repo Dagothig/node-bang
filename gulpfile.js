@@ -29,7 +29,7 @@ gulp.task('server', function() {
 	node = childProcess.spawn(
 		'node',
 		['server.js'],
-		{ stdio: 'inherit' }
+		{ stdio: ['pipe', process.stdout, process.stderr] }
 	);
 });
 
@@ -56,6 +56,7 @@ gulp.task('client', function(cb) {
 		.pipe(gulp.dest('./public'));
 
 	val.on('data', () => log("Client script bundled"));
+
 	return val;
 });
 
@@ -64,8 +65,21 @@ gulp.task('watch-client', function(cb) {
 	return gulp.watch([
 		"./client.js",
 		"./shared/**/*.js",
-		"./client/**/*.js",
+		"./client/**/*.js"
 	], ['client']);
+});
+
+gulp.task('public', function() {
+	log('Public files changed');
+	if (node) node.stdin.write('reload\n');
+});
+
+gulp.task('watch-public', function(cb) {
+	log("Watching public files...");
+	return gulp.watch([
+		"./public/**",
+		"./pages/**"
+	], ['public']);
 });
 
 gulp.task('sloc', function(cb) {
@@ -79,7 +93,10 @@ gulp.task('sloc', function(cb) {
 	]).pipe(require('gulp-sloc')());
 });
 
-gulp.task('default', ['server', 'client', 'watch-server', 'watch-client']);
+gulp.task('default', [
+	'server', 'client',
+	'watch-server', 'watch-client', 'watch-public'
+]);
 
 process.on("exit", function() {
 	if (node) node.kill();
