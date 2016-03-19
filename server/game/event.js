@@ -17,22 +17,25 @@ function Event(choices, format) {
 Event.prototype = {
     constructor: Event,
     get name() { return this.constructor.name; },
-    actionsFor: function(state, player) {
-        return this.actions[player.name];
-    },
-    defaultArgForAction: function(state, player, actions, action) {
+
+    _defaultArgForAction: function(state, player, actions, action) {
         var args = actions[action];
         return {
             action: action,
             arg: (args.length === 1) ? args[0] : misc.rand(args)
         };
     },
-    defaultActionFor: function(state, player) {
+    _defaultActionFor: function(state, player) {
         var acts = this.actionsFor(state, player);
-        return this.defaultArgForAction(state, player, acts,
+        return this._defaultArgForAction(state, player, acts,
             acts[actions.cancel] ? actions.cancel : Misc.rand(Object.keys(acts))
         );
     },
+
+    actionsFor: function(state, player) {
+        return this.actions[player.name];
+    },
+
     handleAction: function(state, player, msg) {
         var choice = this.choices.find(c => c.is(player, msg));
         if (!choice) return;
@@ -40,9 +43,11 @@ Event.prototype = {
         if (!arg) return;
         this['handle' + misc.capitalize(choice.action)](state, player, arg);
     },
-    handleDisconnect: function(state, player) {
-        return this.handleAction(state, player, this.defaultActionFor(player));
+
+    handleDefault: function(state, player) {
+        return this.handleAction(state, player, this._defaultActionFor(player));
     },
+
     format: function(state, player) {
         return misc.merge({
             name: this.name,
@@ -51,11 +56,10 @@ Event.prototype = {
                 this.event.format(state, player) : undefined
         }, (this.format && this.format(state, player)) || {});
     },
+
     update: function(state, delta) {
         this.time -= delta;
-        if (this.time <= 0) {
-
-        }
+        if (this.time <= 0) this.handleDefault();
     }
 };
 

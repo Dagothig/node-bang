@@ -10,7 +10,7 @@ function CardChoiceEvent(player, cards, onChoice, onCancel, format) {
         onChoice && new Choice(player, actions.choose, cards, c => c.id),
         onCancel && new Choice(player, actions.cancel)
     ], format);
-    this.onTarget = onTarget;
+    this.onChoice = onChoice;
     this.onCancel = onCancel;
 
     if (cards.length === 1) onChoice(cards[0]);
@@ -18,7 +18,13 @@ function CardChoiceEvent(player, cards, onChoice, onCancel, format) {
 CardChoiceEvent.prototype = misc.merge(Object.create(Event.prototype), {
     constructor: CardChoiceEvent,
     handleChoice: function(state, player, choice) { this.onChoice(choice); },
-    handleCancel: function(state, player, arg) { this.onCancel(); }
+    handleCancel: function(state, player, arg) { this.onCancel(); },
+    filterCards: function(filter) {
+        Event.call(this, this.choices.filter(choice =>
+            choice.action !== actions.choose || choice.args.filter(filter)
+        ), this.format);
+        return this;
+    }
 });
 
 module.exports = CardChoiceEvent;

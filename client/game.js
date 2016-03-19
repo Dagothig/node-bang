@@ -102,9 +102,15 @@ module.exports = function(onJoin, onAction) {
             var tag = '';
 
             // Setup the actions
+            var tabIndex = 0;
             for (var a in actions) {
                 Array.prototype.forEach.call(actions[a], arg => tag +=
-                    '<div class="action" data-action="' + a + '" data-arg="' + arg + '">'
+                    '<div ' +
+                        'tabindex="' + (++tabIndex) + '" ' +
+                        'class="action" ' +
+                        'data-action="' + a + '" ' +
+                        'data-arg="' + arg + '"' +
+                    '>'
                     + a + ' - ' + arg +
                     '</div>'
                 );
@@ -116,6 +122,10 @@ module.exports = function(onJoin, onAction) {
                 actionTag.onclick = function (e) {
                     tagActions.innerHTML = '';
                     onAction(action, arg);
+                }
+                actionTag.onkeydown = function(e) {
+                    if (e.keyCode !== 32) return;
+                    actionTag.onclick();
                 }
             });
         },

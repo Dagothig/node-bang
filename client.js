@@ -73,8 +73,6 @@ socket.on(msgs.reload, function(msg) {
 });
 socket.on(msgs.auth, function(msg) {
     console.log('received', msgs.auth, msg);
-    localStorage.removeItem('name');
-    localStorage.removeItem('token');
     if (!user) {
         var name = localStorage.getItem('name');
         var token = localStorage.getItem('token');

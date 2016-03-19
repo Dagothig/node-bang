@@ -71,6 +71,15 @@ html, body {
     background-color: #fff;
 }
 
+.action {
+    padding: 0.5em;
+}
+.action:focus {
+    color: #fff;
+    background-color: #08f;
+    outline: none;
+}
+
 /* === [TREE] === */
 .tree-root {
     font-size: 90%;
