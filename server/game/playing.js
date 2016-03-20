@@ -202,9 +202,8 @@ module.exports = new Phase('Playing', {
     },
 
     handleDisconnect: function(game, player) {
-        player.life = 0;
+        log(player.name, 'is now a zombie!');
         this.turn.handleDisconnect(player);
-        this.checkForEnd(game);
     },
 
     format: function(game, player, formatted) {
