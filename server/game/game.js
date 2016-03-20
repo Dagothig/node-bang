@@ -18,9 +18,27 @@ function Game(users, onGameUpdate, onGameEvent, onGameEnd) {
 misc.merge(Game.prototype, {
     begin: function() {
         this.switchToPhase(CharacterPick);
+        this.shouldUpdate = true;
+        this.update();
     },
     end: function() {
+        this.shouldUpdate = false;
         this.onGameEnd();
+    },
+    update: function(delta) {
+        var currentTick = process.hrtime();
+        delta: {
+            if (!this.lastTick) break delta;
+
+            var secDelta = this.currentTick[0] - this.lastTick[0];
+            var nanoDelta = this.currentTick[1] - this.lastTick[1];
+            var delta = secDelta + nanoDelta / (1000 * 1000 * 1000);
+
+            if (this.phase) this.phase.update(this, delta);
+        }
+        this.lastTick = currentTick;
+
+        process.nextTick(() => this.update());
     },
     switchToPhase: function(phase) {
         if (this.phase) {

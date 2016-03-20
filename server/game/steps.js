@@ -10,14 +10,23 @@ function Step(turn) {
     this.turn = turn;
     this.player = turn.player;
     this.event = null;
-    this.onResolved = event => event ?
-        (this.event = event) :
-        this.turn.goToNextStep();
+    this.onResolved = event =>
+        this.changeEvent(event, () => this.turn.goToNextStep());
 }
 Step.prototype = {
     constructor: Step,
     get name() {
         return this.constructor.name;
+    },
+    changeEvent: function(event, onNull) {
+        var zombies = this.game.players.filter(p => p.zombie);
+        this.event = event;
+        if (event) zombies.forEach(zombie => event.handleDefault(zombie));
+        else {
+            this.event = event;
+            if (zombies.length > 0) this.handleDisconnect(zombies.pop());
+            else onNull();
+        }
     },
     format: function() {
         return {
@@ -27,11 +36,21 @@ Step.prototype = {
         };
     },
     start: function() {},
+    update: function(delta) {
+        if (this.event) return this.event.update(delta);
+    },
     actionsFor: function(player) {
         if (this.event) return this.event.actionsFor(player);
     },
     handleAction: function(player, msg) {
         if (this.event) return this.event.handleAction(player, msg);
+    },
+    handleDisconnect: function(zombie) {
+        if (!this.event) handles.damage(this,
+            null, zombie,
+            zombie.life,
+            this.onResolved
+        );
     },
     end: function() {}
 };
@@ -77,10 +96,8 @@ Draw.prototype = misc.merge(Object.create(Step.prototype), {
 function Play(turn) {
     Step.call(this, turn);
     this.bangs = 0;
-    this.baseOnResolved = this.onResolved;
-    this.onResolved = event => event ?
-        (this.event = event) :
-        this.handleAfterPlay();
+    this.onResolved = event =>
+        this.changeEvent(event, () => this.handleAfterPlay());
 }
 Play.prototype = misc.merge(Object.create(Step.prototype), {
     constructor: Play,

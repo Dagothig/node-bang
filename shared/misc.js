@@ -60,7 +60,10 @@ function postpad(str, length, pad) {
     return str + strTimes(pad, length - (str + '').length);
 }
 function capitalize(str) {
-    return str[0] + str.substring(1);
+    return str[0].toUpperCase() + str.substring(1);
+}
+function camelCase(str) {
+    return str[0].toLowerCase() + str.substring(1);
 }
 
 function simpleTime(time) {
@@ -108,6 +111,7 @@ module.exports = {
     prepad: prepad,
     postpad: postpad,
     capitalize: capitalize,
+    camelCase: camelCase,
     simpleTime: simpleTime,
     merge: merge,
     extend: extend,

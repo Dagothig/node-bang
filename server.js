@@ -40,6 +40,7 @@ login.addHandlers(lobby, game);
 var port = process.env.PORT || 80;
 server.listen(port, () => log('Listening on port', port));
 
+// Setup stdin to listen to commands
 var stdin = process.openStdin();
 stdin.setEncoding('utf8');
 stdin.on('data', cmd => {
@@ -47,7 +48,7 @@ stdin.on('data', cmd => {
     if (!cmd.length) return;
     switch(cmd) {
         case 'reload':
-            log('Reloading...');
+            log('Relording...');
             io.emit(msgs.reload, true);
             break;
         case 'exit':

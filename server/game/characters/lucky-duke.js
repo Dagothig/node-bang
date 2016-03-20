@@ -9,10 +9,9 @@ module.exports = new Character("Lucky Duke", {
         if (player.character !== this)
             return events('cardDraw')(player, cards, onDraw, onCancel, format);
 
-        let delegate = events('delegate');
-        delegate.event = events('cardsDraw')(
+        return events('delegate')(onResolved => events('cardsDraw')(
             player, cards, 2,
-            choices => delegate.event = events('cardChoiceEvent')(
+            choices => onResolved(events('cardChoiceEvent')(
                 player, choices,
                 card => {
                     misc.remove(choices, card);
@@ -20,9 +19,8 @@ module.exports = new Character("Lucky Duke", {
                     onDraw(card);
                 },
                 undefined, format
-            ),
+            )),
             onCancel, format
-        );
-        return delegate;
+        ));
     }
 });

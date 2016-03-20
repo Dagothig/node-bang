@@ -1,5 +1,4 @@
-function Choice(player, action, args, argFunc) {
-    this.player = player;
+function Choice(action, args, argFunc) {
     this.action = action;
     this.args = args || [this.action];
     this.argFunc = argFunc || (a => a);
@@ -7,9 +6,6 @@ function Choice(player, action, args, argFunc) {
 }
 Choice.prototype = {
     constructor: Choice,
-    is: function(player, msg) {
-        return this.player.name === player.name
-            && this.action === msg.action;
-    }
+    is: function(msg) { return this.action === msg.action; }
 };
 module.exports = Choice;

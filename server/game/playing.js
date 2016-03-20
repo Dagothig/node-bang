@@ -106,6 +106,9 @@ module.exports = new Phase('Playing', {
             },
             get alive() {
                 return this.life > 0;
+            },
+            get zombie() {
+                return this.alive && this.user.isDisconnected;
             }
         });
 
@@ -164,6 +167,11 @@ module.exports = new Phase('Playing', {
         });
     },
 
+    update: (game, delta) => {
+        if (!this.turn) return;
+        return this.turn.update(delta);
+    },
+
     end: function(game) {
         game.players.forEach(p => {
             delete p.equipped;
@@ -177,6 +185,7 @@ module.exports = new Phase('Playing', {
             delete p.heal;
             delete p.dead;
             delete p.alive;
+            delete p.zombie;
 
             delete p.hand;
         });

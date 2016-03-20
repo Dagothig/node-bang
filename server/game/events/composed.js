@@ -23,31 +23,31 @@ ComposedEvent.prototype = {
                 obj,
             {}
         );
-    }
+    },
 
     resolveEvent: function(i, newEvent) {
         this.events[i] = newEvent;
         if (!this.events.filter(e => e).length) this.onResolved();
     },
 
-    actionsFor: function(state, player) {
-        return this._reduce('actionsFor', state, player);
+    actionsFor: function(player) {
+        return this._reduce('actionsFor', player);
     },
 
-    handleAction: function(state, player, msg) {
-        return this._map('handleAction', state, player, msg);
+    handleAction: function(player, msg) {
+        return this._map('handleAction', player, msg);
     },
 
-    handleDefault: function(state, player) {
-        return this._reduce('handleDefault', state, player);
+    handleDefault: function(player) {
+        return this._reduce('handleDefault', player);
     },
 
-    format: function(state, player) {
-        return this._reduce('format', state, player);
+    format: function(player) {
+        return this._reduce('format', player);
     },
 
-    update: function(state, delta) {
-        return this._map('update', state, delta);
+    update: function(delta) {
+        return this._map('update', delta);
     }
 };
 

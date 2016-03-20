@@ -2,7 +2,7 @@
 
 var actions = aReq('server/actions'),
     misc = aReq('server/misc'),
-    Event = aReq('server/game/event'),
+    Event = require('./event'),
     CCE = require('./card-choice');
 
 function RemoveOtherCardEvent(
@@ -16,7 +16,7 @@ function RemoveOtherCardEvent(
 }
 RemoveOtherCardEvent.prototype = misc.merge(Object.create(CCE.prototype), {
     constructor: RemoveOtherCardEvent,
-    handleChoice: function(state, player, choice) {
+    handleChoice: function(player, choice) {
         this.onChoice(choice.id === 'hand' ?
             this.target.hand.removeRand() :
             this.target.equipped.remove(choice.id)

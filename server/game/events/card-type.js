@@ -6,7 +6,7 @@ var misc = aReq('server/misc'),
 function CardTypeEvent(player, cardType, onChoice, onCancel, format) {
     CardTypesEvent.call(this, player, [cardType], onChoice, onCancel, format);
 }
-CardTypeEvent.prototype = misc.merge(Object.create(Event.prototype), {
+CardTypeEvent.prototype = misc.merge(Object.create(CardTypesEvent.prototype), {
     constructor: CardTypeEvent,
 });
 

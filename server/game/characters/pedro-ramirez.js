@@ -9,21 +9,14 @@ module.exports = new Character("Pedro Ramirez", {
         if (!step.phase.cards.discarded.length) return onResolved();
 
         let self = this;
-        onResolved({
-            actionsFor: function(p) {
-                if (p !== step.player) return {};
-                let acts = {};
-                acts[actions.draw] = ['pile', 'discarded'];
-                return acts;
-            },
-            handleAction: function(p, msg) {
-                if (p !== step.player) return;
-                if (msg.action !== actions.draw) return;
-                if (msg.arg === 'pile') onResolved();
-                else if (msg.arg === 'discarded')
+        onResolved(events('simple')(
+            step.player, actions.draw, ['pile', 'discarded'],
+            function(p, arg) {
+                if (arg === 'pile') onResolved();
+                else if (arg === 'discarded')
                     self.handleDrawDiscard(step, onResolved, onSkip);
             }
-        });
+        ));
     },
     handleDrawDiscard: function(step, onResolved, onSkip) {
         step.player.hand.drawFromPile();

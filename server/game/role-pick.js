@@ -42,6 +42,7 @@ module.exports = new Phase('Role pick', {
             else game.switchToPhase(Playing);
         }, 1000);
     },
+    update: (game, delta) => {},
     end: function(game) {
         game.players.forEach(p => {
             delete p.confirmedRole;

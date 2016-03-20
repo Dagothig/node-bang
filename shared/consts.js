@@ -1,9 +1,5 @@
-var seconds = amount => amount * 1000;
-var minutes = amount => seconds(amount * 60);
-var hours = amount => minutes(amount * 60);
-
 module.exports = {
-    disconnectTimeout: seconds(5),
+    disconnectTimeout: 5,
     minPasswordLength: 4,
 
     minPlayers: 4,

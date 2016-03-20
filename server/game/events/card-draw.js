@@ -9,7 +9,7 @@ function CardDrawEvent(player, cards, onDraw, onCancel, format) {
         c => onDraw(c[0]), onCancel,  format
     );
 }
-CardDrawEvent.prototype = misc.merge(Object.create(Event.prototype), {
+CardDrawEvent.prototype = misc.merge(Object.create(CardsDrawEvent.prototype), {
     constructor: CardDrawEvent,
 });
 

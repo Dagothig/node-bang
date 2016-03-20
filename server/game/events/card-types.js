@@ -10,7 +10,7 @@ function CardTypesEvent(player, cardTypes, onChoice, onCancel, format) {
         onChoice, onCancel, format
     );
 }
-CardTypesEvent.prototype = misc.merge(Object.create(Event.prototype), {
+CardTypesEvent.prototype = misc.merge(Object.create(CardChoiceEvent.prototype), {
     constructor: CardTypesEvent,
 });
 

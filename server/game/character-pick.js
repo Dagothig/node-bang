@@ -36,6 +36,8 @@ module.exports = new Phase('Character pick', {
         this.startTimer(game, consts.characterPickMaxTime);
     },
 
+    update: (game, delta) => {},
+
     end: function(game) {
         game.players.filter(p => !p.character).forEach(p => {
             p.character = misc.spliceRand(p.characters);

@@ -2,13 +2,13 @@
 
 var actions = aReq('server/actions'),
     misc = aReq('server/misc'),
-    Event = aReq('server/game/event'),
-    Choice = aReq('server/game/choice');
+    Event = require('./event'),
+    Choice = require('./choice');
 
 function TargetEvent(player, targets, onTarget, onCancel, format) {
-    Event.call(this, [
-        onTarget && new Choice(player, actions.target, targets, t => t.name),
-        onCancel && new Choice(player, actions.cancel)
+    Event.call(this, player, [
+        onTarget && new Choice(actions.target, targets, t => t.name),
+        onCancel && new Choice(actions.cancel)
     ], format);
     this.onTarget = onTarget;
     this.onCancel = onCancel;
@@ -17,8 +17,8 @@ function TargetEvent(player, targets, onTarget, onCancel, format) {
 }
 TargetEvent.prototype = misc.merge(Object.create(Event.prototype), {
     constructor: TargetEvent,
-    handleTarget: function(state, player, target) { this.onTarget(target); },
-    handleCancel: function(state, player, arg) { this.onCancel(); }
+    handleTarget: function(player, target) { this.onTarget(target); },
+    handleCancel: function(player, arg) { this.onCancel(); }
 });
 
 module.exports = TargetEvent;

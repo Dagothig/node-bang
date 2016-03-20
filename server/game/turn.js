@@ -23,7 +23,10 @@ misc.merge(Turn.prototype, {
         if (nextStep) return new nextStep(this);
         return null;
     },
-
+    update: (delta) => {
+        if (!this.step) return {};
+        return this.step.update(delta);
+    },
     actionsFor: function(player) {
         if (!this.step) return {};
         return this.step.actionsFor(player);
@@ -33,7 +36,8 @@ misc.merge(Turn.prototype, {
         this.step.handleAction(player, msg);
     },
     handleDisconnect: function(player) {
-        throw "Lolcakes told me I lied";
+        if (!this.step) return;
+        this.step.handleDisconnect(player);
     }
 });
 Turn.steps = aReq('server/game/steps');

@@ -2,6 +2,7 @@
 
 var misc = aReq('server/misc'),
     actions = aReq('server/actions'),
+    Choice = aReq('server/game/events/choice'),
     Character = aReq('server/game/characters/character'),
 
     events = aReq('server/game/events');
@@ -11,21 +12,14 @@ module.exports = new Character("Jesse Jones", {
         if (step.player.character !== this) return onResolved();
 
         let self = this;
-        onResolved({
-            actionsFor: function(p) {
-                if (p !== step.player) return {};
-                let acts = {}
-                acts[actions.draw] = ['pile', 'player'];
-                return acts;
-            },
-            handleAction: function(p, msg) {
-                if (p !== step.player) return;
-                if (msg.action !== actions.draw) return;
-                if (msg.arg === 'pile') onResolved();
-                else if (msg.arg === 'player')
+        onResolved(events('simple')(
+            step.player, actions.draw, ['pile', 'player'],
+            function(p, arg) {
+                if (arg === 'pile') onResolved();
+                else if (arg === 'player')
                     self.handleSteal(step, onResolved, onSkip);
             }
-        });
+        ));
     },
     handleSteal: function(step, onResolved, onSkip) {
         onResolved(events('target')(

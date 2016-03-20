@@ -13,6 +13,7 @@ function Phase(name, obj) {
         }
     }) ({
         begin: game => {},
+        update: (game, delta) => {},
         end: game => {},
         actionsFor: (game, player) => ({}),
         handleAction: (game, player, msg) => {},

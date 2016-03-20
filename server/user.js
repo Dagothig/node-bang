@@ -17,6 +17,9 @@ misc.merge(User.prototype, {
     get isConnected() {
         return !!this.sockets.length;
     },
+    get isDisconnected() {
+        return !this.sockets.length;
+    },
     addSocket: function(socket) {
         // Add the socket if its not already listed
         if (this.sockets.indexOf(socket) === -1) this.sockets.push(socket);
@@ -37,7 +40,7 @@ misc.merge(User.prototype, {
         if (this.sockets.length) return;
         this.disconnectTimout = setTimeout(() => {
             disconnectCallback();
-        }, consts.disconnectTimeout);
+        }, consts.disconnectTimeout * 1000);
     },
     emit: function() {
         this.sockets.forEach((socket) => socket.emit.apply(socket, arguments));

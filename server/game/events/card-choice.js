@@ -2,13 +2,13 @@
 
 var actions = aReq('server/actions'),
     misc = aReq('server/misc'),
-    Event = aReq('server/game/event'),
-    Choice = aReq('server/game/choice');
+    Event = require('./event'),
+    Choice = require('./choice');
 
 function CardChoiceEvent(player, cards, onChoice, onCancel, format) {
-    Event.call(this, [
-        onChoice && new Choice(player, actions.choose, cards, c => c.id),
-        onCancel && new Choice(player, actions.cancel)
+    Event.call(this, player, [
+        onChoice && new Choice(actions.choose, cards, c => c.id),
+        onCancel && new Choice(actions.cancel)
     ], format);
     this.onChoice = onChoice;
     this.onCancel = onCancel;
@@ -17,8 +17,8 @@ function CardChoiceEvent(player, cards, onChoice, onCancel, format) {
 }
 CardChoiceEvent.prototype = misc.merge(Object.create(Event.prototype), {
     constructor: CardChoiceEvent,
-    handleChoice: function(state, player, choice) { this.onChoice(choice); },
-    handleCancel: function(state, player, arg) { this.onCancel(); },
+    handleChoice: function(player, choice) { this.onChoice(choice); },
+    handleCancel: function(player, arg) { this.onCancel(); },
     filterCards: function(filter) {
         Event.call(this, this.choices.filter(choice =>
             choice.action !== actions.choose || choice.args.filter(filter)

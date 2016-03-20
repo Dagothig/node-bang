@@ -3,7 +3,7 @@
 var misc = aReq('server/misc'),
     TargetEvent = require('./target');
 
-function TargetRangeEvent(player, players, range, , onTarget, onCancel, format) {
+function TargetRangeEvent(player, players, range, onTarget, onCancel, format) {
     let alive = players.filter(p => p.alive && p !== player);
     TargetEvent.call(this,
         player,
