@@ -49,6 +49,12 @@ handleEvent('beforeDeath',
         discarded.push.apply(discarded, player.equipped);
         player.equipped.length = 0;
 
+
+        step.game.onGameEvent({
+            name: 'Dead',
+            player: player.name
+        });
+
         handleAfterDeath(step, killer, player, amount, onResolved);
     },
     onResolved

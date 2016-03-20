@@ -19,6 +19,7 @@ module.exports = new Phase('Playing', {
 
     getNextTurn: function(game) {
         var player, alive = game.players.filter(p => p.alive);
+        if (!alive.length) return null;
         if (!this.turn) player = alive.find(p => p.role === roles.sheriff);
         else player = alive[(alive.indexOf(this.turn.player) + 1) % alive.length];
         return new Turn(game, player);

@@ -20,7 +20,8 @@ misc.merge(Turn.prototype, {
         var nextStep = !this.step ?
             Turn.steps.Draw :
             this.step.constructor.nextStep;
-        if (nextStep) return new nextStep(this);
+        if (nextStep)
+            return new nextStep(this.game, this.player, () => this.goToNextStep());
         return null;
     },
     update: function(delta) {

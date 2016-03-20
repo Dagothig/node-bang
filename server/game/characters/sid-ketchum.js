@@ -19,7 +19,7 @@ module.exports = new Character("Sid Ketchum", {
                 this.handleHeal(step, onResolved, onSkip) :
                 card.handlePlay(step, onSkip),
             // onCancel
-            () => step.turn.goToNextStep()
+            () => step.finalize()
         ));
     },
     handleHeal: function(step, onResolved, onSkip) {

@@ -28,7 +28,7 @@ gulp.task('server', function() {
 	var childProcess = require('child_process');
 	node = childProcess.spawn(
 		'node',
-		['--debug', 'server.js'],
+		['server.js'],
 		{ stdio: ['pipe', process.stdout, process.stderr] }
 	);
 });

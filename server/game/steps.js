@@ -4,14 +4,14 @@ var log = aReq('server/log'),
     events = aReq('server/game/events'),
     handles = aReq('server/game/handles');
 
-function Step(turn) {
-    this.game = turn.game;
-    this.phase = turn.phase;
-    this.turn = turn;
-    this.player = turn.player;
+function Step(game, player, onFinished) {
+    this.game = game;
+    this.phase = game.phase;
+    this.player = player;
+    this.onFinished = onFinished;
     this.event = null;
     this.onResolved = event =>
-        this.changeEvent(event, () => this.turn.goToNextStep());
+        this.changeEvent(event, () => this.finalize());
 }
 Step.prototype = {
     constructor: Step,
@@ -23,8 +23,7 @@ Step.prototype = {
         this.event = event;
         if (event) zombies.forEach(zombie => event.handleDefault(zombie));
         else {
-            this.event = event;
-            if (zombies.length > 0) this.handleDisconnect(zombies.pop());
+            if (zombies.length > 0) this.kill(zombies.pop());
             else onNull();
         }
     },
@@ -47,16 +46,23 @@ Step.prototype = {
     },
     handleDisconnect: function(zombie) {
         if (this.event) this.event.handleDefault(zombie);
-        else handles.damage(this,
-            null, zombie,
-            zombie.life,
-            this.onResolved
-        );
+        else this.kill(zombie);
     },
-    end: function() {}
+    kill: function(zombie, onResolved) {
+        onResolved = onResolved || this.onResolved;
+        zombie.life = 0;
+        handles.beforeDeath(this, zombie, zombie, 0, onResolved);
+    },
+    end: function() {},
+    finalize: function() {
+        zombies = this.game.players.filter(p => p.zombie);
+        if (!zombies.length) return this.onFinished();
+        var zombie = zombies.pop();
+        this.kill(zombies.pop(), e => this.changeEvent(e, () => this.finalize()));
+    }
 };
 
-function Draw(turn) { Step.call(this, turn); }
+function Draw() { Step.apply(this, arguments); }
 Draw.prototype = misc.merge(Object.create(Step.prototype), {
     constructor: Draw,
     start: function() { this.handleBeforeDraw(); },
@@ -87,15 +93,15 @@ Draw.prototype = misc.merge(Object.create(Step.prototype), {
         handles.event('afterDraw',
             this.game.players.filter(p => p.alive), [this, cards],
             // onFollowing
-            () => this.turn.goToNextStep(),
+            () => this.finalize(),
             // onResolved
             this.onResolved
         );
     }
 });
 
-function Play(turn) {
-    Step.call(this, turn);
+function Play() {
+    Step.apply(this, arguments);
     this.bangs = 0;
     this.onResolved = event =>
         this.changeEvent(event, () => this.handleAfterPlay());
@@ -112,7 +118,7 @@ Play.prototype = misc.merge(Object.create(Step.prototype), {
                 // onPlay
                 card => card.handlePlay(this, this.onResolved),
                 // onCancel
-                () => this.turn.goToNextStep()
+                () => this.finalize()
             )),
             // onResolved
             this.onResolved
@@ -129,11 +135,11 @@ Play.prototype = misc.merge(Object.create(Step.prototype), {
     }
 });
 
-function Discard(turn) { Step.call(this, turn); }
+function Discard() { Step.apply(this, arguments); }
 Discard.prototype = misc.merge(Object.create(Step.prototype), {
     constructor: Discard,
     start: function() {
-        if (!this.player.hand.isTooLarge) this.turn.goToNextStep();
+        if (!this.player.hand.isTooLarge) this.finalize();
         else this.onResolved(events('cardChoice')(
             this.player, this.player.hand,
             // onDiscard
