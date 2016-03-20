@@ -1,7 +1,8 @@
 'use strict';
 
-var misc = aReq('server/misc');
-var Event = aReq('server/game/events/event');
+var misc = aReq('server/misc'),
+    Event = aReq('server/game/events/event'),
+    Choice = aReq('server/game/events/choice');
 
 var events = misc.merge((eventName, player) => {
     // Since we want to return a function that behaves as if called on the proper
@@ -11,12 +12,20 @@ var events = misc.merge((eventName, player) => {
         function() {
             return player.character[eventName].apply(player.character, arguments);
         } :
-        events.raw[eventName];
+        function() {
+            let event = events.raw[eventName];
+            let args = Array.from(arguments);
+            function Tempo() {
+                event.apply(this, args);
+            }
+            Tempo.prototype = event.prototype;
+            return new Tempo();
+        };
 }, {
     raw: require('fs')
     .readdirSync('server/game/events')
     .map(f => aReq('server/game/events/' + f))
-    .filter(ev => ev !== Event)
+    .filter(ev => ev !== Event && ev !== Choice)
     .reduce((raw, ev) => Object.defineProperty(
             raw,
             misc.camelCase(ev.name.replace('Event', '')),

@@ -12,12 +12,10 @@ function CardChoiceEvent(player, cards, onChoice, onCancel, format) {
     ], format);
     this.onChoice = onChoice;
     this.onCancel = onCancel;
-
-    if (cards.length === 1) onChoice(cards[0]);
 }
 CardChoiceEvent.prototype = misc.merge(Object.create(Event.prototype), {
     constructor: CardChoiceEvent,
-    handleChoice: function(player, choice) { this.onChoice(choice); },
+    handleChoose: function(player, choice) { this.onChoice(choice); },
     handleCancel: function(player, arg) { this.onCancel(); },
     filterCards: function(filter) {
         Event.call(this, this.choices.filter(choice =>

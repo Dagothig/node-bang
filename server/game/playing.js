@@ -167,9 +167,8 @@ module.exports = new Phase('Playing', {
         });
     },
 
-    update: (game, delta) => {
-        if (!this.turn) return;
-        return this.turn.update(delta);
+    update: function(game, delta) {
+        return this.turn && this.turn.update(delta);
     },
 
     end: function(game) {

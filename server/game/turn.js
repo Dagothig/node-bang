@@ -23,9 +23,8 @@ misc.merge(Turn.prototype, {
         if (nextStep) return new nextStep(this);
         return null;
     },
-    update: (delta) => {
-        if (!this.step) return {};
-        return this.step.update(delta);
+    update: function(delta) {
+        return this.step && this.step.update(delta);
     },
     actionsFor: function(player) {
         if (!this.step) return {};

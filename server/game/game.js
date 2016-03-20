@@ -30,15 +30,15 @@ misc.merge(Game.prototype, {
         delta: {
             if (!this.lastTick) break delta;
 
-            var secDelta = this.currentTick[0] - this.lastTick[0];
-            var nanoDelta = this.currentTick[1] - this.lastTick[1];
+            var secDelta = currentTick[0] - this.lastTick[0];
+            var nanoDelta = currentTick[1] - this.lastTick[1];
             var delta = secDelta + nanoDelta / (1000 * 1000 * 1000);
 
-            if (this.phase) this.phase.update(this, delta);
+            if (this.phase && this.phase.update(this, delta)) this.onGameUpdate();
         }
         this.lastTick = currentTick;
 
-        process.nextTick(() => this.update());
+        setImmediate(() => this.update());
     },
     switchToPhase: function(phase) {
         if (this.phase) {
@@ -84,6 +84,7 @@ misc.merge(Game.prototype, {
         var player = this.findPlayer(user);
         if (!player) return;
         this.phase.handleDisconnect(this, player);
+        this.onGameUpdate();
     }
 });
 

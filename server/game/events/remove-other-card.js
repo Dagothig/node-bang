@@ -16,7 +16,7 @@ function RemoveOtherCardEvent(
 }
 RemoveOtherCardEvent.prototype = misc.merge(Object.create(CCE.prototype), {
     constructor: RemoveOtherCardEvent,
-    handleChoice: function(player, choice) {
+    handleChoose: function(player, choice) {
         this.onChoice(choice.id === 'hand' ?
             this.target.hand.removeRand() :
             this.target.equipped.remove(choice.id)

@@ -1,7 +1,8 @@
 'use strict';
 
 var misc = aReq('server/misc'),
-    Event = require('./event');
+    Event = require('./event'),
+    Choice = require('./choice');
 
 function SimpleEvent(player, action, args, handle, format) {
     Event.call(this, player, [new Choice(action, args)], format);

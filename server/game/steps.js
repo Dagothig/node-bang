@@ -37,7 +37,7 @@ Step.prototype = {
     },
     start: function() {},
     update: function(delta) {
-        if (this.event) return this.event.update(delta);
+        return this.event && this.event.update(delta);
     },
     actionsFor: function(player) {
         if (this.event) return this.event.actionsFor(player);
@@ -46,7 +46,8 @@ Step.prototype = {
         if (this.event) return this.event.handleAction(player, msg);
     },
     handleDisconnect: function(zombie) {
-        if (!this.event) handles.damage(this,
+        if (this.event) this.event.handleDefault(zombie);
+        else handles.damage(this,
             null, zombie,
             zombie.life,
             this.onResolved

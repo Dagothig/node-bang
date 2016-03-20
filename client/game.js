@@ -73,6 +73,21 @@ module.exports = function(onJoin, onAction) {
             this.display(tagEvents, gameEvents);
         },
 
+        update: function(delta) {
+            if (!this.game
+                || !this.game.turn
+                || !this.game.turn.step
+                || !this.game.turn.step.event) return;
+
+            this.game.turn.step.event.time =
+                Math.max(this.game.turn.step.event.time - delta, 0);
+            this.display(tagExtra, this.game && {
+                remainingTime: this.game.remainingTime,
+                turn: this.game.turn,
+                cards: this.game.cards
+            });
+        },
+
         display: function(tag, obj) {
             tag.innerHTML = obj ? this.format('', obj) : '';
         },
@@ -131,7 +146,11 @@ module.exports = function(onJoin, onAction) {
         },
 
         format: function(name, obj) {
-            return (name.length ? name + ': ' : '') + ((typeof obj === 'object') ? this.formatTree(obj) : obj);
+            var type = typeof obj;
+            return (name.length ? name + ': ' : '') +
+                ((type === 'object') ? this.formatTree(obj) :
+                ((type === 'number') ? Math.round(obj) :
+                obj));
         },
         formatTree: function(obj) {
             return '<ul>'

@@ -55,6 +55,14 @@ var game = require('./client/game.js')(
 
 ui.hide(roots);
 
+var lastTime;
+(function updater() {
+    var time = performance.now();
+    game.update((time - lastTime)/1000);
+    lastTime = time;
+    requestAnimationFrame(updater);
+}());
+
 socket.on('connect', function() {
     console.log('connected');
 });

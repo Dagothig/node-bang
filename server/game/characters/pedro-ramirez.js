@@ -1,7 +1,8 @@
 'use strict';
 
 var actions = aReq('server/actions'),
-    Character = aReq('server/game/characters/character');
+    Character = aReq('server/game/characters/character'),
+    events = aReq('server/game/events');
 
 module.exports = new Character("Pedro Ramirez", {
     beforeDraw: function(step, onResolved, onSkip) {

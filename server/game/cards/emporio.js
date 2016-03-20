@@ -16,10 +16,7 @@ misc.extend(Card, Emporio, {
         this.handleEmporio(step, alive, current, cards, onResolved);
     },
     handleEmporio: function(step, players, player, cards, onResolved) {
-        if (!cards.length) {
-            onResolved();
-            return;
-        }
+        if (!cards.length) return onResolved();
         onResolved(events('cardChoice')(
             player, cards,
             // onChoice
@@ -37,9 +34,7 @@ misc.extend(Card, Emporio, {
             undefined,
             // format
             () => ({
-                name: 'Emporio',
-                cards: cards.map(c => c.id),
-                player: player.name
+                cards: cards.map(c => c.id)
             })
         ));
     }
