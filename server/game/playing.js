@@ -222,7 +222,6 @@ module.exports = new Phase('Playing', {
     formatPlayer: function(game, player, other, formatted) {
         return misc.merge(formatted, {
             hand: {
-                // TODO: format cards properly
                 cards: player === other ?
                     other.hand.map(card => card.format()) :
                     other.hand.length

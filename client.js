@@ -77,8 +77,7 @@ socket.on(msgs.alert, function(msg) {
 });
 socket.on(msgs.reload, function(msg) {
     console.log('received', msgs.alert, msg);
-    // todo: reload when asked to
-    //window.location.reload();
+    window.location.reload();
 });
 socket.on(msgs.auth, function(msg) {
     console.log('received', msgs.auth, msg);
@@ -112,9 +111,8 @@ socket.on(msgs.user, function(msg) {
         ui.show(connectedContainer);
     }
     user = msg;
-    // todo actually save stuff
-    //localStorage.setItem('name', msg && msg.name);
-    //localStorage.setItem('token', msg && msg.token);
+    localStorage.setItem('name', msg && msg.name);
+    localStorage.setItem('token', msg && msg.token);
     lobby.handleUsers(user, users);
 });
 socket.on(msgs.users, function(msg) {
