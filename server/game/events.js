@@ -23,7 +23,7 @@ var events = misc.merge((eventName, player) => {
         };
 }, {
     raw: require('fs')
-    .readdirSync('server/game/events')
+    .readdirSync(__dirname + '/events')
     .map(f => aReq('server/game/events/' + f))
     .filter(ev => ev !== Event && ev !== Choice)
     .reduce((raw, ev) => Object.defineProperty(

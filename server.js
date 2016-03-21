@@ -15,7 +15,7 @@ var http = require('http'),
 
 // Setup the static assets and pages
 app.use(express.static('public'));
-require('fs').readdir('./pages', (err, files) => {
+require('fs').readdir(__dirname + '/pages', (err, files) => {
     if (err) throw err;
     files.forEach((file) => {
         var stripped = file.replace('.html', '');
