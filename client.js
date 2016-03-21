@@ -111,8 +111,9 @@ socket.on(msgs.user, function(msg) {
         ui.show(connectedContainer);
     }
     user = msg;
-    localStorage.setItem('name', msg && msg.name);
-    localStorage.setItem('token', msg && msg.token);
+    // todo actually save stuff
+    //localStorage.setItem('name', msg && msg.name);
+    //localStorage.setItem('token', msg && msg.token);
     lobby.handleUsers(user, users);
 });
 socket.on(msgs.users, function(msg) {
