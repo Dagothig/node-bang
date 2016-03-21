@@ -30,10 +30,13 @@ misc.extend(Card, Equipment, {
                     player: target.name,
                     card: this.format()
                 });
-                onResolved();
+                this.handleAfterPlay(step, onResolved, target);
             },
             () => onResolved()
         ));
+    },
+    handleAfterPlay: function(step, onResolved, target) {
+        onResolved();
     }
 });
 

@@ -8,7 +8,7 @@ var actions = aReq('server/actions'),
 function RemoveOtherCardEvent(
     player, target, withHand, withEquipment, onChoice, onCancel, format
 ) {
-    CCE.call(this, misc.fromArrays(
+    CCE.call(this, player, misc.fromArrays(
         (withHand && target.hand.length) ? [{ id: 'hand' }] : [],
         withEquipment ? target.equipped : []
     ), onChoice, onChoice, format);
