@@ -47,7 +47,7 @@ ComposedEvent.prototype = {
     },
 
     update: function(delta) {
-        return this._map('update', delta);
+        return this._map('update', delta).find(val => val);
     }
 };
 

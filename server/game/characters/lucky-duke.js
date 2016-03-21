@@ -11,7 +11,7 @@ module.exports = new Character("Lucky Duke", {
 
         return events('delegate')(onResolved => events('cardsDraw')(
             player, cards, 2,
-            choices => onResolved(events('cardChoiceEvent')(
+            choices => onResolved(events('cardChoice')(
                 player, choices,
                 card => {
                     misc.remove(choices, card);
