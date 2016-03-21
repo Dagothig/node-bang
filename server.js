@@ -14,7 +14,7 @@ var http = require('http'),
     server = http.Server(app);
 
 // Setup the static assets and pages
-app.use(express.static('public'));
+app.use(express.static(__dirname + '/public'));
 require('fs').readdir(__dirname + '/pages', (err, files) => {
     if (err) throw err;
     files.forEach((file) => {
