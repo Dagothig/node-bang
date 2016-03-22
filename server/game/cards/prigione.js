@@ -11,6 +11,7 @@ function Prigione(suit, rank, releaseSuit, minRank, maxRank) {
     this.maxRank = maxRank;
 }
 misc.extend(Equipment, Prigione, {
+    priority: 1,
     handleAfterPlay: function(step, onResolved, target) {
         onResolved();
         if (target === step.player) step.phase.goToNextTurn(step.game);

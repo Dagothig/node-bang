@@ -57,7 +57,6 @@ Step.prototype = {
     finalize: function() {
         zombies = this.game.players.filter(p => p.zombie);
         if (!zombies.length) return this.onFinished();
-        var zombie = zombies.pop();
         this.kill(zombies.pop(), e => this.changeEvent(e, () => this.finalize()));
     }
 };

@@ -18,17 +18,13 @@ module.exports = function(onJoin, onAction) {
         tagPreCount = ui.one(tagPreForm, '#player-count'),
         tagPreJoin = ui.one(tagPreForm, '[name=join]');
 
+    var displayedActions;
+
     tagPreJoin.onchange = function(e) {
         onJoin(e.target.checked);
     };
 
     return {
-        tagGame: tagGame,
-        tagPre: tagPre,
-        tagPreForm: tagPreForm,
-        tagPreHeader: tagPreHeader,
-        tagPreCount: tagPreCount,
-        tagPreJoin: tagPreJoin,
 
         handleJoining: function(current, msg) {
             var users = msg ? msg.users : null;
@@ -70,7 +66,8 @@ module.exports = function(onJoin, onAction) {
 
         handleEvent: function(msg) {
             gameEvents.push(msg);
-            this.display(tagEvents, gameEvents);
+            while (gameEvents.length > 10) gameEvents.shift(); 
+            this.display(tagEvents, gameEvents.slice().reverse());
         },
 
         update: function(delta) {
@@ -111,13 +108,19 @@ module.exports = function(onJoin, onAction) {
         displayActions: function(actions) {
             if (!actions) {
                 tagActions.innerHTML = '';
+                displayedActions = actions;
                 return;
             }
+
+            var same = displayedActions 
+                && JSON.stringify(displayedActions) === JSON.stringify(actions);
+            if (same) return;
+            displayedActions = actions;
 
             var tag = '';
 
             // Setup the actions
-            var tabIndex = 0;
+            var tabIndex = 1;
             for (var a in actions) {
                 Array.prototype.forEach.call(actions[a], arg => tag +=
                     '<div ' +
@@ -136,6 +139,7 @@ module.exports = function(onJoin, onAction) {
                 var arg = actionTag.getAttribute('data-arg');
                 actionTag.onclick = function (e) {
                     tagActions.innerHTML = '';
+                    displayedActions = null;
                     onAction(action, arg);
                 }
                 actionTag.onkeydown = function(e) {

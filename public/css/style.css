@@ -52,6 +52,9 @@ html, body {
 .scroll {
   overflow: auto;
 }
+.no-scroll {
+    overflow: hidden;
+}
 
 .root-bg {
     background: #aaa;

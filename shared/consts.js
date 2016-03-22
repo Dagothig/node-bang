@@ -1,5 +1,5 @@
 module.exports = {
-    disconnectTimeout: 5,
+    disconnectTimeout: 30,
     minPasswordLength: 4,
 
     minPlayers: 4,

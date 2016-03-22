@@ -9,7 +9,6 @@ var Card = aReq('server/game/cards/card'),
 var handleEvent = (eventName, players, recurseArgs, onFollowing, onResolved) => {
     let handlers = [];
     players.forEach(p => handlers.push.apply(handlers, p.handlers(eventName)));
-    handlers.reverse();
 
     let handlePile = args => {
         let next = handlers.pop();

@@ -1,7 +1,7 @@
 var msgs = require('./shared/messages.js'),
     ui = require('./client/ui.js'),
     misc = require('./client/misc.js');
-
+window.misc = misc;
 var socket = io(),
     user,
     users;
@@ -53,7 +53,10 @@ var game = require('./client/game.js')(
     }
 );
 
-var icon = window.icony = require('./client/icon.js')(['favicon.ico', 'favicon-alert.ico'], 1000);
+var icon = require('./client/icon.js')(
+    ['favicon.ico', 'favicon-alert.ico'], 
+    ['¡Bang!', '!Bang¡'], 
+    1000);
 icon.state = {
     _focus: false,
     _stuff: false,
