@@ -53,6 +53,23 @@ var game = require('./client/game.js')(
     }
 );
 
+var icon = window.icony = require('./client/icon.js')(['favicon.ico', 'favicon-alert.ico'], 1000);
+icon.state = {
+    _focus: false,
+    _stuff: false,
+
+    set focus(focus) {
+        this._focus = focus;
+        icon.flash((this._stuff = (this._stuff && !focus)) && user);
+    },
+    set stuff(stuff) {
+        icon.flash((this._stuff = (stuff && !this._focus)) && user);
+    }
+};
+
+window.onfocus = () => icon.state.focus = true;
+window.onblur = () => icon.state.focus = false;
+
 ui.hide(roots);
 
 var lastTime;
@@ -65,22 +82,29 @@ var lastTime;
 
 socket.on('connect', function() {
     console.log('connected');
+    icon.state.stuff = true;
 });
 socket.on('disconnect', function() {
     console.log('disconnected');
+    icon.state.stuff = true;
     ui.hide(roots);
     ui.show(loader);
 });
+
 socket.on(msgs.alert, function(msg) {
     console.log('received', msgs.alert, msg);
+    icon.state.stuff = true;
     alert(msg);
 });
 socket.on(msgs.reload, function(msg) {
     console.log('received', msgs.alert, msg);
+    icon.state.stuff = true;
     window.location.reload();
 });
+
 socket.on(msgs.auth, function(msg) {
     console.log('received', msgs.auth, msg);
+    icon.state.stuff = true;
     if (!user) {
         var name = localStorage.getItem('name');
         var token = localStorage.getItem('token');
@@ -100,8 +124,10 @@ socket.on(msgs.auth, function(msg) {
         ui.show(login.element);
     }
 });
+
 socket.on(msgs.user, function(msg) {
     console.log('received', msgs.user, msg);
+    icon.state.stuff = true;
     if (user && !msg) {
         ui.hide(roots);
         ui.show(login.element);
@@ -116,25 +142,33 @@ socket.on(msgs.user, function(msg) {
     //localStorage.setItem('token', msg && msg.token);
     lobby.handleUsers(user, users);
 });
+
 socket.on(msgs.users, function(msg) {
     console.log('received', msgs.users, msg);
+    icon.state.stuff = true;
     users = msg;
     lobby.handleUsers(user, users);
 });
+
 socket.on(msgs.message, function(msg) {
     console.log('received', msgs.message, msg);
+    icon.state.stuff = true;
     lobby.handleMessage(msg.name, msg.message);
 });
+
 socket.on(msgs.joining, function(msg) {
     console.log('received', msgs.joining, msg);
+    icon.state.stuff = true;
     game.handleJoining(user, msg);
 });
+
 socket.on(msgs.game, function(msg) {
     console.log('received', msgs.game, msg);
+    icon.state.stuff = true;
     game.handleGame(msg, user);
 });
-
 socket.on(msgs.event, function(msg) {
     console.log('received', msgs.event, msg);
+    icon.state.stuff = true;
     game.handleEvent(msg);
 });

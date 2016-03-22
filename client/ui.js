@@ -20,6 +20,7 @@ function hide() {
         else if (arg.classList) arg.classList.add('hidden');
     }
 }
+
 module.exports = {
     one: one,
     many: many,
