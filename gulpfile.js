@@ -47,11 +47,15 @@ gulp.task('client', function(cb) {
 	log('Bundling client script...');
 	var plumber = require('gulp-plumber'),
 		browserify = require('gulp-browserify'),
-		rename = require('gulp-rename');
+		rename = require('gulp-rename'),
+		babel = require('gulp-babel');
 
 	var val = gulp.src('./client.js')
 		.pipe(plumber({ errorHandler: errorHandler('client') }))
 		.pipe(browserify())
+		.pipe(babel({
+			presets: ['es2015']
+		}))
 		.pipe(rename('app.js'))
 		.pipe(gulp.dest('./public'));
 

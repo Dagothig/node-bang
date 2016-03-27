@@ -1,7 +1,19 @@
-var msgs = require('./shared/messages.js'),
-    ui = require('./client/ui.js'),
-    misc = require('./client/misc.js');
-window.misc = misc;
+var msgs = require('./shared/messages'),
+    ui = require('./client/ui'),
+    misc = window.misc = require('./client/misc');
+
+var strat = require('./client/local-storage-strat');
+var settings = require('./client/settings')(strat, {
+    saveToken: [false, 'bool', 'user'],
+    sound: [false, 'bool', 'user'],
+    newInterface: [true, 'bool', 'user'],
+    name: ['', 'str', 'sys'],
+    token: ['', 'str', 'sys']
+});
+settings.bind('saveToken', val => {
+    if (!val) settings.name = settings.token = '';
+});
+    
 var socket = io(),
     user,
     users;
@@ -10,7 +22,7 @@ var roots = ui.many('body>*'),
     loader = ui.one('#loader'),
     connectedContainer = ui.one('#connected-container');
 
-var login = require('./client/login.js')(
+var login = require('./client/login.js')(settings,
     function onLogin(name, password) {
         ui.hide(roots);
         ui.show(loader);
@@ -28,16 +40,30 @@ var lobby = require('./client/lobby.js')(
         });
     }
 );
-var menu = require('./client/menu.js')(
+var menu = require('./client/menu.js')(settings,
     function onDisconnect() {
         if (confirm('Are you certain you want to disconnect?')) {
-            localStorage.removeItem('name');
-            localStorage.removeItem('token');
+            settings.clear();
             window.location.reload();
         }
     }
 );
 var game = require('./client/game.js')(
+    function onJoin(joining) {
+        socket.emit(msgs.joining, {
+            token: user.token,
+            joining: joining
+        });
+    },
+    function onAction(action, arg) {
+        socket.emit(msgs.action, {
+            token: user.token,
+            action: action,
+            arg: arg
+        });
+    }
+);
+var gameV2 = require('./client/game-v2.js')(
     function onJoin(joining) {
         socket.emit(msgs.joining, {
             token: user.token,
@@ -109,8 +135,8 @@ socket.on(msgs.auth, function(msg) {
     console.log('received', msgs.auth, msg);
     icon.state.stuff = true;
     if (!user) {
-        var name = localStorage.getItem('name');
-        var token = localStorage.getItem('token');
+        var name = settings.name;
+        var token = settings.token;
         if (name && token) user = { name: name, token: token };
     }
     if (user) {
@@ -119,8 +145,7 @@ socket.on(msgs.auth, function(msg) {
             token: user.token
         });
         user = null;
-        localStorage.removeItem('name');
-        localStorage.removeItem('token');
+        settings.clear('name', 'token');
     } else {
         login.handleAuth(msg);
         ui.hide(roots);
@@ -140,9 +165,10 @@ socket.on(msgs.user, function(msg) {
         ui.show(connectedContainer);
     }
     user = msg;
-    // todo actually save stuff
-    //localStorage.setItem('name', msg && msg.name);
-    //localStorage.setItem('token', msg && msg.token);
+    if (settings.saveToken) {
+        settings.name = (msg && msg.name) || '';
+        settings.token = (msg && msg.token) || '';
+    }
     lobby.handleUsers(user, users);
 });
 
@@ -163,15 +189,18 @@ socket.on(msgs.joining, function(msg) {
     console.log('received', msgs.joining, msg);
     icon.state.stuff = true;
     game.handleJoining(user, msg);
+    gameV2.handleJoining(user, msg);
 });
 
 socket.on(msgs.game, function(msg) {
     console.log('received', msgs.game, msg);
     icon.state.stuff = true;
     game.handleGame(msg, user);
+    gameV2.handleGame(msg, user);
 });
 socket.on(msgs.event, function(msg) {
     console.log('received', msgs.event, msg);
     icon.state.stuff = true;
     game.handleEvent(msg);
+    gameV2.handleEvent(msg);
 });

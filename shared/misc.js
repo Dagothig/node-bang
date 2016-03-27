@@ -65,6 +65,11 @@ function capitalize(str) {
 function camelCase(str) {
     return str[0].toLowerCase() + str.substring(1);
 }
+function spacize(str) {
+    return str.substring(0, 1).toUpperCase() +
+        Array.from(str.substring(1))
+            .map(c => c.match(/[A-Z]/) ? (' ' + c) : c).join('');
+}
 
 function simpleTime(time) {
     time = time || new Date();
@@ -112,6 +117,7 @@ module.exports = {
     postpad: postpad,
     capitalize: capitalize,
     camelCase: camelCase,
+    spacize: spacize,
     simpleTime: simpleTime,
     merge: merge,
     extend: extend,

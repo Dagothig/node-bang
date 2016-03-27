@@ -24,7 +24,9 @@ var formattedJoining = users => {
         }));
     return {
         users: joining,
-        reason: formattedReason(joining)
+        reason: formattedReason(joining),
+        minPlayers: consts.minPlayers,
+        maxPlayers: consts.maxPlayers
     };
 }
 var canStart = users => misc.bounded(

@@ -5,6 +5,10 @@ html, body {
     line-height: 1em;
 }
 
+a {
+    color: #08f;
+}
+
 /* === [MISC] === */
 .pass-through {
     pointer-events: none;
@@ -104,8 +108,9 @@ html, body {
 /* === [LIST] === */
 .list {
     overflow: auto;
-    background: #eee;
+    background: rgba(0, 0, 0, 0.05);
     border: none;
+    border-bottom: solid 1px #ddd;
     border-top: solid 3px #ddd;
     border-left: solid 1px #ddd;
     border-right: solid 1px #ddd;
@@ -132,7 +137,6 @@ html, body {
 .list em::after {
     content: "]";
 }
-
 /* === [FLEX] === */
 .flex {
     display: flex;
@@ -190,9 +194,9 @@ html, body {
 .form-box {
     width: 400px;
     margin: 1rem auto;
-    border-left: solid 2px #ddd;
-    border-right: solid 2px #ddd;
-    border-bottom: solid 6px #ddd;
+    border-left: solid 2px rgba(0, 0, 0, 0.1);
+    border-right: solid 2px rgba(0, 0, 0, 0.1);
+    border-bottom: solid 6px rgba(0, 0, 0, 0.1);
 }
 form {
     margin: 0;
@@ -220,15 +224,15 @@ form .form-group label:after {
     margin: 0 0.25em;
 }
 input, textarea, input+.check {
-    background: #eee;
+    background: rgba(0, 0, 0, 0.05);
     padding: 0.75rem;
     border-radius: 0.5rem;
     border-style: solid;
-    border-color: #ddd;
+    border-color: rgba(0, 0, 0, 0.10);
     border-top-width: 3px;
     border-left-width: 1px;
     border-right-width: 1px;
-    border-bottom-width: 0;
+    border-bottom-width: 1px;
 }
 input:focus,
 input[type=submit]:hover,
@@ -236,32 +240,33 @@ input[type=button]:hover,
 input[type=checkbox]:hover+.check,
 input[type=checkbox]:focus+.check {
     outline: none;
-    background: #ddd;
-    border-color: #bbb;
+    background: rgba(0, 0, 0, 0.10);
+    border-color: rgba(0, 0, 0, 0.20);
 }
 input:focus,
 input[type=checkbox]:focus+.check {
-    box-shadow: 0 0 0 1px #08f;
+    border-color: #08f;
 }
 input[type=submit],
 input[type=button],
 input+.check {
     cursor: pointer;
-    border-top-width: 0;
+    border-top-width: 1px;
     border-bottom-width: 3px;
 }
 input[type=submit]:active,
 input[type=button]:active,
 input[type=checkbox]:active+.check {
-    background: #ccc;
-    border-color: #bbb;
+    background: rgba(0, 0, 0, 0.15);
+    border-color: rgba(0, 0, 0, 0.20);
 }
 input[type=submit].active,
 input[type=button].active,
 input[type=submit]:active,
-input[type=button]:active {
+input[type=button]:active,
+input[type=checkbox]:checked+.check {
     border-top-width: 3px;
-    border-bottom-width: 0px;
+    border-bottom-width: 1px;
 }
 input[type=checkbox] {
     position: absolute;
@@ -269,16 +274,19 @@ input[type=checkbox] {
     cursor: pointer;
 }
 input[type=checkbox]+.check {
-    color: rgba(0, 0, 0, 0.25);
+    color: rgba(0, 0, 0, 0.1);
+
     text-align: center;
     padding: 0;
-    width: 1.5rem;
-    line-height: 1.5rem;
+    width: 1.5em;
+    line-height: 1.5em;
 }
 input[type=checkbox]:checked+.check {
-    color: rgba(0, 128, 0, 1);
-    border-top-width: 3px;
-    border-bottom-width: 0px;
+    color: rgba(0, 0, 0, 1);
+    background: rgba(120, 240, 10, 1);
+}
+input[type=checkbox]:checked:hover+.check {
+    background: rgba(110, 220, 5, 1);
 }
 /* Bug fix linked to font-awesome icons having an unwanted space afterwards */
 input[type=checkbox]+.fa:after {

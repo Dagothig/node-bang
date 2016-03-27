@@ -20,10 +20,15 @@ function hide() {
         else if (arg.classList) arg.classList.add('hidden');
     }
 }
+function findParentBefore(node, before) {
+    if (node.parentElement === before) return node;
+    return findParentBefore(node.parentElement, before);
+}
 
 module.exports = {
     one: one,
     many: many,
     show: show,
-    hide: hide
+    hide: hide,
+    findParentBefore: findParentBefore
 };

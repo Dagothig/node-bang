@@ -51,9 +51,7 @@
                 <label for="menu-btn" class="check fa fa-bars absolute top right clickable"></label>
                 <div class="container top right absolute clickable full-height flex vertical">
                     <div class="title flex horizontal">Menu</div>
-                    <div class="list grow-1 flex-vertical">
-                        <div><a id="disconnect" href="#">Disconnect</a></div>
-                    </div>
+                    <div class="list grow-1 flex-vertical"></div>
                 </div>
             </div>
         </div>
@@ -74,8 +72,13 @@
                     <label class="grow-1" for="password">Password</label>
                     <input class="grow-2 center" id="password" name="password" type="password" />
                 </div>
-                <div class="form-group flex horizontal right">
-                    <input value="Login" type="submit" />
+                <div class="form-group flex horizontal">
+                    <label class="grow-1 center" for="save-token-login">Save token</label>
+                    <span class="grow-1 center">
+                        <input id="save-token-login" type="checkbox" name="save-token-login" />
+                        <label for="save-token-login" class="check fa fa-check"></label>
+                    </span>
+                    <input class="grow-1" value="Login" type="submit" />
                 </div>
             </form>
             <div class="grow-1"></div>

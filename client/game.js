@@ -1,6 +1,5 @@
 var ui = require('./ui'),
-    misc = require('./misc'),
-    consts = require('../shared/consts');
+    misc = require('./misc');
 
 var gameEvents = [];
 
@@ -33,7 +32,7 @@ module.exports = function(onJoin, onAction) {
             tagPreCount.innerHTML =
                 users.reduce((acc, user) => acc + 1, 0) +
                 " / " +
-                consts.minPlayers + "-" + consts.maxPlayers;
+                msg.minPlayers + "-" + msg.maxPlayers;
         },
 
         handleGame: function(game, current) {
