@@ -6,7 +6,7 @@ module.exports = function(settings, onDisconnect) {
         list = ui.one(element, '.list');
 
     var settingsTitle = document.createElement('div');
-    settingsTitle.innerHTML = 'Settings';
+    settingsTitle.innerHTML = '<em>Settings</em>';
     list.appendChild(settingsTitle);
 
     settings.all
@@ -20,7 +20,7 @@ module.exports = function(settings, onDisconnect) {
             var name = 'menu' + misc.capitalize(key);
 
             var label = document.createElement('label');
-            label.attributes.for = name;
+            label.setAttribute('for', name);
             label.className = 'grow-1 center';
             label.innerHTML = misc.spacize(key);
             container.appendChild(label);
@@ -29,12 +29,13 @@ module.exports = function(settings, onDisconnect) {
             checkboxContainer.className = 'center';
             
             var checkbox = document.createElement('input');
+            checkbox.id = name;
             checkbox.name = name;
             checkbox.type = 'checkbox';
             checkboxContainer.appendChild(checkbox);
 
             var check = document.createElement('label');
-            check.attributes.for = name;
+            check.setAttribute('for', name);
             check.className = 'check fa fa-check';
             checkboxContainer.appendChild(check);
 

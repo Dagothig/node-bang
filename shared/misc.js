@@ -1,3 +1,5 @@
+'use strict';
+
 function shuffle(arr) {
     for (var i = 0; i < arr.length; i++) {
         var ri = (Math.random() * arr.length)|0;
@@ -33,8 +35,8 @@ function filterFrom(arr, e, step, filter) {
         if (!filter || filter(arr[next], next)) return arr[next];
     }
 }
-after = (arr, e, filter) => filterFrom(arr, e, 1, filter);
-before = (arr, e, filter) => filterFrom(arr, e, -1, filter);
+var after = (arr, e, filter) => filterFrom(arr, e, 1, filter);
+var before = (arr, e, filter) => filterFrom(arr, e, -1, filter);
 
 function fromArrays() {
     var arr = [];

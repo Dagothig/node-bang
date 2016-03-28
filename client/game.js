@@ -3,42 +3,19 @@ var ui = require('./ui'),
 
 var gameEvents = [];
 
-module.exports = function(onJoin, onAction) {
+module.exports = function(onAction) {
     var tagGame = ui.one('#game'),
         tagExtra = ui.one(tagGame, '#extra'),
         tagPlayers = ui.one(tagGame, '#players'),
         tagActions = ui.one(tagGame, '#actions'),
-        tagEvents = ui.one(tagGame, '#events'),
-
-        tagPre = ui.one('#pre-game'),
-        tagPreForm = ui.one(tagPre, 'form'),
-        tagPreHeader = ui.one(tagPreForm, '.form-header'),
-        tagPreError = ui.one(tagPreForm, '.form-error'),
-        tagPreCount = ui.one(tagPreForm, '#player-count'),
-        tagPreJoin = ui.one(tagPreForm, '[name=join]');
+        tagEvents = ui.one(tagGame, '#events');
 
     var displayedActions;
 
-    tagPreJoin.onchange = function(e) {
-        onJoin(e.target.checked);
-    };
-
     return {
-
-        handleJoining: function(current, msg) {
-            var users = msg ? msg.users : null;
-            tagPreError.innerHTML = msg.reason ? msg.reason : '';
-            tagPreJoin.checked = !!users.find((user) => misc.isCurrent(current, user));
-            tagPreCount.innerHTML =
-                users.reduce((acc, user) => acc + 1, 0) +
-                " / " +
-                msg.minPlayers + "-" + msg.maxPlayers;
-        },
-
         handleGame: function(game, current) {
             if (game) {
                 ui.show(tagGame);
-                ui.hide(tagPre);
 
                 this.display(tagExtra, game && {
                     remainingTime: game.remainingTime,
@@ -52,7 +29,6 @@ module.exports = function(onJoin, onAction) {
             } else {
                 gameEvents.length = 0;
                 ui.hide(tagGame);
-                ui.show(tagPre);
             }
 
             if (!game || !this.game || game.identifier !== this.game.identifier) {

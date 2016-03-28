@@ -48,7 +48,8 @@ gulp.task('client', function(cb) {
 	var plumber = require('gulp-plumber'),
 		browserify = require('gulp-browserify'),
 		rename = require('gulp-rename'),
-		babel = require('gulp-babel');
+		babel = require('gulp-babel'),
+		uglify = require('gulp-uglify');
 
 	var val = gulp.src('./client.js')
 		.pipe(plumber({ errorHandler: errorHandler('client') }))
@@ -56,6 +57,7 @@ gulp.task('client', function(cb) {
 		.pipe(babel({
 			presets: ['es2015']
 		}))
+		.pipe(uglify())
 		.pipe(rename('app.js'))
 		.pipe(gulp.dest('./public'));
 

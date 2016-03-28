@@ -6,7 +6,7 @@ var strat = require('./client/local-storage-strat');
 var settings = require('./client/settings')(strat, {
     saveToken: [false, 'bool', 'user'],
     sound: [false, 'bool', 'user'],
-    newInterface: [true, 'bool', 'user'],
+    //newInterface: [true, 'bool', 'user'],
     name: ['', 'str', 'sys'],
     token: ['', 'str', 'sys']
 });
@@ -48,13 +48,15 @@ var menu = require('./client/menu.js')(settings,
         }
     }
 );
-var game = require('./client/game.js')(
+var pregame = require('./client/pre-game')(
     function onJoin(joining) {
         socket.emit(msgs.joining, {
             token: user.token,
             joining: joining
         });
-    },
+    }
+);
+var game = require('./client/game.js')(
     function onAction(action, arg) {
         socket.emit(msgs.action, {
             token: user.token,
@@ -64,12 +66,6 @@ var game = require('./client/game.js')(
     }
 );
 var gameV2 = require('./client/game-v2.js')(
-    function onJoin(joining) {
-        socket.emit(msgs.joining, {
-            token: user.token,
-            joining: joining
-        });
-    },
     function onAction(action, arg) {
         socket.emit(msgs.action, {
             token: user.token,
@@ -109,31 +105,19 @@ var lastTime;
     requestAnimationFrame(updater);
 }());
 
-socket.on('connect', function() {
-    console.log('connected');
+var on = (key, func) => socket.on(key, function() {
+    console.log(key, arguments);
     icon.state.stuff = true;
+    if (func) func.apply(this, arguments);
 });
-socket.on('disconnect', function() {
-    console.log('disconnected');
-    icon.state.stuff = true;
+on('connect');
+on('disconnect', () => {
     ui.hide(roots);
     ui.show(loader);
 });
-
-socket.on(msgs.alert, function(msg) {
-    console.log('received', msgs.alert, msg);
-    icon.state.stuff = true;
-    alert(msg);
-});
-socket.on(msgs.reload, function(msg) {
-    console.log('received', msgs.alert, msg);
-    icon.state.stuff = true;
-    window.location.reload();
-});
-
-socket.on(msgs.auth, function(msg) {
-    console.log('received', msgs.auth, msg);
-    icon.state.stuff = true;
+on(msgs.alert, msg => alert(msg));
+on(msgs.reload, () => window.location.reload());
+on(msgs.auth, msg => {
     if (!user) {
         var name = settings.name;
         var token = settings.token;
@@ -152,10 +136,7 @@ socket.on(msgs.auth, function(msg) {
         ui.show(login.element);
     }
 });
-
-socket.on(msgs.user, function(msg) {
-    console.log('received', msgs.user, msg);
-    icon.state.stuff = true;
+on(msgs.user, msg => {
     if (user && !msg) {
         ui.hide(roots);
         ui.show(login.element);
@@ -171,36 +152,19 @@ socket.on(msgs.user, function(msg) {
     }
     lobby.handleUsers(user, users);
 });
-
-socket.on(msgs.users, function(msg) {
-    console.log('received', msgs.users, msg);
-    icon.state.stuff = true;
+on(msgs.users, msg => {
     users = msg;
     lobby.handleUsers(user, users);
 });
-
-socket.on(msgs.message, function(msg) {
-    console.log('received', msgs.message, msg);
-    icon.state.stuff = true;
-    lobby.handleMessage(msg.name, msg.message);
-});
-
-socket.on(msgs.joining, function(msg) {
-    console.log('received', msgs.joining, msg);
-    icon.state.stuff = true;
-    game.handleJoining(user, msg);
-    gameV2.handleJoining(user, msg);
-});
-
-socket.on(msgs.game, function(msg) {
-    console.log('received', msgs.game, msg);
-    icon.state.stuff = true;
+on(msgs.message, m => lobby.handleMessage(m.name, m.message));
+on(msgs.joining, msg => pregame.handleJoining(user, msg));
+on(msgs.game, msg => {
+    pregame.handleGame(msg, user);
     game.handleGame(msg, user);
     gameV2.handleGame(msg, user);
 });
-socket.on(msgs.event, function(msg) {
-    console.log('received', msgs.event, msg);
-    icon.state.stuff = true;
+on(msgs.event, msg => {
+    pregame.handleGame(msg, user);
     game.handleEvent(msg);
     gameV2.handleEvent(msg);
 });
