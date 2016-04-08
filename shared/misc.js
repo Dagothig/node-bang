@@ -29,7 +29,7 @@ function remove(arr, e) {
 
 function filterFrom(arr, e, step, filter) {
     var i = arr.indexOf(e);
-    for (n = 1; n < arr.length; n++) {
+    for (var n = 1; n < arr.length; n++) {
         var next = (i + n * step) % arr.length;
         while (next < 0) next += arr.length;
         if (!filter || filter(arr[next], next)) return arr[next];
