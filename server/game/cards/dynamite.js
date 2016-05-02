@@ -4,11 +4,11 @@ var Card = aReq('server/game/cards/card'),
     handles = aReq('server/game/handles'),
     Equipment = aReq('server/game/cards/equipment');
 
-function Dynamite(suit, rank, boomSuit, minRank, maxRank) {
+function Dynamite(suit, rank) {
     Equipment.call(this, 'dynamite', suit, rank, 'dynamite');
-    this.boomSuit = boomSuit;
-    this.minRank = minRank;
-    this.maxRank = maxRank;
+    this.boomSuit = Card.suits.spades;
+    this.minRank = Card.ranks.two;
+    this.maxRank = Card.ranks.nine;
 }
 misc.extend(Equipment, Dynamite, {
     format: function() {

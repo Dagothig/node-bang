@@ -4,15 +4,15 @@ module.exports = (strat, confs) => Object.keys(confs).reduce((settings, key) => 
     settings.all.push(key);
 
     var conf = confs[key];
-    
+
     var _key = '_' + key;
     var _keyConf = _key + 'Conf';
     var _keyCBs = _key + 'CBs';
-    
+
     settings[_key] = strat.read(key, conf);
     settings[_keyConf] = conf;
     settings[_keyCBs] = [];
-    
+
     Object.defineProperty(settings, key, {
         get: function() {
             return this[_key];
@@ -22,7 +22,7 @@ module.exports = (strat, confs) => Object.keys(confs).reduce((settings, key) => 
             this[_keyCBs].forEach(cb => cb(val));
         }
     });
-    
+
     return settings;
 }, {
     all: [],

@@ -3,9 +3,9 @@ var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc'),
     Equipment = aReq('server/game/cards/equipment');
 
-function Barile(suit, rank, avoidSuit) {
+function Barile(suit, rank) {
     Equipment.call(this, 'barile', suit, rank, 'barile');
-    this.avoidSuit = avoidSuit;
+    this.avoidSuit = Card.suits.hearts;
 }
 misc.extend(Equipment, Barile, {
     format: function() {

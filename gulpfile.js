@@ -57,7 +57,7 @@ gulp.task('client', function(cb) {
 		.pipe(babel({
 			presets: ['es2015']
 		}))
-		.pipe(uglify())
+		//.pipe(uglify())
 		.pipe(rename('app.js'))
 		.pipe(gulp.dest('./public'));
 

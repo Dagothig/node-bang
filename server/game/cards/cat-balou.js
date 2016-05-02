@@ -10,16 +10,20 @@ misc.extend(Card, CatBalou, {
         onResolved(events('targetOthers')(
             step.player, step.game.players,
             // onTarget; removing someone's card
-            target => onResolved(events('removeOtherCard')(
-                step.player, target, true, true,
-                card => {
-                    step.player.hand.discard(this.id);
-                    step.phase.cards.discarded.push(card);
-                    onResolved();
-                },
-                // no choice; cancel
-                () => onResolved()
-            )),
+            target => {
+                onResolved(events('removeOtherCard')(
+                    step.player, target, true, true,
+                    card => {
+                        step.player.hand.discard(this.id);
+                        step.phase.cards.discarded.push(card);
+                        onResolved();
+                    },
+                    // no choice; cancel
+                    () => {
+                        onResolved()
+                    }
+                ))
+            },
             // onCancel; the catbalou was not used
             () => onResolved()
         ));

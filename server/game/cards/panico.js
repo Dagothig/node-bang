@@ -12,6 +12,7 @@ misc.extend(Card, Panico, {
             // onTarget; panicking someone
             target => onResolved(events('removeOtherCard')(
                 step.player, target, true, true,
+                // onPlay; the panico was used and we have gained a card
                 card => this.handleCard(step, target, card, onResolved),
                 // onCancel; the panico was not used
                 () => onResolved()

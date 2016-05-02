@@ -27,7 +27,7 @@ module.exports = function(settings, onDisconnect) {
 
             var checkboxContainer = document.createElement('span');
             checkboxContainer.className = 'center';
-            
+
             var checkbox = document.createElement('input');
             checkbox.id = name;
             checkbox.name = name;

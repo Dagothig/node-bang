@@ -11,13 +11,13 @@ function RemoveOtherCardEvent(
     CCE.call(this, player, misc.fromArrays(
         (withHand && target.hand.length) ? [{ id: 'hand' }] : [],
         withEquipment ? target.equipped : []
-    ), onChoice, onChoice, format);
+    ), onChoice, onCancel, format);
     this.target = target;
 }
 RemoveOtherCardEvent.prototype = misc.merge(Object.create(CCE.prototype), {
     constructor: RemoveOtherCardEvent,
     handleChoose: function(player, choice) {
-        this.onChoice(choice.id === 'hand' ?
+        this.onChoice((choice.id === 'hand') ?
             this.target.hand.removeRand() :
             this.target.equipped.remove(choice.id)
         );

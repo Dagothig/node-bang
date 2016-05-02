@@ -19,14 +19,14 @@ module.exports = new Character("Calamity Janet", {
         );
     },
     beforePlay: function(step, onResolved, onSkip) {
-        if (step.player.character !== this) return onResolved();
-        onResolved(events('cardChoice')(step.player,
-            step.player.hand.filter(card => card instanceof Mancato ?
+        if (step.player.character !== this) onResolved();
+        else onResolved(events('cardChoice')(step.player,
+            step.player.hand.filter(card => (card instanceof Mancato) ?
                 Bang.prototype.filter.call(card, step) :
                 card.filter(step)
             ),
             // onPlay
-            card => card instanceof Mancato ?
+            card => (card instanceof Mancato) ?
                 Bang.prototype.handlePlay.call(card, step, onSkip) :
                 card.handlePlay(step, onSkip),
             // onCancel

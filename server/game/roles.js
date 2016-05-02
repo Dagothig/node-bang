@@ -6,8 +6,10 @@ roles = {
         lifeModifier: 1,
         initCardsModifier: 1,
         afterDeath: function(step, killer, player, amount, onResolved, onSkip) {
-            if (killer.role === this && player.role === roles.deputy)
+            if (player && player.role === this &&
+                killer && killer.role === roles.deputy) {
                 killer.hand.discard();
+            }
             onResolved();
         }
     }),

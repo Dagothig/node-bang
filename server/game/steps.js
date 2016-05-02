@@ -112,8 +112,8 @@ Play.prototype = misc.merge(Object.create(Step.prototype), {
         handles.event('beforePlay',
             this.game.players.filter(p => p.alive), [this],
             // onFollowing
-            () => this.onResolved(events('cardChoice')(
-                this.player, this.player.hand.filter(c => c.filter(this)),
+            () => this.onResolved(events('cardChoice')(this.player,
+                this.player.hand.filter(c => c.filter(this)),
                 // onPlay
                 card => card.handlePlay(this, this.onResolved),
                 // onCancel

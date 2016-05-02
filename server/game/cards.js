@@ -126,14 +126,14 @@ var cards = [
 
     new Mirino(suits.spades, ranks.ace),
 
-    new Barile(suits.spades, ranks.king, suits.hearts),
-    new Barile(suits.spades, ranks.queen, suits.hearts),
+    new Barile(suits.spades, ranks.king),
+    new Barile(suits.spades, ranks.queen),
 
-    new Prigione(suits.hearts, ranks.four, suits.hearts, ranks.two, ranks.ace),
-    new Prigione(suits.spades, ranks.jack, suits.hearts, ranks.two, ranks.ace),
-    new Prigione(suits.spades, ranks.queen, suits.hearts, ranks.two, ranks.ace),
+    new Prigione(suits.hearts, ranks.four),
+    new Prigione(suits.spades, ranks.jack),
+    new Prigione(suits.spades, ranks.queen),
 
-    new Dynamite(suits.hearts, ranks.two, suits.spades, ranks.two, ranks.nine),
+    new Dynamite(suits.hearts, ranks.two)
 ];
 
 module.exports = cards;

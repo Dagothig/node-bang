@@ -11,13 +11,14 @@ module.exports = function(settings, onLogin) {
     element.onsubmit = function() {
         name.value = name.value.trim();
         onLogin(name.value, password.value);
-        password.value = '';
+        // todo: clear password
+        //password.value = '';
         return false;
     };
 
     settings.bind('saveToken', val => saveToken.checked = val);
     saveToken.onchange = function(e) {
-        if (settings.saveToken !== saveToken.checked) 
+        if (settings.saveToken !== saveToken.checked)
             settings.saveToken = saveToken.checked;
     }
 

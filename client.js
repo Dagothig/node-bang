@@ -4,16 +4,16 @@ var msgs = require('./shared/messages'),
 
 var strat = require('./client/local-storage-strat');
 var settings = require('./client/settings')(strat, {
-    saveToken: [false, 'bool', 'user'],
+    saveToken: [true, 'bool', 'user'],
     sound: [false, 'bool', 'user'],
-    //newInterface: [true, 'bool', 'user'],
+    newInterface: [true, 'bool', 'user'],
     name: ['', 'str', 'sys'],
     token: ['', 'str', 'sys']
 });
 settings.bind('saveToken', val => {
     if (!val) settings.name = settings.token = '';
 });
-    
+
 var socket = io(),
     user,
     users;
@@ -56,7 +56,7 @@ var pregame = require('./client/pre-game')(
         });
     }
 );
-var game = require('./client/game.js')(
+var game = require('./client/game.js')(settings,
     function onAction(action, arg) {
         socket.emit(msgs.action, {
             token: user.token,
@@ -65,7 +65,7 @@ var game = require('./client/game.js')(
         });
     }
 );
-var gameV2 = require('./client/game-v2.js')(
+var gameV2 = require('./client/game-v2.js')(settings,
     function onAction(action, arg) {
         socket.emit(msgs.action, {
             token: user.token,
@@ -76,8 +76,8 @@ var gameV2 = require('./client/game-v2.js')(
 );
 
 var icon = require('./client/icon.js')(
-    ['favicon.ico', 'favicon-alert.ico'], 
-    ['¡Bang!', '!Bang¡'], 
+    ['favicon.ico', 'favicon-alert.ico'],
+    ['¡Bang!', '!Bang¡'],
     1000);
 icon.state = {
     _focus: false,
@@ -162,9 +162,12 @@ on(msgs.game, msg => {
     pregame.handleGame(msg, user);
     game.handleGame(msg, user);
     gameV2.handleGame(msg, user);
+    if (msg && msg.turn && msg.turn.step && msg.turn.step.event) {
+        game.handleEvent(msg.turn.step.event);
+        gameV2.handleEvent(msg.turn.step.event);
+    }
 });
 on(msgs.event, msg => {
-    pregame.handleGame(msg, user);
     game.handleEvent(msg);
     gameV2.handleEvent(msg);
 });

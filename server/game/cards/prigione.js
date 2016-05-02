@@ -4,11 +4,11 @@ var Card = aReq('server/game/cards/card'),
     roles = aReq('server/game/roles'),
     Equipment = aReq('server/game/cards/equipment');
 
-function Prigione(suit, rank, releaseSuit, minRank, maxRank) {
+function Prigione(suit, rank) {
     Equipment.call(this, 'prigione', suit, rank, 'prigione');
-    this.releaseSuit = releaseSuit;
-    this.minRank = minRank;
-    this.maxRank = maxRank;
+    this.releaseSuit = Card.suits.hearts;
+    this.minRank = Card.ranks.ace;
+    this.maxRank = Card.ranks.king;
 }
 misc.extend(Equipment, Prigione, {
     priority: 1,
