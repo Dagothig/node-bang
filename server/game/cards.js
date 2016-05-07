@@ -13,7 +13,7 @@ var Bang = attacking.Bang,
     Indians = attacking.Indians,
     Beer = healing.Beer,
     Saloon = healing.Saloon,
-    Stagecoach = drawing.Stagecoach,
+    Diligenza = drawing.Diligenza,
     WellsFargo = drawing.WellsFargo,
     Emporio = aReq('server/game/cards/emporio'),
     Panico = aReq('server/game/cards/panico'),
@@ -83,8 +83,8 @@ var cards = [
 
     new Saloon(suits.hearts, ranks.five),
 
-    new Stagecoach(suits.spades, ranks.nine),
-    new Stagecoach(suits.spades, ranks.nine),
+    new Diligenza(suits.spades, ranks.nine),
+    new Diligenza(suits.spades, ranks.nine),
 
     new WellsFargo(suits.hearts, ranks.three),
 

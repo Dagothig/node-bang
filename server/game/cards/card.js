@@ -26,17 +26,12 @@ var suits = {
     hearts: 'hearts',
     diamonds: 'diamonds'
 };
-var types = {
-    brown: 'brown',
-    blue: 'blue'
-};
 
-function Card(name, suit, rank, type) {
+function Card(name, suit, rank) {
     this.id = name + ':' + suit + ':' + rank;
     this.name = name;
     this.suit = suit;
     this.rank = rank;
-    this.type = type;
 }
 Card.prototype.filter = function(step) { return true; };
 Card.prototype.handlePlay = function(step, onResolved) {};
@@ -47,8 +42,7 @@ misc.merge(Card.prototype, {
         return {
             id: this.id,
             rank: this.rank,
-            suit: this.suit,
-            type: this.type
+            suit: this.suit
         };
     }
 });
@@ -56,7 +50,6 @@ Object.assign(Card, {
     ranks: ranks,
     rankValues: rankValues,
     suits: suits,
-    types: types,
     rankWithin: function(rank, min, max) {
         return misc.bounded(
             rankValues[rank],

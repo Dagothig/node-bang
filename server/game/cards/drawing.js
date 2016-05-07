@@ -7,21 +7,21 @@ function handleDrawCard(step, card, amount, onResolved) {
     onResolved();
 }
 
-function Stagecoach(suit, rank) {
-    Card.call(this, 'stagecoach', suit, rank, Card.types.brown);
+function Diligenza(suit, rank) {
+    Card.call(this, 'diligenza', suit, rank);
 }
-misc.extend(Card, Stagecoach, {
+misc.extend(Card, Diligenza, {
     handlePlay: function(step, onResolved) { handleDrawCard(step, this, 2, onResolved); }
 });
 
 function WellsFargo(suit, rank) {
-    Card.call(this, 'wellsfargo', suit, rank, Card.types.brown);
+    Card.call(this, 'wellsfargo', suit, rank);
 }
 misc.extend(Card, WellsFargo, {
     handlePlay: function(step, onResolved) { handleDrawCard(step, this, 3, onResolved); }
 });
 
 module.exports = {
-    Stagecoach: Stagecoach,
+    Diligenza: Diligenza,
     WellsFargo: WellsFargo
 };

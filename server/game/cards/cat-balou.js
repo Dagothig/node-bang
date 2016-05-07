@@ -3,7 +3,7 @@ var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc');
 
 function CatBalou(suit, rank) {
-    Card.call(this, 'catbalou', suit, rank, Card.types.brown);
+    Card.call(this, 'catbalou', suit, rank);
 }
 misc.extend(Card, CatBalou, {
     handlePlay: function(step, onResolved) {

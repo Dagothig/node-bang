@@ -5,7 +5,7 @@ var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc');
 
 function Emporio(suit, rank) {
-    Card.call(this, 'emporio', suit, rank, Card.types.brown);
+    Card.call(this, 'emporio', suit, rank);
 }
 misc.extend(Card, Emporio, {
     handlePlay: function(step, onResolved) {

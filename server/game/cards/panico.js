@@ -3,7 +3,7 @@ var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc');
 
 function Panico(suit, rank) {
-    Card.call(this, 'panico', suit, rank, Card.types.brown);
+    Card.call(this, 'panico', suit, rank);
 }
 misc.extend(Card, Panico, {
     handlePlay: function(step, onResolved) {

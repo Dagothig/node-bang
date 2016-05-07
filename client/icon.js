@@ -13,8 +13,8 @@ module.exports = (iconHrefs, titles, flashTime) => ({
         this.lighted = lighted;
         if (!this.lighted) this._i = 0;
         else if (this.lighted) this._i++;
-        this.icon.href = iconHrefs[this._i % iconHrefs.length] + '?ver=1.' + this._i;
-        document.title = titles[this._i % titles.length];
+        this.icon.href = iconHrefs[this._i%iconHrefs.length] + '?ver=1.' + this._i;
+        document.title = titles[this._i%titles.length];
     },
     flash: function(flashing) {
         this.flashing = flashing;

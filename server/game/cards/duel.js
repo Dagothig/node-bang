@@ -5,7 +5,7 @@ var Card = aReq('server/game/cards/card'),
     Bang = aReq('server/game/cards/attacking').Bang;
 
 function Duel(suit, rank) {
-    Card.call(this, 'duel', suit, rank, Card.types.brown);
+    Card.call(this, 'duel', suit, rank);
 }
 misc.extend(Card, Duel, {
     handlePlay: function(step, onResolved) {

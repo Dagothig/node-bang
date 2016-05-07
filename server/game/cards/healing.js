@@ -2,7 +2,7 @@ var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc');
 
 function Beer(suit, rank) {
-    Card.call(this, 'beer', suit, rank, Card.types.brown);
+    Card.call(this, 'beer', suit, rank);
 }
 misc.extend(Card, Beer, {
     handlePlay: function(step, onResolved) {
@@ -18,7 +18,7 @@ misc.extend(Card, Beer, {
 });
 
 function Saloon(suit, rank) {
-    Card.call(this, 'saloon', suit, rank, Card.types.brown);
+    Card.call(this, 'saloon', suit, rank);
 }
 misc.extend(Card, Saloon, {
     handlePlay: function(step, onResolved) {

@@ -2,7 +2,7 @@ var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc');
 
 function Equipment(name, suit, rank, slot) {
-    Card.call(this, name, suit, rank, Card.types.blue);
+    Card.call(this, name, suit, rank);
     this.slot = slot;
 }
 misc.extend(Card, Equipment, {

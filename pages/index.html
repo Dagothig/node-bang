@@ -14,7 +14,7 @@
                 <div id="events" class="grow-1 tree-root no-scroll"></div>
                 <div id="actions" class="grow-1 tree-root scroll"></div>
             </div>
-            <div id="game-v2" class="grow-1"></div>
+            <div id="game-v2" class="grow-1 relative no-scroll"></div>
             <div id="pre-game" class="grow-1 flex vertical root-bg scroll">
                 <div class="grow-1"></div>
                 <form class="form-box box">
@@ -99,6 +99,14 @@
             </div>
             <div class="grow-1"></div>
         </div>
-        <script src="/app.js"></script>
+
+        <script type="text/javascript">
+            Math.HALF_PI = Math.PI / 2;
+            Math.QUARTER_PI = Math.PI / 4;
+            Math.EIGTH_PI = Math.PI / 8;
+
+            Math.TWO_PI = Math.PI * 2;
+        </script>
+        <script type="text/javascript" src="/app.js"></script>
     </body>
 </html>

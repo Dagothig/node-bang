@@ -36,6 +36,10 @@ a {
     bottom: 0;
 }
 
+.relative {
+    position: relative;
+}
+
 .line {
     width: 1px;
     height: 1px;
@@ -433,4 +437,216 @@ textarea {
 }
 #menu #menu-btn:checked+.check+.container {
     visibility: visible;
+}
+
+/* === [CARDS] === */
+.card {
+    position: absolute;
+    width: 4.5em;
+    height: 7.5em;
+    margin-left: -2.25em;
+    margin-right: -2.25em;
+    margin-top: -3.75em;
+    margin-bottom: -3.75em;
+    z-index: 0;
+
+    transition: 0.25s ease-in-out;
+
+    transform-style: preserve-3d;
+    transform-origin: center;
+    perspective: 40em;
+}
+.card.visible:hover, .card.known:hover {
+    transform: scale(1.0) rotateZ(0deg) !important;
+    z-index: 100;
+}
+.card.visible .face, .card.known:hover .face {
+    transform: rotateY(360deg);
+}
+.card.visible .back, .card.known:hover .back {
+    transform: rotateY(180deg);
+}
+
+.card .face, .card .back {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 0.5em;
+    padding: 0.25em;
+    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
+    transition: transform 0.25s ease-in-out;
+    backface-visibility: hidden;
+}
+
+.card .face {
+    transform: rotateY(180deg);
+    border-width: 0.25em;
+    border-style: solid;
+    background-color: #efe8e0;
+}
+.card .face.blue {
+    border-color: #08f;
+}
+.card .face.brown {
+    border-color: #a51;
+}
+
+.card .back {
+    transform: rotateY(0deg);
+    border: solid 0.25em #853;
+    background-color: #d83;
+}
+.card .back:not(.character):not(.role):after {
+    content: "BANG!";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 20em;
+    margin-left: -10em;
+    text-align: center;
+    line-height: 0;
+    transform: rotateZ(65deg);
+    font-size: 1.4em;
+    font-weight: 800;
+    color: #853;
+}
+
+.card .back.role {
+    background: linear-gradient(90deg, #b62, #d83, #b62, #d83, #b62);
+}
+
+.card .back.character div {
+    width: 2.8em;
+    height: 0.6em;
+    background: linear-gradient(0deg, #c91, #ec1, #c91);
+    border: solid 0.05em #853;
+    border-top-left-radius: 100%;
+    border-bottom-left-radius: 100%;
+    border-top-right-radius: 0.5em;
+    border-bottom-right-radius: 0.5em;
+    margin-left: 0.35em;
+    margin-right: 0.35em;
+    margin-top: 0.6em;
+    transform-origin: center;
+}
+.card .back.character div:first-child {
+    margin-top: 0.35em;
+}
+.card .back.character .bullet-1 {
+    transform: rotateZ(4deg);
+}
+.card .back.character .bullet-2 {
+    transform: rotateZ(177deg);
+}
+.card .back.character .bullet-3 {
+    transform: rotateZ(-1deg);
+}
+.card .back.character .bullet-4 {
+    transform: rotateZ(185deg);
+}
+.card .back.character .bullet-5 {
+    transform: rotateZ(-3deg);
+}
+
+.card .name, .card .image, .card .description {
+    width: 100%;
+}
+.card .name {
+    height: 15%;
+    text-align: center;
+    font-size: 0.5em;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+.card .image {
+    height: 40%;
+    background-color: #dcb;
+}
+.card .description {
+    height: 45%;
+    font-size: 0.4em;
+    line-height: 1em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+.card .type {
+    position: absolute;
+    left: 0.1em;
+    bottom: 0.1em;
+}
+.card .type .suit, .card .type .rank {
+    display: inline-block;
+    height: 0.5em;
+    line-height: 0.5em;
+    vertical-align: middle;
+}
+
+.card .suit {
+    width: 0.5em;
+    height: 0.5em;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.card .suit.spades { background-image: url("/imgs/spades.svg"); }
+.card .suit.clovers { background-image: url("/imgs/clovers.svg"); }
+.card .suit.hearts { background-image: url("/imgs/hearts.svg"); }
+.card .suit.diamonds { background-image: url("/imgs/diamonds.svg"); }
+
+.card .rank {
+    text-align: center;
+    color: #000;
+}
+.card .rank:after {
+    font-size: 0.5em;
+    font-weight: 800;
+}
+.card .rank.ace:after { content: "A"; }
+.card .rank.two:after { content: "2"; }
+.card .rank.three:after { content: "3"; }
+.card .rank.four:after { content: "4"; }
+.card .rank.five:after { content: "5"; }
+.card .rank.six:after { content: "6"; }
+.card .rank.seven:after { content: "7"; }
+.card .rank.eight:after { content: "8"; }
+.card .rank.nine:after { content: "9"; }
+.card .rank.ten {
+    letter-spacing: -0.05em;
+}
+.card .rank.ten:after { content: "10"; }
+.card .rank.jack:after { content: "J"; }
+.card .rank.queen:after { content: "Q"; }
+.card .rank.king:after { content: "K"; }
+
+.card-pile {
+    z-index: 1;
+    position: absolute;
+}
+.card-pile .card {
+    position: relative;
+}
+.card-pile .card .face, .card-pile .card .back {
+    box-shadow: none;
+}
+.card-pile .bottom, .card-pile .size {
+    margin-left: -2.25em;
+    margin-right: -2.25em;
+    width: 4.5em;
+    border-radius: 0.5em;
+}
+.card-pile .bottom {
+    z-index: -1;
+    position: absolute;
+    bottom: 0;
+    height: 7.5em;
+    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
+}
+.card-pile .size {
+    /* The negative margin of cards -1 because of padding */
+    margin-top: 2.75em;
+    padding-top: 1em;
+    background-color: #643;
 }

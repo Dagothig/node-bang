@@ -9,7 +9,7 @@ var handleIndians = (step, card, target, onResolved) =>
     handles.attack('Indians', step, card, target, Bang, onResolved);
 
 function Bang(suit, rank) {
-    Card.call(this, 'bang', suit, rank, Card.types.brown);
+    Card.call(this, 'bang', suit, rank);
 }
 misc.extend(Card, Bang, {
     filter: function(step) { return step.bangs < step.player.stat('bangs'); },
@@ -29,14 +29,14 @@ misc.extend(Card, Bang, {
 });
 
 function Mancato(suit, rank) {
-    Card.call(this, 'mancato', suit, rank, Card.types.brown);
+    Card.call(this, 'mancato', suit, rank);
 }
 misc.extend(Card, Mancato, {
     filter: function(step) { return false; }
 });
 
 function Gatling(suit, rank) {
-    Card.call(this, 'gatling', suit, rank, Card.types.brown);
+    Card.call(this, 'gatling', suit, rank);
 }
 misc.extend(Card, Gatling, {
     handlePlay: function(step, onResolved) {
@@ -50,7 +50,7 @@ misc.extend(Card, Gatling, {
 });
 
 function Indians(suit, rank) {
-    Card.call(this, 'indians', suit, rank, Card.types.brown);
+    Card.call(this, 'indians', suit, rank);
 }
 misc.extend(Card, Indians, {
     handlePlay: function(step, onResolved) {

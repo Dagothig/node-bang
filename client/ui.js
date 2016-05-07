@@ -24,11 +24,18 @@ function findParentBefore(node, before) {
     if (node.parentElement === before) return node;
     return findParentBefore(node.parentElement, before);
 }
+function create(tagName, className, parent) {
+    var tag = document.createElement(tagName);
+    tag.className = className;
+    if (parent) parent.appendChild(tag);
+    return tag;
+}
 
 module.exports = {
     one: one,
     many: many,
     show: show,
     hide: hide,
-    findParentBefore: findParentBefore
+    findParentBefore: findParentBefore,
+    create: create
 };
