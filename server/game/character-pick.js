@@ -54,12 +54,12 @@ module.exports = new Phase('Character pick', {
     actionsFor: function(game, player) {
         if (!player) return {};
         var acts = {};
-        acts[actions.select] = player.characters.map(character => character.name);
+        acts[actions.choose] = player.characters.map(character => character.name);
         return acts;
     },
 
     handleAction: function(game, player, msg) {
-        if (!player || msg.action !== actions.select) return;
+        if (!player || msg.action !== actions.choose) return;
         player.character =
             player.characters.find((c) => c.name === msg.arg)
             || player.character;
@@ -77,7 +77,13 @@ module.exports = new Phase('Character pick', {
         return formatted;
     },
 
-    formatPlayer: (game, player, other, formatted) => formatted,
+    formatPlayer: function(game, player, other, formatted) {
+        return misc.merge(formatted, {
+            characters: (player === other) ?
+                player.characters.map(c => c.format()) :
+                player.characters.length
+        });
+    },
 
     checkForEnd: function(game) {
         var unchosen = game.players.filter((player) => !player.character);

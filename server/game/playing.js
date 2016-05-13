@@ -26,7 +26,7 @@ module.exports = new Phase('Playing', {
     },
 
     begin: function(game) {
-        this.cards = new CardPile(aReq('server/game/cards'));
+        this.cards = new CardPile(aReq('server/game/cards').slice());
         game.players.forEach(p => this.extendPlayer(game, p));
         this.goToNextTurn(game);
     },
@@ -51,7 +51,8 @@ module.exports = new Phase('Playing', {
                 if (card) {
                     cards.discarded.push(card);
                     game.onGameEvent({
-                        name: 'Discard',
+                        name: 'discard',
+                        from: 'equipped',
                         player: player.name,
                         card: card.format()
                     });
@@ -119,7 +120,8 @@ module.exports = new Phase('Playing', {
             drawFromPile: function(amount) {
                 cards.draw(amount||1).forEach(card => this.push(card));
                 game.onGameEvent({
-                    name: 'Draw',
+                    name: 'draw',
+                    from: 'pile',
                     player: player.name,
                     amount: amount||1
                 });
@@ -138,7 +140,8 @@ module.exports = new Phase('Playing', {
                     this.length = 0;
                     cards.discarded.push.apply(cards.discarded, discarded);
                     game.onGameEvent({
-                        name: 'Discard',
+                        name: 'discard',
+                        from: 'hand',
                         player: player.name,
                         cards: discarded.map(c => c.format())
                     });
@@ -149,7 +152,8 @@ module.exports = new Phase('Playing', {
                 if (card) {
                     cards.discarded.push(card);
                     game.onGameEvent({
-                        name: 'Discard',
+                        name: 'discard',
+                        from: 'hand',
                         player: player.name,
                         card: card.format()
                     });
@@ -226,7 +230,7 @@ module.exports = new Phase('Playing', {
                     other.hand.map(card => card.format()) :
                     other.hand.length
             },
-            equipment: other.equipped.map(card => card.format()),
+            equipped: other.equipped.map(card => card.format()),
             life: other.life,
             stats: other.stats(),
             distance: player ? player.distanceTo(game.players, other) : undefined

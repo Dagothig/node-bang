@@ -82,7 +82,7 @@ function handleGame(io, users, user, socket) {
 }
 
 function handleJoining(io, users, user, socket, msg) {
-    if (user.token !== msg.token || game) return;
+    if (!msg || user.token !== msg.token || game) return;
     var joining = formattedJoining(users);
     if (user.joining !== msg.joining) {
         user.joining = !user.joining && msg.joining
@@ -99,7 +99,7 @@ function handleJoining(io, users, user, socket, msg) {
 }
 
 function handleAction(io, users, user, socket, msg) {
-    if (user.token !== msg.token || !game) return;
+    if (!msg || user.token !== msg.token || !game) return;
     game.handleAction(user, msg);
 }
 
@@ -108,9 +108,6 @@ module.exports = (io, users) => ({
         socket.on(msgs.game, () => handleGame(io, users, user, socket));
         socket.on(msgs.joining, msg => handleJoining(io, users, user, socket, msg));
         socket.on(msgs.action, msg => handleAction(io, users, user, socket, msg));
-
-        socket.emit(msgs.game, formattedGame(user));
-        socket.emit(msgs.joining, formattedJoining(users));
     },
     onDisconnected: (user, socket) => {
         if (game) game.handleDisconnect(user);

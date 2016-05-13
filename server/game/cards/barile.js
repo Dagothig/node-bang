@@ -14,8 +14,9 @@ misc.extend(Equipment, Barile, {
         });
     },
     getTarget: events('targetSelf'),
-    beforeBangResponse: function(step, card, target, onResolved, onSkip) {
-        if (!target.equipped.find(c => c === this)) return onResolved();
+    beforeBangResponse: function(step, card, target, onResolved, onSkip, skipCheck) {
+        if (!skipCheck && !target.equipped.find(c => c === this))
+            return onResolved();
 
         onResolved(events('cardDraw', target)(
             target, step.phase.cards,
@@ -26,7 +27,7 @@ misc.extend(Equipment, Barile, {
             },
             () => onResolved(),
             () => ({
-                name: 'Barile',
+                name: 'barile',
                 source: step.player.name,
                 target: target.name,
                 barile: this.format()

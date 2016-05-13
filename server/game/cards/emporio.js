@@ -13,6 +13,12 @@ misc.extend(Card, Emporio, {
         var alive = step.game.players.filter(p => p.alive);
         var current = alive[alive.indexOf(step.player)];
         var cards = step.phase.cards.draw(alive.length);
+
+        step.game.onGameEvent({
+            name: 'emporio',
+            cards: cards.map(c => c.format())
+        });
+
         this.handleEmporio(step, alive, current, cards, onResolved);
     },
     handleEmporio: function(step, players, player, cards, onResolved) {
@@ -23,7 +29,8 @@ misc.extend(Card, Emporio, {
             card => {
                 player.hand.push(misc.remove(cards, card));
                 step.game.onGameEvent({
-                    name: 'Draw',
+                    name: 'draw',
+                    from: 'emporio',
                     player: player.name,
                     card: card.format()
                 });
@@ -34,7 +41,8 @@ misc.extend(Card, Emporio, {
             undefined,
             // format
             () => ({
-                cards: cards.map(c => c.id)
+                what: 'emporio',
+                cards: cards.map(c => c.format())
             })
         ));
     }

@@ -7,7 +7,7 @@ function TargetRangeEvent(player, players, range, onTarget, onCancel, format) {
     let alive = players.filter(p => p.alive && p !== player);
     TargetEvent.call(this,
         player,
-        alive.filter(p => player.distanceTo(alive, p) <= range),
+        alive.filter(p => p.distanceTo(alive, player) <= range),
         onTarget, onCancel, format
     );
 }

@@ -2,13 +2,13 @@ module.exports = {
     disconnectTimeout: 30,
     minPasswordLength: 4,
 
-    minPlayers: 6,
+    minPlayers: 4,
     maxPlayers: 8,
     gameStartTimer: 0,//10,
     characterChoices: 2,
-    characterPickMaxTime: 0,//60,
-    rolePickMaxTime: 0,//10,
-    eventMaxTime: 60,
+    characterPickMaxTime: 60,
+    rolePickMaxTime: 10,
+    eventMaxTime: 600000,
 
     initCardMax: 5,
     lifeMax: 4,

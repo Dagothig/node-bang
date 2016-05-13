@@ -5,5 +5,12 @@ function Character(name, overrides) {
 
     misc.merge(this, overrides);
 }
+misc.merge(Character.prototype, {
+    format: function() {
+        return {
+            name: this.name
+        };
+    }
+});
 
 module.exports = Character;

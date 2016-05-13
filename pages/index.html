@@ -14,7 +14,9 @@
                 <div id="events" class="grow-1 tree-root no-scroll"></div>
                 <div id="actions" class="grow-1 tree-root scroll"></div>
             </div>
-            <div id="game-v2" class="grow-1 relative no-scroll"></div>
+            <div id="game-v2" class="grow-1 scroll">
+                <div class="container relative no-scroll"></div>
+            </div>
             <div id="pre-game" class="grow-1 flex vertical root-bg scroll">
                 <div class="grow-1"></div>
                 <form class="form-box box">
@@ -36,13 +38,14 @@
                 </form>
                 <div class="grow-1"></div>
             </div>
+
             <div id="lobby" class="flex vertical">
                 <div class="title">Users</div>
                 <div class="users list grow-1 flex vertical"></div>
                 <div class="title">Chat</div>
                 <div class="messages list grow-1 flex vertical-reverse"></div>
                 <form class="flex horizontal">
-                    <input class="grow-1" name="message" autocomplete="off" placeholder="Enter your message here..." />
+                    <input class="grow-1" name="message" autocomplete="off" placeholder="Message" />
                     <span class="margin"></span>
                     <input value="Send" type="submit" />
                 </form>
@@ -71,7 +74,7 @@
                 </div>
                 <div class="form-group flex horizontal">
                     <label class="grow-1" for="password">Password</label>
-                    <input class="grow-2 center" id="password" name="password" type="password" />
+                    <input class="grow-2 center" id="password" value="1234" name="password" type="password" />
                 </div>
                 <div class="form-group flex horizontal">
                     <label class="grow-1 center" for="save-token-login">Save token</label>

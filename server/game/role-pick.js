@@ -56,15 +56,16 @@ module.exports = new Phase('Role pick', {
     actionsFor: function(game, player) {
         var acts = {};
         if (!player) return acts;
-        if (!player.confirmedRole) acts[actions.confirm] = [actions.confirm];
+        if (!player.confirmedRole) acts[actions.cancel] = ['cancel'];
         return acts;
     },
     handleAction: function(game, player, msg) {
         if (!player) return;
         switch (msg.action) {
-            case actions.confirm:
-            player.confirmedRole = true;
-            this.checkForEnd(game);
+            case actions.cancel:
+                player.confirmedRole = true;
+                this.checkForEnd(game);
+                break;
             default:
                 return;
         }

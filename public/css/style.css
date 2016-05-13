@@ -252,10 +252,17 @@ input:focus,
 input[type=checkbox]:focus+.check {
     border-color: #08f;
 }
+input:disabled {
+    cursor: default;
+}
+input:not(:disabled)[type=submit],
+input:not(:disabled)[type=button],
+input:not(:disabled)+.check {
+    cursor: pointer;
+}
 input[type=submit],
 input[type=button],
 input+.check {
-    cursor: pointer;
     border-top-width: 1px;
     border-bottom-width: 3px;
 }
@@ -303,7 +310,8 @@ textarea {
 
 /* === [LOBBY] === */
 #lobby {
-    width: 18rem;
+    width: 20%;
+    min-width: 11.5rem;
     font-size: 0.8rem;
 }
 
@@ -430,7 +438,8 @@ textarea {
     z-index: 1;
 }
 #menu .container {
-    width: 18rem;
+    width: 20%;
+    min-width: 11.5rem;
     font-size: 0.8rem;
     background: #fff;
     visibility: hidden;
@@ -440,6 +449,59 @@ textarea {
 }
 
 /* === [CARDS] === */
+#game-v2 {
+    background-color: #2E4859;
+}
+#game-v2 .container {
+    width: 100%;
+    height: 100%;
+    min-width: 40em;
+    min-height: 40em;
+}
+
+input.cancel-btn {
+    left: 50%;
+    bottom: 0;
+    margin-left: -4em;
+    margin-bottom: 0.5em;
+    z-index: 5000;
+
+    width: 8em;
+    line-height: 2em;
+    position: absolute;
+    padding: 0.25em;
+    border-radius: 0.5em;
+
+    text-transform: uppercase;
+    font-weight: 800;
+
+    background-color: #d83;
+    border-color: #853;
+    color: #853;
+
+    box-shadow: 0 0 0 0 #08f;
+    transition: box-shadow 0.25s;
+}
+input.cancel-btn:disabled {
+    background-color: #aaa;
+    border-color: #888;
+    color: #888;
+}
+input.cancel-btn:not(:disabled) {
+    animation: actionable 1s infinite  ease-in-out;
+}
+input.cancel-btn:not(:disabled):hover {
+    background-color: #d83;
+    border-color: #853;
+    box-shadow: 0 0 0.25em 0.25em #08f;
+    animation: none;
+}
+input.cancel-btn:active {
+    background-color: #c9772d;
+    border-color: #77482c;
+    color: #77482c;
+}
+
 .card {
     position: absolute;
     width: 4.5em;
@@ -450,7 +512,11 @@ textarea {
     margin-bottom: -3.75em;
     z-index: 0;
 
-    transition: 0.25s ease-in-out;
+    transition:
+        left 0.35s ease-in-out,
+        top 0.35s ease-in-out,
+        z-index 0.35s ease-in-out,
+        transform 0.35s ease-in-out;
 
     transform-style: preserve-3d;
     transform-origin: center;
@@ -458,7 +524,8 @@ textarea {
 }
 .card.visible:hover, .card.known:hover {
     transform: scale(1.0) rotateZ(0deg) !important;
-    z-index: 100;
+    /* Yes it is absurdly large; there is a lot of z-index fudging in the code */
+    z-index: 10000 !important;
 }
 .card.visible .face, .card.known:hover .face {
     transform: rotateY(360deg);
@@ -475,22 +542,33 @@ textarea {
     bottom: 0;
     border-radius: 0.5em;
     padding: 0.25em;
-    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
-    transition: transform 0.25s ease-in-out;
+    /*box-shadow: 0 0 0.5em 0em rgba(0, 0, 0, 0.5);*/
+    transition: transform 0.35s ease-in-out;
     backface-visibility: hidden;
+}
+.card.actionable .face, .card.actionable .back {
+    box-shadow: 0 0 0.25em 0em #08f;
+    animation: actionable 1s infinite  ease-in-out;
+    cursor: pointer;
+}
+@keyframes actionable {
+    0% { box-shadow: 0 0 0.25em 0em #08f; }
+    50% { box-shadow: 0 0 0.25em 0.25em #08f;  }
+    100% { box-shadow: 0 0 0.25em 0em #08f; }
 }
 
 .card .face {
     transform: rotateY(180deg);
+    border-color: #853;
     border-width: 0.25em;
     border-style: solid;
     background-color: #efe8e0;
 }
 .card .face.blue {
-    border-color: #08f;
+    border-color: #1B66C1;
 }
 .card .face.brown {
-    border-color: #a51;
+    border-color: #853;
 }
 
 .card .back {
@@ -498,7 +576,7 @@ textarea {
     border: solid 0.25em #853;
     background-color: #d83;
 }
-.card .back:not(.character):not(.role):after {
+.card:not(.character):not(.role) .back:after {
     content: "BANG!";
     position: absolute;
     left: 50%;
@@ -513,42 +591,32 @@ textarea {
     color: #853;
 }
 
-.card .back.role {
+.card.role .back {
     background: linear-gradient(90deg, #b62, #d83, #b62, #d83, #b62);
 }
 
-.card .back.character div {
-    width: 2.8em;
+.card.character .back div {
+    width: 2.6em;
     height: 0.6em;
-    background: linear-gradient(0deg, #c91, #ec1, #c91);
-    border: solid 0.05em #853;
+    background: linear-gradient(0deg, #c91, #ec1, #ec1, #fe8, #ec1, #c91);
+    border: solid 0.1em #853;
     border-top-left-radius: 100%;
     border-bottom-left-radius: 100%;
     border-top-right-radius: 0.5em;
     border-bottom-right-radius: 0.5em;
-    margin-left: 0.35em;
-    margin-right: 0.35em;
-    margin-top: 0.6em;
+    margin-left: 0.45em;
+    margin-right: 0.45em;
+    margin-top: 0.5em;
     transform-origin: center;
 }
-.card .back.character div:first-child {
+.card.character .back div:first-child {
     margin-top: 0.35em;
 }
-.card .back.character .bullet-1 {
-    transform: rotateZ(4deg);
-}
-.card .back.character .bullet-2 {
-    transform: rotateZ(177deg);
-}
-.card .back.character .bullet-3 {
-    transform: rotateZ(-1deg);
-}
-.card .back.character .bullet-4 {
-    transform: rotateZ(185deg);
-}
-.card .back.character .bullet-5 {
-    transform: rotateZ(-3deg);
-}
+.card.character .back .bullet-1 { transform: rotateZ(4deg); }
+.card.character .back .bullet-2 { transform: rotateZ(177deg); }
+.card.character .back .bullet-3 { transform: rotateZ(-1deg); }
+.card.character .back .bullet-4 { transform: rotateZ(185deg); }
+.card.character .back .bullet-5 { transform: rotateZ(-3deg); }
 
 .card .name, .card .image, .card .description {
     width: 100%;
@@ -613,25 +681,24 @@ textarea {
 .card .rank.seven:after { content: "7"; }
 .card .rank.eight:after { content: "8"; }
 .card .rank.nine:after { content: "9"; }
-.card .rank.ten {
-    letter-spacing: -0.05em;
-}
+.card .rank.ten { letter-spacing: -0.05em; }
 .card .rank.ten:after { content: "10"; }
 .card .rank.jack:after { content: "J"; }
 .card .rank.queen:after { content: "Q"; }
 .card .rank.king:after { content: "K"; }
 
-.card-pile {
-    z-index: 1;
-    position: absolute;
-}
-.card-pile .card {
-    position: relative;
-}
 .card-pile .card .face, .card-pile .card .back {
-    box-shadow: none;
+    /*box-shadow: 0 0 0em 0em rgba(0, 0, 0, 0);*/
+}
+.card-pile .top {
+    transition:
+        left 0s ease-in-out,
+        top 0s ease-in-out,
+        z-index 0.35s ease-in-out,
+        transform 0.35s ease-in-out;
 }
 .card-pile .bottom, .card-pile .size {
+    position: absolute;
     margin-left: -2.25em;
     margin-right: -2.25em;
     width: 4.5em;
@@ -639,14 +706,18 @@ textarea {
 }
 .card-pile .bottom {
     z-index: -1;
-    position: absolute;
     bottom: 0;
     height: 7.5em;
-    box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.5);
+    margin-top: -3.75em;
+    box-shadow: 0 0 0.5em 0em rgba(0, 0, 0, 0.5);
 }
 .card-pile .size {
     /* The negative margin of cards -1 because of padding */
     margin-top: 2.75em;
     padding-top: 1em;
     background-color: #643;
+}
+
+.emporio {
+    z-index: 1;
 }

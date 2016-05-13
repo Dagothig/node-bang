@@ -10,9 +10,23 @@ module.exports = new Character("Vulture Sam", {
 
         let sam = step.game.players.find(p => p.character === this);
 
+        step.game.onGameEvent({
+            name: 'draw',
+            from: 'hand',
+            player: sam.name,
+            target: player.name,
+            cards: player.hand.map(c => c.format())
+        });
         sam.hand.push.apply(sam.hand, player.hand);
         player.hand.length = 0;
 
+        step.game.onGameEvent({
+            name: 'draw',
+            from: 'equipped',
+            player: sam.name,
+            target: player.name,
+            cards: player.equipped.map(c => c.format())
+        });
         sam.hand.push.apply(sam.hand, player.equipped);
         player.equipped.length = 0;
 

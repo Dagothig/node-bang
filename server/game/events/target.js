@@ -15,7 +15,7 @@ function TargetEvent(player, targets, onTarget, onCancel, format) {
 }
 TargetEvent.prototype = misc.merge(Object.create(Event.prototype), {
     constructor: TargetEvent,
-    handleTarget: function(player, target) { this.onTarget(target); },
+    handleTarget: function(player, choice) { this.onTarget(choice); },
     handleCancel: function(player, arg) { this.onCancel(); }
 });
 

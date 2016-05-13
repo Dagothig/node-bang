@@ -11,7 +11,7 @@ module.exports = new Character("Black Jack", {
 
         let second = cards[1];
         step.game.onGameEvent({
-            name: 'Drew',
+            name: 'drew',
             player: step.player.name,
             card: second.format()
         });

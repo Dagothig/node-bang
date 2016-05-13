@@ -18,9 +18,9 @@ CardChoiceEvent.prototype = misc.merge(Object.create(Event.prototype), {
     handleChoose: function(player, choice) { this.onChoice(choice); },
     handleCancel: function(player, arg) { this.onCancel(); },
     filterCards: function(filter) {
-        Event.call(this, this.choices.filter(choice =>
+        Event.call(this, this.player, this.choices.filter(choice =>
             choice.action !== actions.choose || choice.args.filter(filter)
-        ), this.format);
+        ), this.formatExtra);
         return this;
     }
 });

@@ -151,6 +151,9 @@ on(msgs.user, msg => {
         settings.token = (msg && msg.token) || '';
     }
     lobby.handleUsers(user, users);
+
+    socket.emit(msgs.joining, { token: user.token });
+    socket.emit(msgs.game, { token: user.token });
 });
 on(msgs.users, msg => {
     users = msg;

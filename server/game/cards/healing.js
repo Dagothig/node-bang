@@ -9,7 +9,7 @@ misc.extend(Card, Beer, {
         step.player.hand.discard(this.id);
         step.player.heal(1);
         step.game.onGameEvent({
-            name: 'Beer',
+            name: 'beer',
             player: step.player.name,
             card: this.id
         });
@@ -27,7 +27,7 @@ misc.extend(Card, Saloon, {
             .filter(p => p.alive)
             .forEach(p => p.heal(1));
         step.game.onGameEvent({
-            name: 'Saloon',
+            name: 'saloon',
             player: step.player.name,
             card: this.id
         });

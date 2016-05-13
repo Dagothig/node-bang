@@ -7,7 +7,7 @@ var formatted = users => users.map(user => ({
 }));
 
 function handleMsg(io, users, user, socket, msg) {
-    if (user.token !== msg.token) return;
+    if (!msg || user.token !== msg.token) return;
     msg.message = validator.trim(validator.escape(msg.message));
     if (!msg.message) return;
     log(user.name, "sent", msg.message);

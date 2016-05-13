@@ -32,7 +32,7 @@ misc.extend(Card, Duel, {
             () => handles.damage(step, source, target, 1, onResolved),
             // format; who is banging who
             () => ({
-                name: 'Duel',
+                name: 'duel',
                 source: source.name,
                 target: target.name
             })

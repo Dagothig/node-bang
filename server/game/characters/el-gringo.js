@@ -12,10 +12,13 @@ module.exports = new Character("El Gringo", {
         if (source) {
             let card = misc.spliceRand(source.hand);
             if (card) target.hand.push(card);
+            // TODO; don't reveal the id of the card
             step.game.onGameEvent({
-                name: 'Steal',
-                thief: target.name,
-                player: source.name
+                name: 'draw',
+                from: 'hand',
+                player: target.name,
+                target: source.name,
+                card: card.format()
             });
         }
 

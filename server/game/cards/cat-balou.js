@@ -13,15 +13,19 @@ misc.extend(Card, CatBalou, {
             target => {
                 onResolved(events('removeOtherCard')(
                     step.player, target, true, true,
-                    card => {
+                    (from, card) => {
                         step.player.hand.discard(this.id);
                         step.phase.cards.discarded.push(card);
+                        step.game.onGameEvent({
+                            name: 'discard',
+                            from: from,
+                            player: target.name,
+                            card: card.format()
+                        });
                         onResolved();
                     },
-                    // no choice; cancel
-                    () => {
-                        onResolved()
-                    }
+                    // on cancel; the cat-balou was not used
+                    () => onResolved()
                 ))
             },
             // onCancel; the catbalou was not used

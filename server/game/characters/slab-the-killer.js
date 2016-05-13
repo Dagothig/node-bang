@@ -18,12 +18,13 @@ module.exports = new Character("Slab the Killer", {
             handles.damage(step, step.player, target, 1, onSkip);
 
         let format = () => ({
-            name: 'Bang',
+            name: 'bang',
             source: step.player.name,
             target: target.name,
             card: card.format()
         });
 
+        // TODO: fix interaction with bariles
         onResolved(events('cardType', target)(
             target, Mancato,
             // onCard; we ask for another Mancato that isn't the first one
@@ -33,7 +34,7 @@ module.exports = new Character("Slab the Killer", {
                     target.hand.discard(card1.id);
                     target.hand.discard(card2.id);
                     step.game.onGameEvent({
-                        name: 'Avoid',
+                        name: 'avoid',
                         what: name,
                         source: step.player.name,
                         target: target.name,

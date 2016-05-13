@@ -11,10 +11,10 @@ module.exports = new Character("Pedro Ramirez", {
 
         let self = this;
         onResolved(events('simple')(
-            step.player, actions.draw, ['pile', 'discarded'],
+            step.player, actions.draw, ['pile', 'discard'],
             function(p, arg) {
                 if (arg === 'pile') onResolved();
-                else if (arg === 'discarded')
+                else if (arg === 'discard')
                     self.handleDrawDiscard(step, onResolved, onSkip);
             }
         ));
@@ -24,7 +24,8 @@ module.exports = new Character("Pedro Ramirez", {
         let card = step.phase.cards.discarded.pop();
         step.player.hand.push(card);
         step.game.onGameEvent({
-            name: 'Draw',
+            name: 'draw',
+            from: 'discard',
             player: step.player.name,
             card: card.format()
         });

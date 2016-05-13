@@ -26,9 +26,14 @@ function findParentBefore(node, before) {
 }
 function create(tagName, className, parent) {
     var tag = document.createElement(tagName);
-    tag.className = className;
+    if (className) tag.className = className;
     if (parent) parent.appendChild(tag);
     return tag;
+}
+function move(tag, x, y, z) {
+    tag.style.left = x + 'px';
+    tag.style.top = y + 'px';
+    tag.style.zIndex = z;
 }
 
 module.exports = {
@@ -37,5 +42,6 @@ module.exports = {
     show: show,
     hide: hide,
     findParentBefore: findParentBefore,
-    create: create
+    create: create,
+    move: move
 };

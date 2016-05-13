@@ -58,6 +58,7 @@ misc.merge(Game.prototype, {
         var game = this, player = this.findPlayer(user);
         return this.phase.format(game, user, {
             identifier: this.identifier,
+            phase: this.phase.name,
             players: this.players.map(other =>
                 this.phase.formatPlayer(game, player, other, {
                     name: other.user.name,

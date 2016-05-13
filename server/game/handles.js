@@ -50,7 +50,7 @@ handleEvent('beforeDeath',
 
 
         step.game.onGameEvent({
-            name: 'Dead',
+            name: 'dead',
             player: player.name
         });
 
@@ -80,7 +80,7 @@ var handleDying = (step, killer, player, amount, onResolved) => {
         () => handleBeforeDeath(step, killer, player, amount, onResolved),
         // Format
         () => ({
-            name: 'Dying',
+            name: 'dying',
             player: player.name,
             killer: killer ? killer.name : undefined
         })
@@ -89,7 +89,7 @@ var handleDying = (step, killer, player, amount, onResolved) => {
 var handleDamage = (step, source, target, amount, onResolved) => {
     target.life -= amount;
     step.game.onGameEvent({
-        name: 'Damage',
+        name: 'damage',
         source: source ? source.name : undefined,
         target: target.name,
         amount: amount
@@ -112,7 +112,7 @@ handleEvent('before' + name + 'Response',
         card => {
             target.hand.discard(card.id);
             step.game.onGameEvent({
-                name: 'Avoid',
+                name: 'avoid',
                 what: name,
                 source: step.player.name,
                 target: target.name,

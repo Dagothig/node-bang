@@ -26,12 +26,16 @@ module.exports = new Character("Jesse Jones", {
             step.player, step.game.players
                 .filter(p => p !== step.player && p.alive && p.hand.length),
             target => {
-                step.player.hand.push(misc.spliceRand(target.hand));
+                let card = misc.spliceRand(target.hand);
+                step.player.hand.push(card);
                 step.player.hand.drawFromPile();
+                // TODO; don't reveal the id of the card
                 step.game.onGameEvent({
-                    name: 'Steal',
-                    thief: step.player.name,
-                    player: target.name
+                    name: 'draw',
+                    from: 'hand',
+                    player: step.player.name,
+                    target: target.name,
+                    card: card.format()
                 });
                 onSkip();
             },

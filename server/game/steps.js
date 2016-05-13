@@ -80,7 +80,8 @@ Draw.prototype = misc.merge(Object.create(Step.prototype), {
             cards => {
                 Array.prototype.push.apply(this.player.hand, cards);
                 this.game.onGameEvent({
-                    name: 'Draw',
+                    name: 'draw',
+                    from: 'pile',
                     player: this.player.name,
                     amount: 2
                 });

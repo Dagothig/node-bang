@@ -13,7 +13,8 @@ misc.extend(Card, Panico, {
             target => onResolved(events('removeOtherCard')(
                 step.player, target, true, true,
                 // onPlay; the panico was used and we have gained a card
-                card => this.handleCard(step, target, card, onResolved),
+                (from, card) =>
+                    this.handleCard(step, target, from, card, onResolved),
                 // onCancel; the panico was not used
                 () => onResolved()
             )),
@@ -21,14 +22,19 @@ misc.extend(Card, Panico, {
             () => onResolved()
         ));
     },
-    handleCard: function(step, target, card, onResolved) {
+    handleCard: function(step, target, from, card, onResolved) {
         step.player.hand.push(card);
         step.player.hand.discard(this.id);
+
+        // TODO; don't reveal the id of the card
         step.game.onGameEvent({
-            name: 'Panico',
-            thief: step.player.name,
-            player: target.name
+            name: 'draw',
+            from: from,
+            player: step.player.name,
+            target: target.name,
+            card: card.format()
         });
+
         onResolved();
     }
 });

@@ -37,8 +37,8 @@ misc.extend(Equipment, Prigione, {
             // Cannot cancel this draw
             undefined,
             () => ({
-                name: 'Prigione',
-                what: 'Draw',
+                name: 'prigione',
+                what: 'draw',
                 prigione: this.format(),
                 player: step.player.name
             })
@@ -60,7 +60,7 @@ misc.extend(Equipment, Prigione, {
     },
     handleReleased: function(step, card, onResolved, onSkip) {
         step.game.onGameEvent({
-            name: 'Prigione',
+            name: 'prigione',
             what: 'released',
             player: step.player.name,
             prigione: this.format(),
@@ -70,8 +70,8 @@ misc.extend(Equipment, Prigione, {
     },
     handleImprisoned: function(step, card, onResolved, onSkip) {
         step.game.onGameEvent({
-            name: 'Prigione',
-            what: 'Imprisoned',
+            name: 'prigione',
+            what: 'imprisoned',
             player: step.player.name,
             prigione: this.format(),
             card: card.format()

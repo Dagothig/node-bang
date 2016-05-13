@@ -26,8 +26,9 @@ misc.extend(Card, Equipment, {
                 if (current) target.equipped.discard(current.id);
                 target.equipped.push(this);
                 step.game.onGameEvent({
-                    name: 'Equipped',
-                    player: target.name,
+                    name: 'equipped',
+                    player: step.player.name,
+                    target: target.name,
                     card: this.format()
                 });
                 this.handleAfterPlay(step, onResolved, target);

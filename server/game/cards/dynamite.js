@@ -27,8 +27,8 @@ misc.extend(Equipment, Dynamite, {
             undefined,
             // format
             () => ({
-                name: 'Dynamite',
-                what: 'Draw',
+                name: 'dynamite',
+                what: 'draw',
                 dynamite: this.format(),
                 player: step.player.name
             })
@@ -50,8 +50,8 @@ misc.extend(Equipment, Dynamite, {
     handleExplode: function(step, card, onResolved, onSkip) {
         step.phase.cards.discarded.push(this);
         step.game.onGameEvent({
-            name: 'Dynamite',
-            what: 'Exploded',
+            name: 'dynamite',
+            what: 'exploded',
             player: step.player.name,
             dynamite: this.format(),
             card: card.format()
@@ -62,8 +62,8 @@ misc.extend(Equipment, Dynamite, {
         var next = misc.after(step.game.players, step.player, p => p.alive);
         next.equipped.push(this);
         step.game.onGameEvent({
-            name: 'Dynamite',
-            what: 'Passed',
+            name: 'dynamite',
+            what: 'passed',
             source: step.player.name,
             target: next.name,
             dynamite: this.format(),
