@@ -15,18 +15,18 @@ function Card() {
     this.tagBack = ui.create('div', 'back', this.tagRoot);
 
     this.onMoveFinish = () => {
-        this.tagRoot.classList.remove('moving');
         if (this.tempZ !== null) {
             this.tagRoot.style.zIndex = this.z;
             this.tempZ = null;
         }
+        this.tagRoot.classList.remove('moving');
     }
 
     this.tempZ = null;
     this.move(0, 0, 0, 0);
 }
 Card.hoverScale = 1.5;
-Card.transitionTime = 3500;
+Card.transitionTime = 350;
 Card.prototype = {
     constructor: Card,
 

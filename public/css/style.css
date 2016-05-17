@@ -513,9 +513,9 @@ input.cancel-btn:active {
     z-index: 0;
 
     transition:
-        left 3.5s ease-in-out,
-        top 3.5s ease-in-out,
-        transform 3.5s ease-in-out;
+        left 0.35s ease-in-out,
+        top 0.35s ease-in-out,
+        transform 0.35s ease-in-out;
 
     transform-style: preserve-3d;
     transform-origin: center;
@@ -541,11 +541,10 @@ input.cancel-btn:active {
     bottom: 0;
     border-radius: 0.5em;
     padding: 0.25em;
-    /*box-shadow: 0 0 0.5em 0em rgba(0, 0, 0, 0.5);*/
-    transition: transform 3.5s ease-in-out;
+    transition: transform 0.35s ease-in-out;
     backface-visibility: hidden;
 }
-.card.actionable .face, .card.actionable .back {
+.card.actionable .face, .card.actionable .back, .card-pile .bottom.actionable {
     box-shadow: 0 0 0.25em 0em #08f;
     animation: actionable 1s infinite ease-in-out;
     cursor: pointer;
@@ -686,14 +685,11 @@ input.cancel-btn:active {
 .card .rank.queen:after { content: "Q"; }
 .card .rank.king:after { content: "K"; }
 
-.card-pile .card .face, .card-pile .card .back {
-    /*box-shadow: 0 0 0em 0em rgba(0, 0, 0, 0);*/
-}
 .card-pile .top {
     transition:
         left 0s ease-in-out,
         top 0s ease-in-out,
-        transform 3.5s ease-in-out;
+        transform 0.35s ease-in-out;
 }
 .card-pile .bottom, .card-pile .size {
     position: absolute;

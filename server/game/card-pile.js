@@ -1,8 +1,9 @@
 var misc = aReq('server/misc'),
     log = aReq('server/log');
 
-function CardPile(cards) {
+function CardPile(game, cards) {
     this._backing = misc.shuffle(cards);
+    this.game = game;
     this.discarded = [];
 }
 misc.merge(CardPile.prototype, {
@@ -15,6 +16,11 @@ misc.merge(CardPile.prototype, {
                 log('Reshuffling deck');
                 this._backing = misc.shuffle(this.discarded);
                 this.discarded = [];
+                this.game.onGameEvent({
+                    name: 'reshuffling',
+                    pile: this.length,
+                    discard: this.discarded.map(c => c.format())
+                });
                 continue;
             }
             cards.push(card);

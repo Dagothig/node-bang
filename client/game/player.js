@@ -23,7 +23,9 @@ function Player() {
 
     this.x = this.y = this.z = 0;
 }
-Player.equippedOverlap = 0.4;
+Player.equippedShift = -0.4;
+Player.handShift = 0.1;
+Player.characterShift = 0.4;
 // We consider 1 depth per card, 10 per cards for a total of 23
 Player.equippedZ = 0;
 Player.roleZ = Player.equippedZ + Cards.depth;
@@ -109,15 +111,23 @@ Player.prototype = {
 
         let xShift = -this.character.getWidth();
 
+        let yHandShift = this.hand.getHeight() * Player.handShift;
         this.hand.arcMove(
-            this.x + xDirX * xShift,
-            this.y + xDirY * xShift,
+            this.x +
+            xDirX * xShift +
+            yDirX * yHandShift,
+
+            this.y +
+            xDirY * xShift +
+            yDirY * yHandShift,
+
             this.z + Player.handZ,
+
             rotAngle,
             Math.QUARTER_PI
         );
 
-        let yEquipShift = this.equipped.getHeight() * (Player.equippedOverlap-1);
+        let yEquipShift = this.equipped.getHeight() * Player.equippedShift;
         this.equipped.move(
             this.x + yDirX * yEquipShift,
             this.y + yDirY * yEquipShift,
@@ -128,12 +138,19 @@ Player.prototype = {
         let xStatShift =
             this.hand.getWidth() * 0.5 +
             this.character.getWidth() * 0.35;
-        let yStatShift = this.character.getHeight() * 0.4;
+        let yStatShift = this.character.getHeight() * Player.characterShift;
 
         this.character.move(
-            this.x + xDirX * (xShift + xStatShift) + yDirX * yStatShift,
-            this.y + xDirY * (xShift + xStatShift) + yDirY * yStatShift,
+            this.x +
+            xDirX * (xShift + xStatShift) +
+            yDirX * yStatShift,
+
+            this.y +
+            xDirY * (xShift + xStatShift) +
+            yDirY * yStatShift,
+
             this.z + Player.characterZ,
+
             rotAngle
         );
 
@@ -180,9 +197,8 @@ Player.prototype = {
         return this;
     },
     getHeight: function() {
-        return this.hand.getHeight() +
-            this.equipped.getHeight() * (1 - Player.equippedOverlap) +
-            this.character.getHeight() * 0.4;
+        return this.character.getHeight() *
+            (Player.characterShift - Player.equippedShift + 1);
     }
 }
 

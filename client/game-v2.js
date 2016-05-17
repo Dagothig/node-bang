@@ -70,7 +70,7 @@ Game.prototype = {
             this.players.find(p => p.info.name === msg.target);
         switch (msg.name) {
             case 'draw':
-                let func = arg => player.hand.append(source.draw(arg));
+                let func = arg => player.hand.append(source.draw(arg), arg);
                 let source = (msg.from === 'pile' ? this.pile :
                     (msg.from === 'discard' ? this.discard :
                     (msg.from === 'hand' ? target.hand :
@@ -84,38 +84,47 @@ Game.prototype = {
 
             case 'discard':
                 ((msg.card && [msg.card]) || msg.cards).forEach(c =>
-                    this.discard.append(player[msg.from].draw(c))
+                    this.discard.append(player[msg.from].draw(c), c)
                 );
                 break;
 
             case 'pile':
                 ((msg.card && [msg.card]) || msg.cards).forEach(c =>
-                    this.pile.append(player[msg.from].draw(c))
+                    this.pile.append(player[msg.from].draw(c), c)
                 );
                 break;
 
             case 'equipped':
                 let target = this.players.find(p => p.info.name === msg.target);
-                target.equipped.append(player.hand.draw(msg.card));
+                target.equipped.append(player.hand.draw(msg.card), msg.card);
                 break;
 
             case 'dynamite':
                 switch (msg.what) {
                     case 'passed':
-                        this.discard.append(this.pile.draw(msg.card));
-                        target.equipped.append(source.equipped.draw(msg.dynamite))
+                        this.discard.append(this.pile.draw(msg.card), msg.card);
+                        target.equipped.append(
+                            source.equipped.draw(msg.dynamite),
+                            msg.dynamite
+                        );
                         break;
                     case 'exploded':
-                        this.discard.append(this.pile.draw(msg.card));
-                        this.discard.append(player.equipped.draw(msg.dynamite))
+                        this.discard.append(this.pile.draw(msg.card), msg.card);
+                        this.discard.append(
+                            player.equipped.draw(msg.dynamite),
+                            msg.dynamite
+                        );
                         break;
                 }
                 break;
 
             case 'emporio':
-                msg.cards.forEach(c => this.emporio.append(
-                    this.pile.draw().setInfo(c)
-                ));
+                msg.cards.forEach(c => this.emporio.append(this.pile.draw(c), c));
+                break;
+
+            case 'reshuffling':
+                this.pile.setInfo(msg.pile);
+                this.discard.setInfo(msg.discarded);
                 break;
         }
     },
@@ -224,23 +233,23 @@ Game.prototype = {
             x: this.tagGame.offsetWidth / 2,
             y: this.tagGame.offsetHeight / 2
         };
-        let centerSize = this.pile ? this.pile.topCard.getHeight() * 0.6 : 0;
+        let centerSize = this.pile ? this.pile.tagBottom.offsetHeight * 0.6 : 0;
         if (this.players) this.players.forEach(p => {
             let dirX = p.dirX;
             let dirY = p.dirY;
 
-            let heightShift =
-                p.hand.getHeight() / 2 +
-                p.equipped.getHeight() * (1 - Player.equippedOverlap);
+            let height = p.getHeight();
 
             let remain = Math.max(Math.sqrt(
                 Math.pow(dirX * halfSize.x, 2) +
                 Math.pow(dirY * halfSize.y, 2)
-            ) - centerSize - p.getHeight(), 0) * 0.75;
+            ) - centerSize - height, 0);
+
+            let shift = centerSize + height / 2 + remain * 0.75
 
             p.move(
-                halfSize.x + dirX * (centerSize + heightShift + remain),
-                halfSize.y + dirY * (centerSize + heightShift + remain),
+                halfSize.x + dirX * shift,
+                halfSize.y + dirY * shift,
                 p.z, p.angle
             )
         });

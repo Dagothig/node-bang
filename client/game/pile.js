@@ -29,27 +29,37 @@ Pile.prototype = {
         if (this.pendingCards.length) {
             this.pendingInfo = cardsInfo;
             return this;
-        } else this.pendingInfo = null;
-
-        if (cardsInfo.length !== undefined) {
-            if (cardsInfo.length) {
-                this.topCard.setInfo(cardsInfo[cardsInfo.length - 1]);
-                this.size = cardsInfo.length;
-            } else this.size = 0;
-        } else {
-            this.topCard.setInfo();
-            this.size = cardsInfo;
         }
+        this.info = cardsInfo;
 
-        if (this.size > 0) ui.show(this.tagSize, this.topCard.tagRoot);
-        else ui.hide(this.tagSize, this.topCard.tagRoot);
-
+        this._updateToInfo();
         this._updateToSize();
 
-        this.info = cardsInfo;
         return this;
     },
 
+    actionable: function(onAction, action, arg) {
+        if (this.size > 0)  {
+            this.topCard.actionable(() => {
+                onAction(action, arg);
+                this.topCard.unactionable();
+            });
+        } else {
+            this.tagBottom.classList.add('actionable');
+            this.tagBottom.onclick = () => {
+                this.tagBottom.classList.remove('actionable');
+                this.tagBottom.onclick = null;
+                onAction(action, arg);
+            }
+        }
+        return this;
+    },
+    unactionable: function() {
+        this.topCard.unactionable();
+        this.tagBottom.classList.remove('actionable');
+        this.tagBottom.onclick = null;
+        return this;
+    },
     setActions: function(actions, onAction) {
         let action = null;
         for (let act in actions) {
@@ -58,15 +68,25 @@ Pile.prototype = {
                 break;
             }
         }
-        if (action) this.topCard.actionable(() => {
-            onAction(action, this.name);
-            this.topCard.unactionable();
-        });
-        else this.topCard.unactionable();
-
-        return this;
+        return action ?
+            this.actionable(onAction, action, this.name) :
+            this.unactionable();
     },
 
+    _updateToInfo() {
+        if (this.info.length !== undefined) {
+            if (this.info.length) {
+                this.topCard.setInfo(this.info[this.info.length - 1]);
+                this.size = this.info.length;
+            } else this.size = 0;
+        } else {
+            this.topCard.setInfo();
+            this.size = this.info;
+        }
+
+        if (this.size > 0) ui.show(this.tagSize, this.topCard.tagRoot);
+        else ui.hide(this.tagSize, this.topCard.tagRoot);
+    },
     _updateToSize() {
         this.tagSize.style.height = this.size + 'px';
         ui.move(this.tagSize,
@@ -101,32 +121,35 @@ Pile.prototype = {
         return this.topCard.getHeight() + this.size;
     },
 
-    append: function(card) {
+    append: function(card, info) {
         this.tagRoot.appendChild(card.tagRoot);
 
         this.pendingCards.push(card);
         let size = (this.size + this.pendingCards.length);
         card.transitionZ(this.z + Pile.depth);
-        setTimeout(() => {
+        requestAnimationFrame(() => setTimeout(() => {
             if (this.info.length === undefined) card.unknown();
+            else card.setInfo(info);
             card.move(
                 this.x,
                 this.y - size,
-                this.z + Pile.sizeZ + size + 1,
+                this.z + Pile.sizeZ + size,
                 0
             );
             setTimeout(() => this._completePendingCard(), Card.transitionTime);
-        }, 0);
+        }, 0));
     },
     _completePendingCard: function() {
         let card = this.pendingCards.splice(0, 1)[0];
         this.tagRoot.removeChild(card.tagRoot);
         if (this.info.length !== undefined) this.info.push(card.info);
         else this.info++;
-        if (!this.pendingCards.length && this.pendingInfo)
-            this.setInfo(this.pendingInfo);
-        else
-            this.setInfo(this.info);
+        this._updateToInfo();
+        this._updateToSize();
+        if (!this.pendingCards.length) {
+            this.info = this.pendingInfo;
+            this.pendingInfo = null;
+        }
     },
 
     draw: function(info) {
@@ -143,7 +166,8 @@ Pile.prototype = {
 
         this.tagRoot.appendChild(this.topCard.tagRoot);
 
-        return oldTop.setInfo(info).unactionable();
+        this.unactionable();
+        return oldTop;
     }
 }
 

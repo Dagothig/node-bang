@@ -199,11 +199,12 @@ Cards.prototype = {
         return this.cards.length ? card.getHeight() : 0;
     },
 
-    append: function(card) {
+    append: function(card, info) {
         this.tagRoot.appendChild(card.tagRoot);
         this.cards.push(card);
-        card.transitionZ(this.z + Cards.Depth);
+        card.transitionZ(card.z + this.cards.length - 1);
         if (!this.visible) card[this.infoFunc]();
+        else card[this.infoFunc](info);
     },
 
     draw: function(info) {
@@ -216,7 +217,7 @@ Cards.prototype = {
 
         if (!card) card = this.cards.pop();
         this.tagRoot.removeChild(card.tagRoot);
-        return card.unactionable().setInfo(info);
+        return card.unactionable();
     }
 }
 
