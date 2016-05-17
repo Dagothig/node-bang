@@ -14,9 +14,19 @@ function Card() {
 
     this.tagBack = ui.create('div', 'back', this.tagRoot);
 
+    this.onMoveFinish = () => {
+        this.tagRoot.classList.remove('moving');
+        if (this.tempZ !== null) {
+            this.tagRoot.style.zIndex = this.z;
+            this.tempZ = null;
+        }
+    }
+
+    this.tempZ = null;
     this.move(0, 0, 0, 0);
 }
 Card.hoverScale = 1.5;
+Card.transitionTime = 3500;
 Card.prototype = {
     constructor: Card,
 
@@ -58,7 +68,6 @@ Card.prototype = {
             this.tagFaceTypeRank.className = 'rank';
             this.unknown();
         }
-
 
         return this;
     },
@@ -131,16 +140,28 @@ Card.prototype = {
         while (angle > Math.PI) angle -= Math.TWO_PI;
         while (angle < -Math.PI) angle += Math.TWO_PI;
         angle = (angle !== undefined && angle !== null) ? angle : this.angle;
-
         x = Math.round(x);
         y = Math.round(y);
-        if (x !== this.x) this.tagRoot.style.left = (this.x = x) + 'px';
-        if (y !== this.y) this.tagRoot.style.top = (this.y = y) + 'px';
-        if (z !== this.z) this.tagRoot.style.zIndex = this.z = z;
-        if (angle !== this.angle) this.tagRoot.style.transform =
+        // we assume the z is an integer
+
+        if (x === this.x && y === this.y && z === this.z && angle === this.angle)
+            return this;
+
+        this.tagRoot.classList.add('moving');
+        this.tagRoot.style.left = (this.x = x) + 'px';
+        this.tagRoot.style.top = (this.y = y) + 'px';
+        this.z = z;
+        if (this.tempZ === null) this.tagRoot.style.zIndex = z;
+        this.tagRoot.style.transform =
             'scale(' + (1/Card.hoverScale) + ') ' +
             'rotateZ(' + (this.angle = angle) + 'rad) ';
+        setTimeout(this.onMoveFinish, Card.transitionTime);
 
+        return this;
+    },
+    transitionZ: function(z) {
+        this.tagRoot.style.zIndex = z;
+        this.tempZ = z;
         return this;
     },
 

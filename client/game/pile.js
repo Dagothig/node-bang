@@ -106,17 +106,17 @@ Pile.prototype = {
 
         this.pendingCards.push(card);
         let size = (this.size + this.pendingCards.length);
-        card.tagRoot.style.zIndex = this.z + Pile.sizeZ + size + 1;
-        requestAnimationFrame(() => {
-            if (this.info.length === undefined) card.setInfo();
+        card.transitionZ(this.z + Pile.depth);
+        setTimeout(() => {
+            if (this.info.length === undefined) card.unknown();
             card.move(
                 this.x,
                 this.y - size,
                 this.z + Pile.sizeZ + size + 1,
                 0
             );
-            setTimeout(() => this._completePendingCard(), 350);
-        });
+            setTimeout(() => this._completePendingCard(), Card.transitionTime);
+        }, 0);
     },
     _completePendingCard: function() {
         let card = this.pendingCards.splice(0, 1)[0];
@@ -143,7 +143,6 @@ Pile.prototype = {
 
         this.tagRoot.appendChild(this.topCard.tagRoot);
 
-        oldTop.move(oldTop.x, oldTop.y, oldTop.z * 2);
         return oldTop.setInfo(info).unactionable();
     }
 }

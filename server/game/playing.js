@@ -77,7 +77,7 @@ module.exports = new Phase('Playing', {
             distanceTo: function(players, to) {
                 var dist = Math.abs(players.indexOf(this) - players.indexOf(to));
                 dist = Math.min(dist, players.length - dist);
-                return dist + to.modifier('distance');
+                return dist + to.stat('distance');
             },
 
             stats: function() {

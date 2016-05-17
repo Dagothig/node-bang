@@ -4,10 +4,10 @@ var misc = aReq('server/misc'),
     TargetEvent = require('./target');
 
 function TargetRangeEvent(player, players, range, onTarget, onCancel, format) {
-    let alive = players.filter(p => p.alive && p !== player);
+    let alive = players.filter(p => p.alive);
     TargetEvent.call(this,
         player,
-        alive.filter(p => p.distanceTo(alive, player) <= range),
+        alive.filter(p => player !== p && player.distanceTo(alive, p) <= range),
         onTarget, onCancel, format
     );
 }

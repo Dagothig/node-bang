@@ -19,7 +19,7 @@ Game.prototype = {
     constructor: Game,
 
     handleGame: function(game, current) {
-        return ui.hide(this.tagGame);
+        //return ui.hide(this.tagGame);
 
         if (game) {
             if (this.useInterface) ui.show(this.tagGame);
@@ -46,7 +46,7 @@ Game.prototype = {
     },
 
     handleEvent: function(msg) {
-        return ui.hide(this.tagGame);
+        //return ui.hide(this.tagGame);
 
         this.gameEvents.push(msg);
         while (this.gameEvents.length > 10) this.gameEvents.shift();

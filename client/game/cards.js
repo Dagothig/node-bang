@@ -202,6 +202,7 @@ Cards.prototype = {
     append: function(card) {
         this.tagRoot.appendChild(card.tagRoot);
         this.cards.push(card);
+        card.transitionZ(this.z + Cards.Depth);
         if (!this.visible) card[this.infoFunc]();
     },
 

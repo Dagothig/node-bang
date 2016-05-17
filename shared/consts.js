@@ -6,8 +6,8 @@ module.exports = {
     maxPlayers: 8,
     gameStartTimer: 0,//10,
     characterChoices: 2,
-    characterPickMaxTime: 60,
-    rolePickMaxTime: 10,
+    characterPickMaxTime: 0,//60,
+    rolePickMaxTime: 0,//10,
     eventMaxTime: 600000,
 
     initCardMax: 5,

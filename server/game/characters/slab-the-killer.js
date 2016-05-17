@@ -35,7 +35,7 @@ module.exports = new Character("Slab the Killer", {
                     target.hand.discard(card2.id);
                     step.game.onGameEvent({
                         name: 'avoid',
-                        what: name,
+                        what: 'bang',
                         source: step.player.name,
                         target: target.name,
                         cards: [card1.format(), card2.format()]

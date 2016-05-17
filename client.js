@@ -17,6 +17,7 @@ settings.bind('saveToken', val => {
 var socket = io(),
     user,
     users;
+window.socket = socket;
 
 var roots = ui.many('body>*'),
     loader = ui.one('#loader'),
@@ -110,7 +111,7 @@ var on = (key, func) => socket.on(key, function() {
     icon.state.stuff = true;
     if (func) func.apply(this, arguments);
 });
-on('connect');
+on('connect', () => {});
 on('disconnect', () => {
     ui.hide(roots);
     ui.show(loader);
@@ -134,16 +135,19 @@ on(msgs.auth, msg => {
         login.handleAuth(msg);
         ui.hide(roots);
         ui.show(login.element);
+        login.name.focus();
     }
 });
 on(msgs.user, msg => {
     if (user && !msg) {
         ui.hide(roots);
         ui.show(login.element);
+        login.name.focus();
     }
     if (!user && msg) {
         ui.hide(roots);
         ui.show(connectedContainer);
+        lobby.message.focus();
     }
     user = msg;
     if (settings.saveToken) {
