@@ -21,6 +21,7 @@ misc.extend(Equipment, Barile, {
         onResolved(events('cardDraw', target)(
             target, step.phase.cards,
             card => {
+                // TODO; tell what card was flipped
                 step.phase.cards.discarded.push(card);
                 if (card.suit === this.avoidSuit) onSkip();
                 else onResolved();
