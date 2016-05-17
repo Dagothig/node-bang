@@ -47,6 +47,19 @@ module.exports = new Phase('Playing', {
                     this.splice(index, 1)[0] : null;
             },
             discard: function(cardId) {
+                if (!arguments.length) {
+                    let discarded = this.slice();
+                    this.length = 0;
+                    cards.discarded.push.apply(cards.discarded, discarded);
+                    game.onGameEvent({
+                        name: 'discard',
+                        from: 'equipped',
+                        player: player.name,
+                        cards: discarded.map(c => c.format())
+                    });
+                    return;
+                }
+
                 var card = this.remove(cardId);
                 if (card) {
                     cards.discarded.push(card);

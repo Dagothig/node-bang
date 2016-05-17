@@ -30,6 +30,8 @@ module.exports = new Character("Vulture Sam", {
         sam.hand.push.apply(sam.hand, player.equipped);
         player.equipped.length = 0;
 
-        handles.afterDeath(step, killer, player, amount, onSkip);
+        // Since the players hand will be empty afterwards anyway, we might as well
+        // just continue as usual
+        onResolved();
     }
 });

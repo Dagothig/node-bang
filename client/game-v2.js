@@ -118,6 +118,18 @@ Game.prototype = {
                 }
                 break;
 
+            case 'prigione':
+            case 'barile':
+                switch(msg.what) {
+                    case 'released':
+                    case 'imprisoned':
+                    case 'avoid':
+                    case 'fail':
+                        this.discard.append(this.pile.draw(msg.card), msg.card);
+                        break;
+                }
+                break;
+
             case 'emporio':
                 msg.cards.forEach(c => this.emporio.append(this.pile.draw(c), c));
                 break;

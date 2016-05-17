@@ -40,19 +40,10 @@ handleEvent('beforeDeath',
     step.game.players.filter(p => p.alive || p === player),
     [step, killer, player, amount],
     () => {
-        let discarded = step.phase.cards.discarded;
+        player.hand.discard();
+        player.equipped.discard();
 
-        discarded.push.apply(discarded, player.hand);
-        player.hand.length = 0;
-
-        discarded.push.apply(discarded, player.equipped);
-        player.equipped.length = 0;
-
-
-        step.game.onGameEvent({
-            name: 'dead',
-            player: player.name
-        });
+        step.game.onGameEvent({ name: 'dead', player: player.name });
 
         handleAfterDeath(step, killer, player, amount, onResolved);
     },
@@ -74,7 +65,7 @@ var handleDying = (step, killer, player, amount, onResolved) => {
         // When a beer is played, we check if we are dying again
         card => {
             card.handlePlay(step, onResolved);
-            handleDying(step, killer, player, onResolved);
+            handleDying(step, killer, player, amount, onResolved);
         },
         // Player didn't drink beer; they are dead
         () => handleBeforeDeath(step, killer, player, amount, onResolved),

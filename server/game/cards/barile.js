@@ -21,10 +21,13 @@ misc.extend(Equipment, Barile, {
         onResolved(events('cardDraw', target)(
             target, step.phase.cards,
             card => {
-                // TODO; tell what card was flipped
                 step.phase.cards.discarded.push(card);
-                if (card.suit === this.avoidSuit) onSkip();
-                else onResolved();
+
+                if (card.suit === this.avoidSuit) {
+                    this.handleAvoided(step, card, target, onResolved, onSkip);
+                } else {
+                    this.handleShot(step, card, target, onResolved, onSkip);
+                }
             },
             () => onResolved(),
             () => ({
@@ -34,6 +37,28 @@ misc.extend(Equipment, Barile, {
                 barile: this.format()
             })
         ));
+    },
+    handleAvoided: function(step, card, target, onResolved, onSkip) {
+        step.game.onGameEvent({
+            name: 'barile',
+            what: 'avoid',
+            source: step.player.name,
+            target: target.name,
+            barile: this.format(),
+            card: card.format()
+        });
+        onSkip();
+    },
+    handleShot: function(step, card, target, onResolved, onSkip) {
+        step.game.onGameEvent({
+            name: 'barile',
+            what: 'fail',
+            source: step.player.name,
+            target: target.name,
+            barile: this.format(),
+            card: card.format()
+        });
+        onResolved();
     }
 });
 
