@@ -20,7 +20,7 @@ misc.extend(Equipment, Dynamite, {
     beforeDraw: function(step, onResolved, onSkip) {
         if (!step.player.equipped.find(c => c === this)) return onResolved();
 
-        onResolved(events('cardDraw', step.player)(
+        onResolved(events('cardDraw', step.player, step)(
             step.player, step.phase.cards,
             card => this.handleCard(step, card, onResolved, onSkip),
             // Cannot cancel this draw

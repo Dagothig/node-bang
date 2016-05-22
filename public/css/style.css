@@ -310,7 +310,7 @@ textarea {
 
 /* === [LOBBY] === */
 #lobby {
-    width: 20%;
+    width: 18%;
     min-width: 11.5rem;
     font-size: 0.8rem;
 }
@@ -438,7 +438,7 @@ textarea {
     z-index: 1;
 }
 #menu .container {
-    width: 20%;
+    width: 18%;
     min-width: 11.5rem;
     font-size: 0.8rem;
     background: #fff;
@@ -449,20 +449,53 @@ textarea {
 }
 
 /* === [CARDS] === */
-#game-v2 {
+#game {
     background-color: #2E4859;
 }
-#game-v2 .container {
+#game .container {
     width: 100%;
     height: 100%;
     min-width: 40em;
     min-height: 40em;
 }
 
+.info-plate {
+    background-color: #efe8e0;
+    font-size: 0.8em;
+
+    margin-top: -1.75em;
+    padding: 0.25em;
+    position: absolute;
+    transition:
+        left 0.35s ease-in-out,
+        top 0.35s ease-in-out;
+    border: solid 0.25em #853;
+    border-radius: 0.5em;
+}
+.info-plate.turn {
+    box-shadow: 0 0 0.25em 0.25em #08f;
+}
+.info-plate .name, .info-plate .life {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 1em;
+    line-height: 1em;
+}
+.info-plate .name {
+    font-weight: 800;
+}
+.info-plate .life {
+    font-family: FontAwesome;
+    margin-top: 0.5em;
+    letter-spacing: 0.1em;
+    color: red;
+}
+
 input.cancel-btn {
-    left: 50%;
+    left: 0;
     bottom: 0;
-    margin-left: -4em;
+    margin-left: 0.5em;
     margin-bottom: 0.5em;
     z-index: 5000;
 
@@ -493,8 +526,6 @@ input.cancel-btn:not(:disabled) {
 input.cancel-btn:not(:disabled):hover {
     background-color: #d83;
     border-color: #853;
-    box-shadow: 0 0 0.25em 0.25em #08f;
-    animation: none;
 }
 input.cancel-btn:active {
     background-color: #c9772d;
@@ -521,19 +552,28 @@ input.cancel-btn:active {
     transform-origin: center;
     perspective: 40em;
 }
-.card.visible:not(.moving):hover, .card.known:not(.moving):hover {
+.card.visible:not(.moving):hover,
+.card.known:not(.moving):hover {
+    transition:
+        left 0.35s ease-in-out,
+        top 0.35s ease-in-out,
+        0.25s transform 0.35s ease-in-out;
+
     transform: scale(1.0) rotateZ(0deg) !important;
     /* Yes it is absurdly large; there is a lot of z-index fudging in the code */
     z-index: 10000 !important;
 }
-.card.visible .face, .card.known:hover .face {
+.card.visible .face,
+.card.known:hover .face {
     transform: rotateY(360deg);
 }
-.card.visible .back, .card.known:hover .back {
+.card.visible .back,
+.card.known:hover .back {
     transform: rotateY(180deg);
 }
 
-.card .face, .card .back {
+.card .face,
+.card .back {
     position: absolute;
     left: 0;
     right: 0;
@@ -544,7 +584,9 @@ input.cancel-btn:active {
     transition: transform 0.35s ease-in-out;
     backface-visibility: hidden;
 }
-.card.actionable .face, .card.actionable .back, .card-pile .bottom.actionable {
+.card.actionable .face,
+.card.actionable .back,
+.card-pile .bottom.actionable {
     box-shadow: 0 0 0.25em 0em #08f;
     animation: actionable 1s infinite ease-in-out;
     cursor: pointer;
@@ -712,6 +754,15 @@ input.cancel-btn:active {
     background-color: #643;
 }
 
-.emporio {
+.choice {
     z-index: 1;
+}
+
+.emporio {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 7.5em;
+    margin-top: -3.75em;
+    background-color: #f80;
 }

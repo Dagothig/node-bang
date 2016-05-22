@@ -6,7 +6,7 @@ var misc = aReq('server/misc'),
 function TargetOthersEvent(player, players, onTarget, onCancel, format) {
     TargetEvent.call(this,
         player,
-        players.filter(p => p.alive && p != player),
+        players.filter(p => p.alive && p !== player),
         onTarget, onCancel, format
     );
 }

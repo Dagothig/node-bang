@@ -7,11 +7,12 @@ var misc = aReq('server/misc'),
     Barile = aReq('server/game/cards/barile');
 
 module.exports = new Character("Jourdonnais", {
-    permaBarile: new Barile(),
-    beforeBangResponse: function(step, card, target, onResolved, onSkip) {
-        if (target.character !== this) return onResolved();
-
-        return this.permaBarile
-            .beforeBangResponse(step, card, target, onResolved, onSkip, true);
+    barile: new Barile(),
+    beforeBangResponse: function(step, card, target, attack, onResolved, onSkip) {
+        return target.character === this ?
+            this.barile.tryAvoid(
+                step, card, target, attack, onResolved, onSkip
+            ) :
+            onResolved();
     }
 });

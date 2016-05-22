@@ -164,13 +164,13 @@ Cards.prototype = {
         cardSize.y /= Card.hoverScale;
 
         let arcLength = cardSize.x * (this.cards.length - 1);
-        let arcRadius = arcLength / arcAngle;
+        let arcRadius = arcLength / this.arcAngle;
 
-        let arcPerCard = arcAngle / this.cards.length;
+        let arcPerCard = this.arcAngle / this.cards.length;
         this.cards.forEach((card, cI) => {
             let shiftedI = (cI - (this.cards.length - 1) / 2) * this.density;
-            let arcX = Math.cos(arcPerCard * shiftedI + angle - Math.HALF_PI);
-            let arcY = Math.sin(arcPerCard * shiftedI + angle - Math.HALF_PI);
+            let arcX = Math.cos(arcPerCard * shiftedI + this.angle - Math.HALF_PI);
+            let arcY = Math.sin(arcPerCard * shiftedI + this.angle - Math.HALF_PI);
             card.move(
                 this.x +
                 this.dirX * arcRadius +
@@ -182,7 +182,7 @@ Cards.prototype = {
 
                 this.z + cI,
 
-                angle + arcPerCard * shiftedI
+                this.angle + arcPerCard * shiftedI
             );
         });
 

@@ -126,7 +126,7 @@ Pile.prototype = {
 
         this.pendingCards.push(card);
         let size = (this.size + this.pendingCards.length);
-        card.transitionZ(this.z + Pile.depth);
+        card.transitionZ(Math.max(this.z + Pile.depth, card.z));
         requestAnimationFrame(() => setTimeout(() => {
             if (this.info.length === undefined) card.unknown();
             else card.setInfo(info);

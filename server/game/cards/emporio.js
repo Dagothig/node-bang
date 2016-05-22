@@ -15,7 +15,8 @@ misc.extend(Card, Emporio, {
         var cards = step.phase.cards.draw(alive.length);
 
         step.game.onGameEvent({
-            name: 'emporio',
+            name: 'choice',
+            for: 'emporio',
             cards: cards.map(c => c.format())
         });
 
@@ -30,7 +31,8 @@ misc.extend(Card, Emporio, {
                 player.hand.push(misc.remove(cards, card));
                 step.game.onGameEvent({
                     name: 'draw',
-                    from: 'emporio',
+                    from: 'choice',
+                    for: 'emporio',
                     player: player.name,
                     card: card.format()
                 });
@@ -41,7 +43,8 @@ misc.extend(Card, Emporio, {
             undefined,
             // format
             () => ({
-                what: 'emporio',
+                what: 'choice',
+                for: 'emporio',
                 cards: cards.map(c => c.format())
             })
         ));

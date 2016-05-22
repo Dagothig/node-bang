@@ -10,18 +10,19 @@ var handleEvent = (eventName, players, recurseArgs, onFollowing, onResolved) => 
     let handlers = [];
     players.forEach(p => handlers.push.apply(handlers, p.handlers(eventName)));
 
-    let handlePile = args => {
+    let handlePile = () => {
         let next = handlers.pop();
-        if (next) next[eventName].apply(next, args);
-        else if(onFollowing) onFollowing();
+        if (next) next[eventName].apply(next, recurseArgs);
+        else if(onFollowing) onFollowing.apply(null, recurseArgs);
         else onResolved();
     }
-    recurseArgs.push(event => event ?
-        onResolved(event) :
-        handlePile(recurseArgs)
+    recurseArgs.push(
+        // onResolved
+        event => event ? onResolved(event) : handlePile(),
+        // onSkip
+        onResolved
     );
-    recurseArgs.push(onResolved);
-    handlePile(recurseArgs);
+    handlePile();
 };
 
 var handleAfterDeath = (step, killer, player, amount, onResolved) =>
@@ -60,13 +61,14 @@ var handleDying = (step, killer, player, amount, onResolved) => {
         return;
     }
 
-    onResolved(events('cardType', player)(
+    onResolved(events('cardType', player, step)(
         player, Beer,
         // When a beer is played, we check if we are dying again
-        card => {
-            card.handlePlay(step, onResolved);
-            handleDying(step, killer, player, amount, onResolved);
-        },
+        // (we override the onResolved so that events are still properly handled)
+        card => card.handlePlay(step, event => event ?
+            onResolved(event) :
+            handleDying(step, killer, player, amount, onResolved)
+        ),
         // Player didn't drink beer; they are dead
         () => handleBeforeDeath(step, killer, player, amount, onResolved),
         // Format
@@ -93,33 +95,53 @@ var handleDamage = (step, source, target, amount, onResolved) => {
     );
 };
 
-var handleAttack = (name, step, card, target, avoidCardType, onResolved) =>
-handleEvent('before' + name + 'Response',
-    step.game.players.filter(p => p.alive),
-    [step, card, target],
-    () => onResolved(events('cardType', target)(
-        target, avoidCardType,
-        // onCard; damage avoided
-        card => {
-            target.hand.discard(card.id);
-            step.game.onGameEvent({
-                name: 'avoid',
-                what: name,
+var handleAttackAvoid = (
+    name, step, card, target, avoidCards, avoid, avoidCardType, onResolved
+) => {
+    if (avoidCards.length >= avoid) {
+        avoidCards.forEach(card => target.hand.discard(card.id));
+        step.game.onGameEvent({
+            name: 'avoid',
+            what: name,
+            source: step.player.name,
+            target: target.name,
+            cards: avoidCards.map(c => c.format())
+        });
+        onResolved();
+    } else {
+        onResolved(events('cardType')(
+            target, avoidCardType,
+            // onCard; consider the card for the avoiding
+            avoidCard => {
+                avoidCards.push(avoidCard);
+                handleAttackAvoid(name, step, card, target, avoidCards, avoid, avoidCardType, onResolved);
+            },
+            // onCancel; the damage goes through
+            () => handleDamage(step, step.player, target, 1, onResolved),
+            // format
+            () => ({
+                name: name,
                 source: step.player.name,
                 target: target.name,
                 card: card.format()
-            });
-            onResolved();
-        },
-        // onCancel; damage goes through
-        () => handleDamage(step, step.player, target, 1, onResolved),
-        () => ({
-            name: name,
-            source: step.player.name,
-            target: target.name,
-            card: card.format()
-        })
-    )),
+            })
+        ).filterCards(card => avoidCards.indexOf(card) === -1));
+    }
+};
+
+var handleAttack = (name, step, card, target, avoidCardType, onResolved) =>
+handleEvent('before' + name + 'Response',
+    step.game.players.filter(p => p.alive),
+    [step, card, target, {
+        avoid: 0,
+        required: step.player.stat(name.toLowerCase() + 'Avoid')
+    }],
+    // onFollowing
+    (step, card, target, attack) => handleAttackAvoid(name, step, card, target,
+        [], attack.required - attack.avoid,
+        avoidCardType,
+        onResolved
+    ),
     onResolved
 );
 

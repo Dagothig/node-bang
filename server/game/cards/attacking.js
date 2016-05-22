@@ -7,6 +7,8 @@ var handleBang = (step, card, target, onResolved) =>
     handles.attack('Bang', step, card, target, Mancato, onResolved);
 var handleIndians = (step, card, target, onResolved) =>
     handles.attack('Indians', step, card, target, Bang, onResolved);
+    var handleGatling = (step, card, target, onResolved) =>
+    handles.attack('Gatling', step, card, target, Mancato, onResolved);
 
 function Bang(suit, rank) {
     Card.call(this, 'bang', suit, rank);
@@ -43,7 +45,7 @@ misc.extend(Card, Gatling, {
         step.player.hand.discard(this.id);
         onResolved(events('composed')(
             step.game.players.filter(p => p.alive && p !== step.player),
-            (other, onSubResolved) => handleBang(step, this, other, onSubResolved),
+            (other, onSubRes) => handleGatling(step, this, other, onSubRes),
             onResolved
         ));
     }

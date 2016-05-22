@@ -6,14 +6,15 @@ var ui = require('../ui'),
 function Player() {
     this.tagRoot = ui.create('div');
 
+    this.infoPlate = ui.create('div', 'info-plate', this.tagRoot);
+    this.infoName = ui.create('div', 'name', this.infoPlate);
+    this.infoLife = ui.create('div', 'life', this.infoPlate);
+
     this.equipped = new Cards('equipped');
     this.tagRoot.appendChild(this.equipped.tagRoot);
 
     this.role = new Card();
     this.tagRoot.appendChild(this.role.tagRoot);
-
-    this.life = new Card().setCharacter();
-    this.tagRoot.appendChild(this.life.tagRoot);
 
     this.character = new Card();
     this.tagRoot.appendChild(this.character.tagRoot);
@@ -23,20 +24,25 @@ function Player() {
 
     this.x = this.y = this.z = 0;
 }
-Player.equippedShift = -0.4;
-Player.handShift = 0.1;
-Player.characterShift = 0.4;
+// The shits are scientifically calculated to be centered
+Player.equippedShift = -0.525;
+Player.handShift = 0.075;
+Player.characterShift = 0.275;
+Player.infoShift = 0.775;
 // We consider 1 depth per card, 10 per cards for a total of 23
 Player.equippedZ = 0;
 Player.roleZ = Player.equippedZ + Cards.depth;
-Player.lifeZ = Player.roleZ + 1;
-Player.characterZ = Player.lifeZ + 1;
+Player.characterZ = Player.roleZ + 1;
 Player.handZ = Player.characterZ + 1;
-Player.depth = Player.handZ + Cards.depth;
+Player.infoPlateZ = Player.handZ + Cards.depth;
+Player.depth = Player.infoPlateZ + 1;
 Player.prototype = {
     constructor: Player,
 
-    setInfo: function(playerInfo) {
+    setInfo: function(playerInfo, turn) {
+
+        this.infoName.innerHTML = playerInfo.name;
+
         if (playerInfo.hand) {
             this.hand.name = 'hand' + playerInfo.name;
             this.hand.infoFunc = 'setInfo';
@@ -46,7 +52,9 @@ Player.prototype = {
             this.hand.infoFunc = 'setCharacter';
             ui.show(this.hand.tagRoot);
         } else ui.hide(this.hand.tagRoot);
-        this.hand.setInfo((playerInfo.hand && playerInfo.hand.cards) || playerInfo.characters);
+        this.hand.setInfo(
+            (playerInfo.hand && playerInfo.hand.cards) || playerInfo.characters
+        );
 
         if (playerInfo.equipped) {
             this.equipped.name = 'equipped' + playerInfo.name;
@@ -59,10 +67,19 @@ Player.prototype = {
         else
             this.character.setCharacter();
 
+        this.infoLife.innerHTML = '';
         if (playerInfo.life) {
             this.lifeLevel = playerInfo.life;
-            ui.show(this.life.tagRoot);
-        } else ui.hide(this.life.tagRoot);
+            for (let i = 0; i < playerInfo.stats.life; i++)
+                this.infoLife.innerHTML +=
+                    (i < playerInfo.life ? "\uf004" : "\uf08a");
+        }
+
+        if (turn && (turn.player === playerInfo.name)) {
+            this.infoPlate.classList.add('turn');
+        } else {
+            this.infoPlate.classList.remove('turn');
+        }
 
         this.role.setRole(playerInfo.role);
 
@@ -109,9 +126,23 @@ Player.prototype = {
         let xDirY = yDirX;
         let rotAngle = angle - Math.HALF_PI;
 
-        let xShift = -this.character.getWidth();
+        let xShift = -this.character.getWidth() / 2;
+        let cHeight = this.character.getHeight();
 
-        let yHandShift = this.hand.getHeight() * Player.handShift;
+        let yInfoShift = cHeight * Player.infoShift;
+        ui.move(this.infoPlate,
+            this.x +
+            yDirX * yInfoShift,
+
+            this.y +
+            yDirY * yInfoShift,
+
+            this.z + Player.infoPlateZ
+        );
+        this.infoPlate.style.marginLeft = (-this.infoPlate.offsetWidth / 2) + 'px';
+        this.infoPlate.style.transform = 'rotateZ(' + rotAngle + 'rad)';
+
+        let yHandShift = cHeight * Player.handShift;
         this.hand.arcMove(
             this.x +
             xDirX * xShift +
@@ -127,18 +158,23 @@ Player.prototype = {
             Math.QUARTER_PI
         );
 
-        let yEquipShift = this.equipped.getHeight() * Player.equippedShift;
+        let yEquipShift = cHeight * Player.equippedShift;
         this.equipped.move(
-            this.x + yDirX * yEquipShift,
-            this.y + yDirY * yEquipShift,
+            this.x +
+            yDirX * yEquipShift,
+
+            this.y +
+            yDirY * yEquipShift,
+
             this.z + Player.equippedZ,
+
             rotAngle
         );
 
         let xStatShift =
             this.hand.getWidth() * 0.5 +
-            this.character.getWidth() * 0.35;
-        let yStatShift = this.character.getHeight() * Player.characterShift;
+            this.character.getWidth() * 0.25;
+        let yStatShift = cHeight * Player.characterShift;
 
         this.character.move(
             this.x +
@@ -154,30 +190,8 @@ Player.prototype = {
             rotAngle
         );
 
-        let lifeHeight = this.life.getHeight();
-        lifeHeight -= lifeHeight / 15 + lifeHeight / 25;
-
-        let lifeShift =
-            this.lifeLevel * lifeHeight / 5 -
-            lifeHeight / 2 +
-            this.character.getWidth() / 2;
-
-        this.life.move(
-            this.x +
-            xDirX * (xShift + xStatShift + lifeShift) +
-            yDirX * yStatShift,
-
-            this.y +
-            xDirY * (xShift + xStatShift + lifeShift) +
-            yDirY * yStatShift,
-
-            this.z + Player.lifeZ,
-
-            angle
-        );
-
         let xRoleShift = this.role.getWidth() * 0.1;
-        let yRoleShift = -this.role.getHeight() * 0.2;
+        let yRoleShift = -cHeight * 0.2;
 
         // The role is the card the most un
         this.role.move(
@@ -197,8 +211,8 @@ Player.prototype = {
         return this;
     },
     getHeight: function() {
-        return this.character.getHeight() *
-            (Player.characterShift - Player.equippedShift + 1);
+        // The division per two is roughly the overlap
+        return this.infoPlate.offsetHeight / 2 + this.character.getHeight() * (Player.characterShift - Player.equippedShift + 1);
     }
 }
 

@@ -5,8 +5,6 @@ var msgs = require('./shared/messages'),
 var strat = require('./client/local-storage-strat');
 var settings = require('./client/settings')(strat, {
     saveToken: [true, 'bool', 'user'],
-    sound: [false, 'bool', 'user'],
-    newInterface: [true, 'bool', 'user'],
     name: ['', 'str', 'sys'],
     token: ['', 'str', 'sys']
 });
@@ -66,15 +64,6 @@ var game = require('./client/game.js')(settings,
         });
     }
 );
-var gameV2 = require('./client/game-v2.js')(settings,
-    function onAction(action, arg) {
-        socket.emit(msgs.action, {
-            token: user.token,
-            action: action,
-            arg: arg
-        });
-    }
-);
 
 var icon = require('./client/icon.js')(
     ['favicon.ico', 'favicon-alert.ico'],
@@ -84,13 +73,13 @@ icon.state = {
     _focus: false,
     _stuff: false,
 
-    set focus(focus) {
+    set focus(focus) {/*
         this._focus = focus;
         icon.flash((this._stuff = (this._stuff && !focus)) && user);
-    },
-    set stuff(stuff) {
+    */},
+    set stuff(stuff) {/*
         icon.flash((this._stuff = (stuff && !this._focus)) && user);
-    }
+    */}
 };
 
 window.onfocus = () => icon.state.focus = true;
@@ -168,13 +157,7 @@ on(msgs.joining, msg => pregame.handleJoining(user, msg));
 on(msgs.game, msg => {
     pregame.handleGame(msg, user);
     game.handleGame(msg, user);
-    gameV2.handleGame(msg, user);
-    if (msg && msg.turn && msg.turn.step && msg.turn.step.event) {
+    if (msg && msg.turn && msg.turn.step && msg.turn.step.event)
         game.handleEvent(msg.turn.step.event);
-        gameV2.handleEvent(msg.turn.step.event);
-    }
 });
-on(msgs.event, msg => {
-    game.handleEvent(msg);
-    gameV2.handleEvent(msg);
-});
+on(msgs.event, msg => game.handleEvent(msg));

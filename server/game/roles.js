@@ -7,22 +7,19 @@ roles = {
         lifeModifier: 1,
         initCardsModifier: 1,
         afterDeath: function(step, killer, player, amount, onResolved, onSkip) {
-            if (killer && killer.role === this &&
-                player && player.role === roles.deputy) {
+            if (!killer || !player || killer === player) return onResolved();
+
+            if (killer.role === this && player.role === roles.deputy) {
                 killer.hand.discard();
             }
-            onResolved();
-        }
-    }),
-    deputy: new Role("Deputy", "Unknown", {}),
-    outlaw: new Role("Outlaw", "Unknown", {
-        afterDeath: function(step, killer, player, amount, onResolved, onSkip) {
-            if (killer && player && player.role === this) {
+            if (player.role === roles.outlaw) {
                 killer.hand.drawFromPile(3);
             }
             onResolved();
         }
     }),
+    deputy: new Role("Deputy", "Unknown", {}),
+    outlaw: new Role("Outlaw", "Unknown", {}),
     renegade: new Role("Renegade", "Unknown", {})
 };
 Object.keys(roles).forEach(key => roles[key].key = key);

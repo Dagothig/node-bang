@@ -8,28 +8,33 @@ var misc = aReq('server/misc'),
     events = aReq('server/game/events');
 
 module.exports = new Character("Jesse Jones", {
+    priority: -1,
     beforeDraw: function(step, onResolved, onSkip) {
         if (step.player.character !== this) return onResolved();
 
-        let self = this;
-        onResolved(events('simple')(
-            step.player, actions.draw, ['pile', 'player'],
-            function(p, arg) {
-                if (arg === 'pile') onResolved();
-                else if (arg === 'player')
-                    self.handleSteal(step, onResolved, onSkip);
-            }
-        ));
-    },
-    handleSteal: function(step, onResolved, onSkip) {
-        onResolved(events('target')(
-            step.player, step.game.players
-                .filter(p => p !== step.player && p.alive && p.hand.length),
-            target => {
+        onResolved(misc.merge(events('event')(
+            step.player,
+            [ // Choices
+                new Choice(actions.draw, ['pile']),
+                new Choice(actions.target,
+                    step.game.players.filter(p => p.alive && p !== step.player),
+                    t => t.name
+                )
+            ],
+            // format
+            () => ({
+                name: 'CardsDrawEvent',
+                for: 'Jesse Jones'
+            })
+        ), {
+            handleDraw: function(player) {
+                player.hand.drawFromPile(2);
+                onSkip();
+            },
+            handleTarget: function(player, target) {
                 let card = misc.spliceRand(target.hand);
-                step.player.hand.push(card);
-                step.player.hand.drawFromPile();
-                // TODO; don't reveal the id of the card
+                player.hand.push(card);
+                player.hand.drawFromPile();
                 step.game.onGameEvent({
                     name: 'draw',
                     from: 'hand',
@@ -38,8 +43,7 @@ module.exports = new Character("Jesse Jones", {
                     card: card.format()
                 });
                 onSkip();
-            },
-            () => this.beforeDraw(step, onResolved, onSkip)
-        ));
+            }
+        }));
     }
 });

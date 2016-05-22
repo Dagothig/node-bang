@@ -14,20 +14,24 @@ misc.extend(Equipment, Barile, {
         });
     },
     getTarget: events('targetSelf'),
-    beforeBangResponse: function(step, card, target, onResolved, onSkip, skipCheck) {
-        if (!skipCheck && !target.equipped.find(c => c === this))
+    beforeBangResponse: function(step, card, target, attack, onResolved, onSkip) {
+        if (!target.equipped.find(c => c === this))
             return onResolved();
-
-        onResolved(events('cardDraw', target)(
+        Barile.prototype.tryAvoid.apply(this, arguments);
+    },
+    tryAvoid: function(step, card, target, attack, onResolved, onSkip) {
+        if (attack.avoid === attack.required) return onResolved();
+        onResolved(events('cardDraw', target, step)(
             target, step.phase.cards,
             card => {
                 step.phase.cards.discarded.push(card);
 
-                if (card.suit === this.avoidSuit) {
-                    this.handleAvoided(step, card, target, onResolved, onSkip);
-                } else {
-                    this.handleShot(step, card, target, onResolved, onSkip);
-                }
+                if (card.suit === this.avoidSuit) this.handleAvoided(
+                    step, card, target, attack, onResolved, onSkip
+                );
+                else this.handleShot(
+                    step, card, target, attack, onResolved, onSkip
+                );
             },
             () => onResolved(),
             () => ({
@@ -38,7 +42,8 @@ misc.extend(Equipment, Barile, {
             })
         ));
     },
-    handleAvoided: function(step, card, target, onResolved, onSkip) {
+    handleAvoided: function(step, card, target, attack, onResolved, onSkip) {
+        attack.avoid++;
         step.game.onGameEvent({
             name: 'barile',
             what: 'avoid',
@@ -47,9 +52,9 @@ misc.extend(Equipment, Barile, {
             barile: this.format(),
             card: card.format()
         });
-        onSkip();
+        onResolved();
     },
-    handleShot: function(step, card, target, onResolved, onSkip) {
+    handleShot: function(step, card, target, attack, onResolved, onSkip) {
         step.game.onGameEvent({
             name: 'barile',
             what: 'fail',

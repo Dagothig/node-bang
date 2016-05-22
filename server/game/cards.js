@@ -128,6 +128,11 @@ var cards = [
 
     new Barile(suits.spades, ranks.king),
     new Barile(suits.spades, ranks.queen),
+    new Barile(suits.spades, ranks.ace),
+    new Barile(suits.spades, ranks.two),
+    new Barile(suits.spades, ranks.three),
+    new Barile(suits.spades, ranks.four),
+    new Barile(suits.spades, ranks.five),
 
     new Prigione(suits.hearts, ranks.four),
     new Prigione(suits.spades, ranks.jack),

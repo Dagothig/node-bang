@@ -11,14 +11,18 @@ function Diligenza(suit, rank) {
     Card.call(this, 'diligenza', suit, rank);
 }
 misc.extend(Card, Diligenza, {
-    handlePlay: function(step, onResolved) { handleDrawCard(step, this, 2, onResolved); }
+    handlePlay: function(step, onResolved) {
+        handleDrawCard(step, this, 2, onResolved);
+    }
 });
 
 function WellsFargo(suit, rank) {
     Card.call(this, 'wellsfargo', suit, rank);
 }
 misc.extend(Card, WellsFargo, {
-    handlePlay: function(step, onResolved) { handleDrawCard(step, this, 3, onResolved); }
+    handlePlay: function(step, onResolved) {
+        handleDrawCard(step, this, 3, onResolved);
+    }
 });
 
 module.exports = {
