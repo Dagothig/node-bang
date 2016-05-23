@@ -19,7 +19,11 @@ module.exports = new Character("Sid Ketchum", {
                 this.handleHeal(step, onResolved, onSkip) :
                 card.handlePlay(step, onSkip),
             // onCancel
-            () => step.finalize()
+            () => step.finalize(),
+            // format
+            () => ({
+                for: 'play'
+            })
         ));
     },
     handleHeal: function(step, onResolved, onSkip) {
@@ -36,9 +40,15 @@ module.exports = new Character("Sid Ketchum", {
                     step.player.heal(1);
                     onFinished();
                 },
-                onFinished
+                onFinished,
+                () => ({
+                    for: 'Sid Ketchum'
+                })
             )),
-            onFinished
+            onFinished,
+            () => ({
+                for: 'Sid Ketchum'
+            })
         ));
     }
 });

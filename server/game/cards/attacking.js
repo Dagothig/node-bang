@@ -1,3 +1,5 @@
+'use strict';
+
 var Card = aReq('server/game/cards/card'),
     events = aReq('server/game/events'),
     misc = aReq('server/misc'),
@@ -7,7 +9,7 @@ var handleBang = (step, card, target, onResolved) =>
     handles.attack('Bang', step, card, target, Mancato, onResolved);
 var handleIndians = (step, card, target, onResolved) =>
     handles.attack('Indians', step, card, target, Bang, onResolved);
-    var handleGatling = (step, card, target, onResolved) =>
+var handleGatling = (step, card, target, onResolved) =>
     handles.attack('Gatling', step, card, target, Mancato, onResolved);
 
 function Bang(suit, rank) {
@@ -43,11 +45,19 @@ function Gatling(suit, rank) {
 misc.extend(Card, Gatling, {
     handlePlay: function(step, onResolved) {
         step.player.hand.discard(this.id);
-        onResolved(events('composed')(
+        onResolved(misc.merge(events('composed')(
             step.game.players.filter(p => p.alive && p !== step.player),
             (other, onSubRes) => handleGatling(step, this, other, onSubRes),
             onResolved
-        ));
+        ), {
+            format: function(player) {
+                let formatted = this._reduce('format', player);
+                formatted.player = this.events
+                    .filter(ev => ev)
+                    .map(ev => ev.player.name);
+                return formatted;
+            }
+        }));
     }
 });
 
@@ -57,11 +67,19 @@ function Indians(suit, rank) {
 misc.extend(Card, Indians, {
     handlePlay: function(step, onResolved) {
         step.player.hand.discard(this.id);
-        onResolved(events('composed')(
+        onResolved(misc.merge(events('composed')(
             step.game.players.filter(p => p.alive && p !== step.player),
             (other, onSubRes) => handleIndians(step, this, other, onSubRes),
             onResolved
-        ));
+        ), {
+            format: function(player) {
+                let formatted = this._reduce('format', player);
+                formatted.player = this.events
+                    .filter(ev => ev)
+                    .map(ev => ev.player.name);
+                return formatted;
+            }
+        }));
     }
 });
 

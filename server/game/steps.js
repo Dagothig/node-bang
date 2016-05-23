@@ -118,7 +118,10 @@ Play.prototype = misc.merge(Object.create(Step.prototype), {
                 // onPlay
                 card => card.handlePlay(this, this.onResolved),
                 // onCancel
-                () => this.finalize()
+                () => this.finalize(),
+                () => ({
+                    for: 'play'
+                })
             )),
             // onResolved
             this.onResolved
@@ -146,7 +149,12 @@ Discard.prototype = misc.merge(Object.create(Step.prototype), {
             card => {
                 this.player.hand.discard(card.id);
                 this.start();
-            }
+            },
+            // onCancel
+            null,
+            () => ({
+                for: 'discard'
+            })
         ));
     }
 });

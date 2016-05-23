@@ -473,7 +473,7 @@ textarea {
     border-radius: 0.5em;
 }
 .info-plate.turn {
-    box-shadow: 0 0 0.25em 0.25em #08f;
+    box-shadow: 0 0 0 0.125em #08f;
 }
 .info-plate .name, .info-plate .life {
     display: block;
@@ -511,8 +511,6 @@ input.cancel-btn {
     background-color: #d83;
     border-color: #853;
     color: #853;
-
-    box-shadow: 0 0 0 0 #08f;
     transition: box-shadow 0.25s;
 }
 input.cancel-btn:disabled {
@@ -521,7 +519,7 @@ input.cancel-btn:disabled {
     color: #888;
 }
 input.cancel-btn:not(:disabled) {
-    animation: actionable 1s infinite  ease-in-out;
+    box-shadow: 0 0 0 0.125em #08f;
 }
 input.cancel-btn:not(:disabled):hover {
     background-color: #d83;
@@ -546,19 +544,15 @@ input.cancel-btn:active {
     transition:
         left 0.35s ease-in-out,
         top 0.35s ease-in-out,
-        transform 0.35s ease-in-out;
+        transform 0.35s ease-in-out,
+        z-index 0s;
 
     transform-style: preserve-3d;
     transform-origin: center;
     perspective: 40em;
 }
-.card.visible:not(.moving):hover,
-.card.known:not(.moving):hover {
-    transition:
-        left 0.35s ease-in-out,
-        top 0.35s ease-in-out,
-        0.25s transform 0.35s ease-in-out;
-
+.card.visible:not(.moving).hover,
+.card.known:not(.moving).hover {
     transform: scale(1.0) rotateZ(0deg) !important;
     /* Yes it is absurdly large; there is a lot of z-index fudging in the code */
     z-index: 10000 !important;
@@ -587,14 +581,8 @@ input.cancel-btn:active {
 .card.actionable .face,
 .card.actionable .back,
 .card-pile .bottom.actionable {
-    box-shadow: 0 0 0.25em 0em #08f;
-    animation: actionable 1s infinite ease-in-out;
+    box-shadow: 0 0 0 0.125em #08f;
     cursor: pointer;
-}
-@keyframes actionable {
-    0% { box-shadow: 0 0 0.25em 0em #08f; }
-    50% { box-shadow: 0 0 0.25em 0.25em #08f;  }
-    100% { box-shadow: 0 0 0.25em 0em #08f; }
 }
 
 .card .face {
@@ -765,4 +753,39 @@ input.cancel-btn:active {
     height: 7.5em;
     margin-top: -3.75em;
     background-color: #f80;
+}
+
+.event {
+    position: absolute;
+    width: 6em;
+    margin: 0.5em;
+    right: 0;
+    bottom: 0;
+    color: white;
+    text-align: center;
+}
+.event .player {
+    line-height: 1.1em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-size: 0.8em;
+    margin-bottom: 0.5em;
+}
+.event .reason {
+    font-size: 0.8em;
+    margin-bottom: 0.5em;
+}
+.event .type {
+    height: 6em;
+    padding: 0.25em;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    box-sizing: border-box;
+}
+.event .type.draw {
+    background-image: url("/imgs/draw.svg");
+}
+.event .type.choice {
+    background-image: url("/imgs/choose.svg");
 }

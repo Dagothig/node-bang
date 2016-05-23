@@ -285,13 +285,13 @@ Game.prototype = {
                 Math.pow(dirY * halfSize.y, 2)
             ) - centerSize - height, 0);
 
-            let shift = centerSize + height / 2 + remain * 0.75;
+            let shift = centerSize + height / 2 + remain * 0.9;
 
             p.move(
                 halfSize.x + dirX * shift,
                 halfSize.y + dirY * shift,
                 p.z, p.angle
-            )
+            );
         });
         let playersDepth = (this.players ? this.players.length : 0) * Player.depth;
 

@@ -30,7 +30,11 @@ module.exports = new Character("Calamity Janet", {
                 Bang.prototype.handlePlay.call(card, step, onSkip) :
                 card.handlePlay(step, onSkip),
             // onCancel
-            () => step.finalize()
+            () => step.finalize(),
+            // format
+            () => ({
+                for: 'play'
+            })
         ));
     }
 });

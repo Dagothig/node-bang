@@ -102,7 +102,7 @@ var handleAttackAvoid = (
         avoidCards.forEach(card => target.hand.discard(card.id));
         step.game.onGameEvent({
             name: 'avoid',
-            what: name,
+            for: name,
             source: step.player.name,
             target: target.name,
             cards: avoidCards.map(c => c.format())
@@ -120,7 +120,7 @@ var handleAttackAvoid = (
             () => handleDamage(step, step.player, target, 1, onResolved),
             // format
             () => ({
-                name: name,
+                for: name,
                 source: step.player.name,
                 target: target.name,
                 card: card.format()

@@ -35,7 +35,7 @@ misc.extend(Equipment, Barile, {
             },
             () => onResolved(),
             () => ({
-                name: 'barile',
+                for: 'barile',
                 source: step.player.name,
                 target: target.name,
                 barile: this.format()
