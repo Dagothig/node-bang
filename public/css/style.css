@@ -551,8 +551,8 @@ input.cancel-btn:active {
     transform-origin: center;
     perspective: 40em;
 }
-.card.visible:not(.moving).hover,
-.card.known:not(.moving).hover {
+.card.visible:not(.moving):hover,
+.card.known:not(.moving):hover {
     transform: scale(1.0) rotateZ(0deg) !important;
     /* Yes it is absurdly large; there is a lot of z-index fudging in the code */
     z-index: 10000 !important;

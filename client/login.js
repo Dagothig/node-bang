@@ -11,8 +11,7 @@ module.exports = function(settings, onLogin) {
     element.onsubmit = function() {
         name.value = name.value.trim();
         onLogin(name.value, password.value);
-        // TODO; clear password
-        //password.value = '';
+        password.value = '';
         return false;
     };
 

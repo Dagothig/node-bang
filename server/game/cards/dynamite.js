@@ -16,7 +16,6 @@ misc.extend(Equipment, Dynamite, {
             boomSuit: this.boomSuit
         });
     },
-    getTarget: events('targetSelf'),
     beforeDraw: function(step, onResolved, onSkip) {
         if (!step.player.equipped.find(c => c === this)) return onResolved();
 

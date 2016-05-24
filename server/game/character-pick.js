@@ -1,7 +1,7 @@
 var misc = aReq('server/misc'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),
-    consts = aReq('shared/consts'),
+    consts = aReq('server/consts'),
 
     actions = aReq('server/actions'),
 

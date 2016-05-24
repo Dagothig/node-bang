@@ -1,6 +1,5 @@
 var ui = require('./ui'),
     misc = require('./misc'),
-    consts = require('../shared/consts'),
     Card = require('./game/card'),
     Cards = require('./game/cards'),
     Pile = require('./game/pile'),

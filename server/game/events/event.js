@@ -2,7 +2,7 @@
 
 var misc = aReq('server/misc'),
     actions = aReq('server/actions'),
-    consts = aReq('shared/consts');
+    consts = aReq('server/consts');
 
 function Event(player, choices, formatExtra) {
     this.player = player;

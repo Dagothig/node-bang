@@ -2,7 +2,7 @@ var crypto = require('crypto'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),
     misc = aReq('server/misc'),
-    consts = aReq('shared/consts');
+    consts = aReq('server/consts');
 
 function User(name, password) {
     this.sockets = [];

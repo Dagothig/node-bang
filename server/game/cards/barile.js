@@ -13,7 +13,6 @@ misc.extend(Equipment, Barile, {
             avoidSuit: this.avoidSuit
         });
     },
-    getTarget: events('targetSelf'),
     beforeBangResponse: function(step, card, target, attack, onResolved, onSkip) {
         if (!target.equipped.find(c => c === this))
             return onResolved();

@@ -2,7 +2,7 @@ var log = aReq('server/log'),
     warn = aReq('server/warn'),
     msgs = aReq('shared/messages'),
     strings = aReq('shared/strings'),
-    consts = aReq('shared/consts'),
+    consts = aReq('server/consts'),
     validator = require('validator'),
     User = aReq('server/user'),
 

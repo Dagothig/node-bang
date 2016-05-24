@@ -1,7 +1,7 @@
 var log = aReq('server/log'),
     msgs = aReq('shared/messages'),
     strings = aReq('shared/strings'),
-    consts = aReq('shared/consts'),
+    consts = aReq('server/consts'),
     misc = aReq('server/misc'),
     Game = aReq('server/game/game');
 
