@@ -29,6 +29,7 @@ var handleAfterDeath = (step, killer, player, amount, onResolved) =>
 handleEvent('afterDeath',
     step.game.players.filter(p => p.alive || p === player),
     [step, killer, player, amount],
+    // onFollowing
     () => {
         if (player === step.player) step.phase.goToNextTurn(step.game);
         else onResolved();
@@ -40,6 +41,7 @@ var handleBeforeDeath = (step, killer, player, amount, onResolved) =>
 handleEvent('beforeDeath',
     step.game.players.filter(p => p.alive || p === player),
     [step, killer, player, amount],
+    // onFollowing
     () => {
         player.hand.discard();
         player.equipped.discard();
@@ -56,7 +58,9 @@ var handleDying = (step, killer, player, amount, onResolved) => {
         handleEvent('afterDamage',
             step.game.players.filter(p => p.alive),
             [step, killer, player, amount],
-            undefined, onResolved
+            // onFollowing
+            undefined,
+            onResolved
         );
         return;
     }
@@ -72,7 +76,7 @@ var handleDying = (step, killer, player, amount, onResolved) => {
         // Player didn't drink beer; they are dead
         () => handleBeforeDeath(step, killer, player, amount, onResolved),
         // Format
-        () => ({
+        p => ({
             name: 'dying',
             player: player.name,
             killer: killer ? killer.name : undefined
@@ -91,7 +95,9 @@ var handleDamage = (step, source, target, amount, onResolved) => {
     else handleEvent('afterDamage',
         step.game.players.filter(p => p.alive),
         [step, source, target, amount],
-        undefined, onResolved
+        // onFollowing
+        undefined,
+        onResolved
     );
 };
 
@@ -109,7 +115,7 @@ var handleAttackAvoid = (
         });
         onResolved();
     } else {
-        onResolved(events('cardType')(
+        onResolved(events('cardType', target, step)(
             target, avoidCardType,
             // onCard; consider the card for the avoiding
             avoidCard => {
@@ -119,7 +125,7 @@ var handleAttackAvoid = (
             // onCancel; the damage goes through
             () => handleDamage(step, step.player, target, 1, onResolved),
             // format
-            () => ({
+            p => ({
                 for: name,
                 source: step.player.name,
                 target: target.name,
@@ -137,7 +143,8 @@ handleEvent('before' + name + 'Response',
         required: step.player.stat(name.toLowerCase() + 'Avoid')
     }],
     // onFollowing
-    (step, card, target, attack) => handleAttackAvoid(name, step, card, target,
+    (step, card, target, attack) => handleAttackAvoid(
+        name, step, card, target,
         [], attack.required - attack.avoid,
         avoidCardType,
         onResolved

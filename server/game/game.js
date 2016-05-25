@@ -8,11 +8,11 @@ var crypto = require('crypto'),
     Player = aReq('server/game/player'),
     CharacterPick = aReq('server/game/character-pick');
 
-function Game(users, onGameUpdate, onGameEvent, onGameEnd) {
+function Game(users, onUpdate, onEvent, onEnd) {
     this.identifier = crypto.randomBytes(48).toString('hex');
-    this.onGameUpdate = onGameUpdate;
-    this.onGameEvent = onGameEvent;
-    this.onGameEnd = onGameEnd;
+    this.onGameUpdate = onUpdate;
+    this.onGameEvent = onEvent;
+    this.onGameEnd = onEnd;
     this.players = misc.shuffle(users.map(user => new Player(user)));
 }
 misc.merge(Game.prototype, {

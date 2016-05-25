@@ -131,13 +131,22 @@ module.exports = new Phase('Playing', {
         var cards = this.cards;
         player.hand = misc.merge(cards.draw(player.stat('initCards')), {
             drawFromPile: function(amount) {
-                cards.draw(amount||1).forEach(card => this.push(card));
-                game.onGameEvent({
+                amount = amount || 1;
+                let drawn = cards.draw(amount);
+                drawn.forEach(card => this.push(card));
+                let specific = {
                     name: 'draw',
                     from: 'pile',
                     player: player.name,
-                    amount: amount||1
-                });
+                    cards: drawn.map(c => c.format())
+                };
+                let unspecific = {
+                    name: 'draw',
+                    from: 'pile',
+                    player: player.name,
+                    amount: amount
+                };
+                game.onGameEvent(p => p === player ? specific : unspecific);
             },
             remove: function(cardId) {
                 var index = this.indexOf(this.find(card => card.id === cardId));
@@ -225,10 +234,7 @@ module.exports = new Phase('Playing', {
 
     format: function(game, player, formatted) {
         return misc.merge(formatted, {
-            turn: {
-                player: this.turn.player.name,
-                step: this.turn.step.format()
-            },
+            turn: this.turn.format(player),
             cards: {
                 pile: this.cards.length,
                 discard: this.cards.discarded.map(card => card.format())

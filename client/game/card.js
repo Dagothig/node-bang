@@ -28,7 +28,7 @@ function Card() {
     this.tempZ = null;
     this.move(0, 0, 0, 0);
 }
-Card.hoverScale = 1.7;
+Card.hoverScale = 1.5;
 Card.transitionTime = 350;
 Card.prototype = {
     constructor: Card,

@@ -12,14 +12,23 @@ module.exports = new Character("El Gringo", {
         if (source) {
             let card = misc.spliceRand(source.hand);
             if (card) { target.hand.push(card);
-                // TODO; don't reveal the id of the card
-                step.game.onGameEvent({
+                let specific = {
                     name: 'draw',
                     from: 'hand',
                     player: target.name,
                     target: source.name,
                     card: card.format()
-                });
+                };
+                let unspecific = {
+                    name: 'draw',
+                    from: 'hand',
+                    player: target.name,
+                    target: source.name,
+                    amount: 1
+                };
+                step.game.onGameEvent(player =>
+                    (p === source || p === target) ? specific : unspecific
+                );
             }
         }
 

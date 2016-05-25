@@ -1,3 +1,5 @@
+'use strict';
+
 var log = aReq('server/log'),
     actions = aReq('server/actions'),
     misc = aReq('server/misc'),
@@ -27,11 +29,11 @@ Step.prototype = {
             else onNull();
         }
     },
-    format: function() {
+    format: function(player) {
         return {
             name: this.name,
             event: (this.event && this.event.format) ?
-                this.event.format() : undefined
+                this.event.format(player) : undefined
         };
     },
     start: function() {},
@@ -55,7 +57,7 @@ Step.prototype = {
     },
     end: function() {},
     finalize: function() {
-        zombies = this.game.players.filter(p => p.zombie);
+        let zombies = this.game.players.filter(p => p.zombie);
         if (!zombies.length) return this.onFinished();
         this.kill(zombies.pop(), e => this.changeEvent(e, () => this.finalize()));
     }
@@ -79,12 +81,21 @@ Draw.prototype = misc.merge(Object.create(Step.prototype), {
             this.player, this.phase.cards, 2,
             cards => {
                 Array.prototype.push.apply(this.player.hand, cards);
-                this.game.onGameEvent({
+                let specific = {
+                    name: 'draw',
+                    from: 'pile',
+                    player: this.player.name,
+                    cards: cards.map(card => card.format())
+                };
+                let unspecific = {
                     name: 'draw',
                     from: 'pile',
                     player: this.player.name,
                     amount: 2
-                });
+                };
+                this.game.onGameEvent(p =>
+                    p === this.player ? specific : unspecific
+                );
                 this.handleAfterDraw(cards);
             }
         ));
@@ -119,7 +130,8 @@ Play.prototype = misc.merge(Object.create(Step.prototype), {
                 card => card.handlePlay(this, this.onResolved),
                 // onCancel
                 () => this.finalize(),
-                () => ({
+                // format
+                player => ({
                     for: 'play'
                 })
             )),
@@ -152,7 +164,8 @@ Discard.prototype = misc.merge(Object.create(Step.prototype), {
             },
             // onCancel
             null,
-            () => ({
+            // format
+            player => ({
                 for: 'discard'
             })
         ));

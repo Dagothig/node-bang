@@ -65,7 +65,9 @@ function startGame(io, users) {
         // On update
         () => users.forEach(user => user.emit(msgs.game, formattedGame(user))),
         // On event
-        msg => io.emit(msgs.event, msg),
+        msg => !(msg instanceof Function) ?
+            io.emit(msgs.event, msg) :
+            users.forEach(user => user.emit(msgs.event, msg(game.findPlayer(user)))),
         // On end
         () => {
             game = null;

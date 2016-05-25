@@ -203,6 +203,12 @@ Cards.prototype = {
         this.tagRoot.appendChild(card.tagRoot);
         this.cards.push(card);
         card.transitionZ(this.z + this.cards.length + 10000);
+        requestAnimationFrame(() =>
+            setTimeout(
+                () => this.visible ? card[this.infoFunc](info) : card.unknown(),
+                0
+            )
+        );
     },
 
     draw: function(info) {

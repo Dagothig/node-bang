@@ -15,6 +15,7 @@ function Pile(name) {
 
     this.pendingCards = [];
     this.pendingInfo = null;
+    ui.hide(this.tagSize, this.topCard.tagRoot);
 
     this.move(0, 0, 0);
 }

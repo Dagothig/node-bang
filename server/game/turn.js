@@ -31,6 +31,12 @@ misc.merge(Turn.prototype, {
         if (!this.step) return {};
         return this.step.actionsFor(player);
     },
+    format: function(player) {
+        return {
+            player: this.player.name,
+            step: this.step.format(player)
+        };
+    },
     handleAction: function(player, msg) {
         if (!this.step) return;
         this.step.handleAction(player, msg);

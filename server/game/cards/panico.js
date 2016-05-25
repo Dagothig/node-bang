@@ -1,3 +1,5 @@
+'use strict';
+
 var Card = aReq('server/game/cards/card'),
     events = aReq('server/game/events'),
     misc = aReq('server/misc');
@@ -26,14 +28,23 @@ misc.extend(Card, Panico, {
         step.player.hand.push(card);
         step.player.hand.discard(this.id);
 
-        // TODO; don't reveal the id of the card
-        step.game.onGameEvent({
+        let specific = {
             name: 'draw',
             from: from,
             player: step.player.name,
             target: target.name,
             card: card.format()
-        });
+        };
+        let unspecific = {
+            name: 'draw',
+            from: from,
+            player: step.player.name,
+            target: target.name,
+            amount: 1
+        };
+        step.game.onGameEvent(player =>
+            (player === step.player || player === target) ? specific : unspecific
+        );
 
         onResolved();
     }

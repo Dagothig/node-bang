@@ -228,6 +228,9 @@ form .form-group label:after {
     content: ":";
     margin: 0 0.25em;
 }
+form .form-group label[for] {
+    cursor: pointer;
+}
 input, textarea, input+.check {
     background: rgba(0, 0, 0, 0.05);
     padding: 0.75rem;

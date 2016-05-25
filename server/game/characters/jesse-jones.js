@@ -37,13 +37,23 @@ module.exports = new Character("Jesse Jones", {
                 let card = misc.spliceRand(target.hand);
                 player.hand.push(card);
                 player.hand.drawFromPile();
-                step.game.onGameEvent({
+                let specific = {
                     name: 'draw',
                     from: 'hand',
                     player: step.player.name,
                     target: target.name,
                     card: card.format()
-                });
+                };
+                let unspecific = {
+                    name: 'draw',
+                    from: 'hand',
+                    player: step.player.name,
+                    target: target.name,
+                    amount: 1
+                };
+                step.game.onGameEvent(p =>
+                    (p === step.player || p === target) ? specific : unspecific
+                );
                 onSkip();
             }
         }));
