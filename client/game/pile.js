@@ -74,7 +74,7 @@ Pile.prototype = {
     },
 
     _updateToInfo() {
-        if (this.info.length !== undefined) {
+        if (this.info && this.info.length !== undefined) {
             if (this.info.length) {
                 this.topCard.setInfo(this.info[this.info.length - 1]);
                 this.size = this.info.length;
@@ -128,7 +128,7 @@ Pile.prototype = {
         let size = (this.size + this.pendingCards.length);
         card.transitionZ(Math.max(this.z + Pile.depth, card.z + 1));
         requestAnimationFrame(() => setTimeout(() => {
-            if (this.info.length === undefined) card.unknown();
+            if (!this.info || this.info.length === undefined) card.unknown();
             else card.setInfo(info);
             card.move(
                 this.x,
@@ -142,7 +142,7 @@ Pile.prototype = {
     _completePendingCard: function() {
         let card = this.pendingCards.splice(0, 1)[0];
         this.tagRoot.removeChild(card.tagRoot);
-        if (this.info.length !== undefined) this.info.push(card.info);
+        if (this.info && this.info.length !== undefined) this.info.push(card.info);
         else this.info++;
         this._updateToInfo();
         this._updateToSize();
@@ -153,6 +153,7 @@ Pile.prototype = {
     },
 
     draw: function(info) {
+        this.unactionable();
         let oldTop = this.topCard;
         oldTop.tagRoot.classList.remove('top');
         this.tagRoot.removeChild(oldTop.tagRoot);
@@ -160,13 +161,12 @@ Pile.prototype = {
         this.topCard = new Card();
         this.topCard.tagRoot.classList.add('top');
 
-        if (this.info.length !== undefined) this.info.pop();
+        if (this.info && this.info.length !== undefined) this.info.pop();
         else this.info--;
         this.setInfo(this.info);
 
         this.tagRoot.appendChild(this.topCard.tagRoot);
 
-        this.unactionable();
         return oldTop;
     }
 }

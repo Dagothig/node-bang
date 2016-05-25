@@ -72,6 +72,7 @@ process.argv.slice(2)
                 param[index + 1].toUpperCase() +
                 param.slice(index + 2);
         }
+        if (consts[param] === undefined) return;
         if (Number.isInteger(consts[param])) value = Number.parseInt(value);
         log('Override const', param, ':', consts[param], '->', value);
         consts[param] = value;

@@ -84,6 +84,7 @@ function simpleTime(time) {
 
 function merge(to) {
     Array.from(arguments).slice(1).forEach(src => {
+        if (!src) return;
         Object.defineProperties(to, Object.keys(src).reduce((descrs, key) => {
             descrs[key] = Object.getOwnPropertyDescriptor(src, key);
             return descrs;

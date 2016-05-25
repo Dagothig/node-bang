@@ -12,12 +12,14 @@ module.exports = new Character("Jesse Jones", {
     beforeDraw: function(step, onResolved, onSkip) {
         if (step.player.character !== this) return onResolved();
 
+        let filter = p => p.alive && p !== step.player && p.hand.length;
         onResolved(misc.merge(events('event')(
             step.player,
             [ // Choices
                 new Choice(actions.draw, ['pile']),
-                new Choice(actions.target,
-                    step.game.players.filter(p => p.alive && p !== step.player),
+                new Choice(
+                    actions.target,
+                    step.game.players.filter(filter),
                     t => t.name
                 )
             ],

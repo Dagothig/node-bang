@@ -4,7 +4,6 @@ var ui = require('../ui'),
 function Decal() {
     this.tagRoot = ui.create('div');
 
-    this.emporio = ui.create('div', 'emporio', this.tagRoot);
     this.tagEvent = ui.create('div', 'event', this.tagRoot);
     this.eventPlayerName = ui.create('div', 'player', this.tagEvent);
     this.eventReason = ui.create('div', 'reason', this.tagEvent);
@@ -26,13 +25,29 @@ Decal.prototype = {
             event.player;
 
         let name = event.name;
-        if (name === 'CardsDrawEvent') {
+        if (
+            name === 'CardsDrawEvent' ||
+            name === 'CardDrawEvent'
+        ) {
             this.eventType.className = 'type draw';
             this.eventType.innerHTML = '';
-        } else if (name === 'CardChoiceEvent' || name == 'CardTypeEvent') {
+        }
+        else if (
+            name === 'CardChoiceEvent' ||
+            name === 'CardTypeEvent'
+        ) {
             this.eventType.className = 'type choice';
             this.eventType.innerHTML = '';
-        } else {
+        }
+        else if (
+            name === 'TargetRangeEvent' ||
+            name === 'TargetOthersEvent' ||
+            name === 'TargetEvent'
+        ) {
+            this.eventType.className = 'type target';
+            this.eventType.innerHTML = '';
+        }
+        else {
             this.eventType.className = 'type';
             this.eventType.innerHTML = misc.spacize(name);
         }
@@ -40,15 +55,6 @@ Decal.prototype = {
         if (event.for) ui.show(this.eventReason);
         else ui.hide(this.eventReason);
         this.eventReason.innerHTML = event.for;
-
-        if (game.turn.step.event.for === 'emporio') {
-            let width = 48;
-            this.emporio.style.width = width + 'px';
-            this.emporio.style.marginLeft = -width + 'px';
-            ui.show(this.emporio);
-        } else {
-            ui.hide(this.emporio);
-        }
     },
 
     move: function(z) {

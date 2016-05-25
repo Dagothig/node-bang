@@ -38,9 +38,9 @@ module.exports = new Phase('Role pick', {
 
         this.remainingTime = consts.rolePickMaxTime;
         this.remainingInterval = setInterval(() => {
-            if (--this.remainingTime > 0) game.onGameUpdate();
-            else game.switchToPhase(Playing);
-        }, 1000);
+            if ((this.remainingTime -= 0.1) <= 0) game.switchToPhase(Playing);
+        }, 100);
+        game.onGameUpdate();
     },
     update: (game, delta) => {},
     end: function(game) {

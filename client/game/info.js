@@ -2,55 +2,55 @@ module.exports = {
     characters: {
         "Bart Cassidy": {
             life: 4,
-            description: "Each time he loses a life point, he immediately draws a card from the deck."
+            description: "Each time he is hit, he draws a card."
         },
         "Black Jack": {
             life: 4,
-            description: "During phase 1 of his turn, he must show the second card he draws: if it’s Heart or Diamonds (just like a 'draw!'), he draws one additional card (without revealing it)."
+            description: "He shows the second card he draws. On heart or Diamonds, he draws one more card."
         },
         "Calamity Janet": {
             life: 4,
-            description: "She can play BANG! cards as Missed! cards and vice versa. If she plays a Missed! as a BANG!, she cannot play another BANG! card that turn (unless she has a Volcanic in play)."
+            description: "She can play BANG! cards as Missed! cards and vice versa."
         },
         "El Gringo": {
             life: 3,
-            description: "Each time he loses a life point due to a card played by another player, he draws a random card from the hands of that player (one card for each life point). If that player has no more cards, too bad!, he does not draw. Note that Dynamite damages are not caused by any player."
+            description: "Each time he is hit by a player, he draws a card from the hand of that player."
         },
         "Jesse Jones": {
             life: 4,
-            description: "During phase 1 of his turn, he may choose to draw the first card from the deck, or randomly from the hand of any other player. Then he draws the second card from the deck."
+            description: "He may draw his first card from the hand of a player."
         },
         "Jourdonnais": {
             life: 4,
-            description: "Whenever he is the target of a BANG!, he may \"draw!\": on a Heart, he is missed."
+            description: "Whenever he is the target of a BANG!, he may draw! on a Heart, he is missed."
         },
         "Kit Carlson": {
             life: 4,
-            description: "During phase 1 of his turn, he looks at the top three cards of the deck: he chooses 2 to draw, and puts the other one back on the top of the deck, face down."
+            description: "He looks at the top three cards of the deck and chooses one to put back on top."
         },
         "Lucky Duke": {
             life: 4,
-            description: "Each time he is required to \"draw!\" he flips the top two cards from the deck, and chooses the result he prefers. Discard both cards afterwards."
+            description: "Each time he \"draws!\", he flips the top two cards and chooses one."
         },
         "Paul Regret": {
             life: 3,
-            description: "He is considered to have a Mustang in play at all times; all other players must add 1 to the distance to him. If he has another real Mustang in play, he can count both of them, increasing all distances to him by a total of 2."
+            description: "All players see him at a distance increased by 1."
         },
         "Pedro Ramirez": {
             life: 4,
-            description: "During phase 1 of his turn, he may choose to draw the first card from the top of the discard pile or from the deck. Then he draws the second card from the deck."
+            description: "He may draw his first card from the discard pile."
         },
         "Rose Doolan": {
             life: 4,
-            description: "She is considered to have a Mirino in play at all times; she sees the other players at a distance decreased by 1. If she has another real Scope in play, she can count both of them, reducing her distance to all other players by a total of 2."
+            description: "She sees all players at a distance decreased by 1."
         },
         "Sid Ketchum": {
             life: 4,
-            description: "At any time, he may discard 2 cards from his hand to regain one life point. If he is willing and able, he can use this ability more than once at a time."
+            description: "He may discard 2 cards to regain one life point."
         },
         "Slab the Killer": {
             life: 4,
-            description: "Players trying to cancel his BANG! cards need to play 2 Missed!. The Barrel effect, if successfully used, only counts as one Missed!"
+            description: "Player needs 2 Missed! cards to cancel his BANG! card."
         },
         "Suzy Lafayette": {
             life: 4,
@@ -58,11 +58,11 @@ module.exports = {
         },
         "Vulture Sam": {
             life: 4,
-            description: "Whenever a character is eliminated from the game, Sam takes all the cards that player had in his hand and in play, and adds them to his hand."
+            description: "Whenever a player is eliminated from play, he takes in hand all the cards of that player."
         },
         "Willy the Kid": {
             life: 4,
-            description: "He can play any number of \"Bang!\" cards."
+            description: "He can play any number of Bang! cards."
         }
     },
     roles: {
@@ -86,17 +86,17 @@ module.exports = {
     "cards": {
         prigione: {
             name: "Prigione",
-            description: "\"Draw!\" at the beginning of your turn. If the \"drawn!\" card is a hearts discard the jail, play normally. Else discard the jail and skip your turn.",
+            description: "\"Draw!\" at the start of your turn and discard the jail. If it's not hearts skip your turn.",
             type: "blue"
         },
         dynamite: {
             name: "Dynamite",
-            description: "\"Draw!\" at the beginning of your turn. If the \"drawn!\" card is a 2-9 of spades lose 3 life points. Else pass the Dynamite on your left.",
+            description: "\"Draw!\" at the start of your turn. If it is a 2-9 of spades lose 3 life points. Else pass the Dynamite on your left.",
             type: "blue"
         },
         barile: {
             name: "Barile",
-            description: "\"Draw!\" when you are attacked by cards with BANG! symbols. If it is a heart, then the attack misses.",
+            description: "\"Draw!\" when you are the target of a BANG! On hearts, the attack misses.",
             type: "blue"
         },
         mirino: {
@@ -146,27 +146,34 @@ module.exports = {
         },
         beer: {
             name: "Birra",
-            type: "brown"
+            type: "brown",
+            description: "Regain a life point"
         },
         panico: {
             name: "Panico",
-            type: "brown"
+            type: "brown",
+            range: 1,
+            draw: 1
         },
         catbalou: {
             name: "Cat Balou",
-            type: "brown"
+            type: "brown",
+            description: "Force a player to discard a card."
         },
         diligenza: {
             name: "Diligenza",
-            type: "brown"
+            type: "brown",
+            draw: 2
         },
         wellsfargo: {
             name: "Wells Fargo",
-            type: "brown"
+            type: "brown",
+            draw: 3
         },
         gatling: {
             name: "Gatling",
-            type: "brown"
+            type: "brown",
+            description: "All other players are the target of a BANG!"
         },
         indians: {
             name: "Indians!",
@@ -185,6 +192,7 @@ module.exports = {
         },
         saloon: {
             name: "Saloon",
+            description: "Each player regains 1 life point.",
             type: "brown"
         }
     }

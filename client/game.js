@@ -8,6 +8,7 @@ var ui = require('./ui'),
 
 function Game(settings, onAction) {
     this.onAction = onAction;
+    this.settings = settings;
     this.tagRoot = ui.one('#game');
     this.tagGame = ui.one(this.tagRoot, '.container');
     this.tagCancel = ui.create('input', 'cancel-btn');
@@ -23,7 +24,7 @@ function Game(settings, onAction) {
     this.clearGame();
 
     window.addEventListener('resize', ev => this.requestPositions());
-    this.resizeTime = 10;
+    this.resizeTime = 100;
     this.resizeFunc = () => {
         this.resizeTimeout = null;
         this.updatePositions();
@@ -37,9 +38,23 @@ Game.prototype = {
         if (game) {
             ui.show(this.tagRoot);
             this.displayGame(game, current);
+            if (this.settings.ai)
+                setTimeout(() => this.handleAI(game, current), 500);
         } else {
             ui.hide(this.tagRoot);
             if (this.game) this.clearGame();
+        }
+    },
+    handleAI: function(game, current) {
+        let keys = Object.keys(game.actions)
+        let n = keys.reduce((n, act) => n + game.actions[act].length, 0);
+        if (!n) return;
+        let val = (Math.random() * n)|0;
+        for (let i = 0; i < keys.length; i++) {
+            let act = keys[i];
+            let actLen = game.actions[act].length;
+            if (val >= actLen) val -= actLen;
+            else return this.onAction(act, game.actions[act][val]);
         }
     },
 
@@ -106,6 +121,7 @@ Game.prototype = {
                 switch (msg.what) {
                     case 'passed':
                         this.discard.append(this.pile.draw(msg.card), msg.card);
+                        source = this.players.find(p => p.info.name === msg.source);
                         target.equipped.append(
                             source.equipped.draw(msg.dynamite),
                             msg.dynamite
@@ -199,17 +215,16 @@ Game.prototype = {
             }
         }
 
+        if (!this.pile) {
+            this.pile = new Pile('pile');
+            this.tagGame.appendChild(this.pile.tagRoot);
+        }
+        if (!this.discard) {
+            this.discard = new Pile('discard');
+            this.tagGame.appendChild(this.discard.tagRoot);
+        }
         if (game.cards) {
-            if (!this.pile) {
-                this.pile = new Pile('pile');
-                this.tagGame.appendChild(this.pile.tagRoot);
-            }
             this.pile.setInfo(game.cards.pile);
-
-            if (!this.discard) {
-                this.discard = new Pile('discard');
-                this.tagGame.appendChild(this.discard.tagRoot);
-            }
             this.discard.setInfo(game.cards.discard);
         }
 
@@ -237,8 +252,6 @@ Game.prototype = {
             ui.hide(this.choice);
         }
 
-        this.requestPositions();
-
         if (game.actions) {
             let actions = game.actions;
             if (this.players)
@@ -256,10 +269,12 @@ Game.prototype = {
             if (game.actions.cancel) ui.show(this.tagCancel);
             else ui.hide(this.tagCancel);
         }
+
+        this.requestPositions();
     },
 
     requestPositions: function() {
-        if (this.resizeTimeout) clearTimeout(this.resizeTimeout);
+        if (this.resizeTimeout) return;
         this.resizeTimeout = setTimeout(this.resizeFunc, this.resizeTime);
     },
     updatePositions: function() {
@@ -308,12 +323,14 @@ Game.prototype = {
 
         if (this.decal) this.decal.move(playersDepth + Pile.depth);
 
-        if (this.choice) this.choice.move(
-            halfSize.x,
-            halfSize.y,
-            playersDepth + Pile.depth + Decal.depth,
-            0, 1.1
-        );
+        if (this.choice) {
+            this.choice.move(
+                halfSize.x,
+                halfSize.y,
+                playersDepth + Pile.depth + Decal.depth,
+                0, 1.1
+            );
+        }
     }
 };
 

@@ -5,6 +5,7 @@ var msgs = require('./shared/messages'),
 var strat = require('./client/local-storage-strat');
 var settings = require('./client/settings')(strat, {
     saveToken: [true, 'bool', 'user'],
+    ai: [false, 'bool', 'user'],
     name: ['', 'str', 'sys'],
     token: ['', 'str', 'sys']
 });

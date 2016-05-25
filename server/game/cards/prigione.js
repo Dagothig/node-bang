@@ -37,10 +37,8 @@ misc.extend(Equipment, Prigione, {
             // Cannot cancel this draw
             undefined,
             () => ({
-                name: 'prigione',
-                what: 'draw',
-                prigione: this.format(),
-                player: step.player.name
+                for: 'prigione',
+                prigione: this.format()
             })
         ));
     },

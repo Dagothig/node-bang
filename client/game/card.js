@@ -1,5 +1,5 @@
 var ui = require('../ui'),
-    info = require('../../shared/info');
+    info = require('./info');
 
 function Card() {
     this.tagRoot = ui.create('div', 'card');
@@ -7,7 +7,10 @@ function Card() {
     this.tagFace = ui.create('div', 'face', this.tagRoot);
     this.tagFaceName = ui.create('div', 'name', this.tagFace);
     this.tagFaceImage = ui.create('div', 'image', this.tagFace);
-    this.tagFaceDescription = ui.create('div', 'description', this.tagFace);
+    this.tagFaceContent = ui.create('div', 'content', this.tagFace);
+    this.tagFaceDescription = ui.create('div', 'description', this.tagFaceContent);
+    this.tagFaceDraw = ui.create('div', 'draw', this.tagFaceContent);
+    this.tagFaceRange = ui.create('div', 'range', this.tagFaceContent);
     this.tagFaceType = ui.create('div', 'type', this.tagFace);
     this.tagFaceTypeRank = ui.create('div', 'rank', this.tagFaceType);
     this.tagFaceTypeSuit = ui.create('div', 'suit', this.tagFaceType);
@@ -20,12 +23,12 @@ function Card() {
             this.tempZ = null;
         }
         this.tagRoot.classList.remove('moving');
-    }
+    };
 
     this.tempZ = null;
     this.move(0, 0, 0, 0);
 }
-Card.hoverScale = 1.5;
+Card.hoverScale = 1.7;
 Card.transitionTime = 350;
 Card.prototype = {
     constructor: Card,
@@ -56,14 +59,27 @@ Card.prototype = {
             let cardInfo = info.cards[name];
             this.tagFace.className = 'face ' + cardInfo.type;
             this.tagFaceName.innerHTML = cardInfo.name;
-            this.tagFaceDescription.innerHTML = cardInfo.description;
+            this.setImage(name);
+            this.tagFaceDescription.innerHTML = cardInfo.description || '';
+            if (cardInfo.range) {
+                ui.show(this.tagFaceRange);
+                this.tagFaceRange.innerHTML = cardInfo.range;
+            }
+            else ui.hide(this.tagFaceRange);
+            if (cardInfo.draw) {
+                ui.show(this.tagFaceDraw);
+                this.tagFaceDraw.innerHTML = cardInfo.draw + 'x';
+            }
+            else ui.hide(this.tagFaceDraw);
             this.tagFaceTypeSuit.className = 'suit ' + split[1];
             this.tagFaceTypeRank.className = 'rank ' + split[2];
             this.visible();
         } else {
             this.tagFace.className = 'face';
             this.tagFaceName.innerHTML = '';
+            this.setImage();
             this.tagFaceDescription.innerHTML = '';
+            ui.hide(this.tagFaceRange);
             this.tagFaceTypeSuit.className = 'suit';
             this.tagFaceTypeRank.className = 'rank';
             this.unknown();
@@ -78,6 +94,7 @@ Card.prototype = {
         this.tagRoot.classList.remove('role');
         this.tagRoot.classList.add('character');
         this.tagBack.innerHTML = '';
+        ui.hide(this.tagFaceRange, this.tagFaceDraw);
         this.info = char;
         for (let i = 1; i <= 5; i++) ui.create('div', 'bullet-' + i, this.tagBack);
 
@@ -85,10 +102,12 @@ Card.prototype = {
             let charInfo = info.characters[char.name];
             this.tagFaceName.innerHTML = char.name;
             this.tagFaceDescription.innerHTML = charInfo.description;
-            this.visible();
-        } else this.unknown();
+            this.setImage(char.name);
+            return this.visible();
+        }
 
-        return this;
+        this.setImage();
+        return this.unknown();
     },
 
     setRole: function(role) {
@@ -97,18 +116,24 @@ Card.prototype = {
         this.tagRoot.classList.remove('character');
         this.tagRoot.classList.add('role');
         this.tagBack.innerHTML = '';
+        ui.hide(this.tagFaceRange, this.tagFaceDraw);
         this.info = role;
 
         if (role && role.name) {
             let roleInfo = info.roles[role.name];
             if (roleInfo) {
-                this.visible();
                 this.tagFaceName.innerHTML = roleInfo.name;
                 this.tagFaceDescription.innerHTML = roleInfo.description;
-            } else this.unknown();
-        } else this.unknown();
-
-        return this;
+                this.setImage(role.name);
+                return this.visible();
+            }
+        }
+        this.setImage();
+        return this.unknown();
+    },
+    setImage: function(img) {
+        let imgName = img ? img.replace(/\s/g, '-').toLowerCase() : '';
+        this.tagFaceImage.className = 'image ' + imgName;
     },
 
     actionable: function(onAction) {
@@ -137,8 +162,6 @@ Card.prototype = {
     },
 
     move: function(x, y, z, angle) {
-        while (angle > Math.PI) angle -= Math.TWO_PI;
-        while (angle < -Math.PI) angle += Math.TWO_PI;
         angle = (angle !== undefined && angle !== null) ? angle : this.angle;
         x = Math.round(x);
         y = Math.round(y);

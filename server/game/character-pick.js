@@ -14,9 +14,9 @@ module.exports = new Phase('Character pick', {
         this.stopTimer();
         this.remainingTime = time;
         this.remainingInterval = setInterval(() => {
-            if (--this.remainingTime > 0) game.onGameUpdate();
-            else game.switchToPhase(RolePick);
-        }, 1000);
+            if ((this.remainingTime -= 0.1) <= 0) game.switchToPhase(RolePick);
+        }, 100);
+        game.onGameUpdate();
     },
 
     stopTimer: function() {
@@ -87,6 +87,7 @@ module.exports = new Phase('Character pick', {
 
     checkForEnd: function(game) {
         var unchosen = game.players.filter((player) => !player.character);
-        if (!unchosen.length) this.startTimer(game, Math.min(3, this.remainingTime));
+        if (!unchosen.length && this.remainingTime > 3)
+            this.startTimer(game, 3);
     }
 });

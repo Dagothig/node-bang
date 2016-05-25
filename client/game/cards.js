@@ -202,9 +202,7 @@ Cards.prototype = {
     append: function(card, info) {
         this.tagRoot.appendChild(card.tagRoot);
         this.cards.push(card);
-        card.transitionZ(card.z + this.cards.length - 1);
-        if (!this.visible) card[this.infoFunc]();
-        else card[this.infoFunc](info);
+        card.transitionZ(this.z + this.cards.length + 10000);
     },
 
     draw: function(info) {

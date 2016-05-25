@@ -535,6 +535,7 @@ input.cancel-btn:active {
     position: absolute;
     width: 4.5em;
     height: 7.5em;
+    border-radius: 0.5em;
     margin-left: -2.25em;
     margin-right: -2.25em;
     margin-top: -3.75em;
@@ -551,8 +552,17 @@ input.cancel-btn:active {
     transform-origin: center;
     perspective: 40em;
 }
+.card * {
+    pointer-events: none;
+}
 .card.visible:not(.moving):hover,
 .card.known:not(.moving):hover {
+    transition:
+        left 0.35s ease-in-out,
+        top 0.35s ease-in-out,
+        0.35s transform 0.35s ease-in-out,
+        0.35s z-index 0s;
+
     transform: scale(1.0) rotateZ(0deg) !important;
     /* Yes it is absurdly large; there is a lot of z-index fudging in the code */
     z-index: 10000 !important;
@@ -573,16 +583,19 @@ input.cancel-btn:active {
     right: 0;
     top: 0;
     bottom: 0;
-    border-radius: 0.5em;
     padding: 0.25em;
+    border-radius: 0.5em;
     transition: transform 0.35s ease-in-out;
     backface-visibility: hidden;
 }
-.card.actionable .face,
-.card.actionable .back,
+.card.actionable,
+.card-pile .bottom.actionable {
+    cursor: pointer;
+}
+.card.actionable.visible .face,
+.card.actionable:not(.visible) .back,
 .card-pile .bottom.actionable {
     box-shadow: 0 0 0 0.125em #08f;
-    cursor: pointer;
 }
 
 .card .face {
@@ -650,22 +663,130 @@ input.cancel-btn:active {
     width: 100%;
 }
 .card .name {
-    height: 15%;
+    position: relative;
+    width: 12em;
+    height: 10%;
+    left: 50%;
+    margin-left: -6em;
     text-align: center;
     font-size: 0.5em;
     text-transform: uppercase;
     font-weight: 800;
+    transform: scaleX(0.75);
 }
 .card .image {
-    height: 40%;
-    background-color: #dcb;
+    height: 45%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
 }
-.card .description {
+
+.image.deputy { background-image: url('/imgs/deputy.png'); }
+.image.outlaw { background-image: url('/imgs/outlaw.png'); }
+.image.renegade { background-image: url('/imgs/renegade.png'); }
+.image.sheriff { background-image: url('/imgs/sheriff.png'); }
+
+.image.bang { background-image: url('/imgs/bang.png'); }
+.image.barile { background-image: url('/imgs/barile.png'); }
+.image.beer { background-image: url('/imgs/beer.png'); }
+.image.carabine { background-image: url('/imgs/carabine.png'); }
+.image.catbalou { background-image: url('/imgs/catbalou.png'); }
+.image.diligenza { background-image: url('/imgs/diligenza.png'); }
+.image.duel { background-image: url('/imgs/duel.png'); }
+.image.dynamite { background-image: url('/imgs/dynamite.png'); }
+.image.emporio { background-image: url('/imgs/emporio.png'); }
+.image.gatling { background-image: url('/imgs/gatling.png'); }
+.image.indians { background-image: url('/imgs/indians.png'); }
+.image.mancato { background-image: url('/imgs/mancato.png'); }
+.image.mirino { background-image: url('/imgs/mirino.png'); }
+.image.mustang { background-image: url('/imgs/mustang.png'); }
+.image.panico { background-image: url('/imgs/panico.png'); }
+.image.prigione { background-image: url('/imgs/prigione.png'); }
+.image.remington { background-image: url('/imgs/remington.png'); }
+.image.saloon { background-image: url('/imgs/saloon.png'); }
+.image.schofield { background-image: url('/imgs/schofield.png'); }
+.image.volcanic { background-image: url('/imgs/volcanic.svg'); }
+.image.wellsfargo { background-image: url('/imgs/wellsfargo.png'); }
+.image.winchester { background-image: url('/imgs/winchester.png'); }
+
+.image.bart-cassidy { background-image: url('/imgs/bart-cassidy.png'); }
+.image.black-jack { background-image: url('/imgs/black-jack.png'); }
+.image.calamity-janet { background-image: url('/imgs/calamity-janet.png'); }
+.image.el-gringo { background-image: url('/imgs/el-gringo.png'); }
+.image.jesse-jones { background-image: url('/imgs/jesse-jones.png'); }
+.image.jourdonnais { background-image: url('/imgs/jourdonnais.png'); }
+.image.kit-carlson { background-image: url('/imgs/kit-carlson.png'); }
+.image.lucky-duke { background-image: url('/imgs/lucky-duke.png'); }
+.image.paul-regret { background-image: url('/imgs/paul-regret.png'); }
+.image.pedro-ramirez { background-image: url('/imgs/pedro-ramirez.png'); }
+.image.rose-doolan { background-image: url('/imgs/rose-doolan.png'); }
+.image.sid-ketchum { background-image: url('/imgs/sid-ketchum.png'); }
+.image.slab-the-killer { background-image: url('/imgs/slab-the-killer.png'); }
+.image.suzy-lafayette { background-image: url('/imgs/suzy-lafayette.png'); }
+.image.vulture-sam { background-image: url('/imgs/vulture-sam.png'); }
+.image.willy-the-kid { background-image: url('/imgs/willy-the-kid.png'); }
+
+.card .content {
     height: 45%;
     font-size: 0.4em;
+    line-height: 1.2em;
+    text-align: center;
+}
+.card .content .description {
+    text-align: left;
+}
+.card .content .range,
+.card .content .draw {
+    display: inline-block;
+    vertical-align: middle;
+}
+.card .content .range {
+    width: 1em;
+    height: 1em;
     line-height: 1em;
-    padding-top: 0.25em;
-    padding-bottom: 0.25em;
+    font-size: 1.5em;
+    border: solid 0.1em #333;
+    border-radius: 100%;
+    padding: 0.25em;
+    margin: 0.25em;
+    position: relative;
+}
+.card .content .range:before,
+.card .content .range:after {
+    content: "";
+    background-color: #333;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    opacity: 0.25;
+}
+.card .content .range:before {
+    margin-left: -1em;
+    margin-top: -0.5px;
+    width: 2em;
+    height: 1px;
+}
+.card .content .range:after {
+    margin-left: -0.5px;
+    margin-top: -1em;
+    width: 1px;
+    height: 2em;
+}
+
+.card .content .draw {
+    padding: 0.25em;
+    margin: 0.25em;
+}
+.card .content .draw:after {
+    display: inline-block;
+    vertical-align: middle;
+    content: "";
+    width: 1.2em;
+    height: 2em;
+    background-color: #ccc;
+    border-radius: 0.25em;
+    border: solid 0.1em #999;
+    margin-left: 0.25em;
 }
 
 .card .type {
@@ -733,7 +854,7 @@ input.cancel-btn:active {
     bottom: 0;
     height: 7.5em;
     margin-top: -3.75em;
-    box-shadow: 0 0 0.5em 0em rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 0.1em rgba(0, 0, 0, 0.3);
 }
 .card-pile .size {
     /* The negative margin of cards -1 because of padding */
@@ -745,14 +866,8 @@ input.cancel-btn:active {
 .choice {
     z-index: 1;
 }
-
-.emporio {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    height: 7.5em;
-    margin-top: -3.75em;
-    background-color: #f80;
+.choice .card {
+    box-shadow: 0.25em 0.75em 0 0 rgba(0, 0, 0, 0.3);
 }
 
 .event {
@@ -788,4 +903,7 @@ input.cancel-btn:active {
 }
 .event .type.choice {
     background-image: url("/imgs/choose.svg");
+}
+.event .type.target {
+    background-image: url("/imgs/target.svg");
 }
