@@ -5,6 +5,7 @@ var ui = require('../ui'),
 function Pile(name) {
     this.name = name;
     this.size = 0;
+    this.visible = false;
 
     this.tagRoot = ui.create('div', 'card-pile');
     this.tagBottom = ui.create('div', 'bottom', this.tagRoot);
@@ -32,6 +33,7 @@ Pile.prototype = {
             return this;
         }
         this.info = cardsInfo;
+        this.visible = cardsInfo && cardsInfo.length !== undefined;
 
         this._updateToInfo();
         this._updateToSize();
@@ -75,13 +77,13 @@ Pile.prototype = {
     },
 
     _updateToInfo() {
-        if (this.info && this.info.length !== undefined) {
+        if (this.visible) {
             if (this.info.length) {
                 this.topCard.setInfo(this.info[this.info.length - 1]);
                 this.size = this.info.length;
             } else this.size = 0;
         } else {
-            this.topCard.setInfo();
+            this.topCard.setInfo(null);
             this.size = this.info;
         }
 
@@ -101,6 +103,18 @@ Pile.prototype = {
             this.z + Pile.sizeZ + this.size + 1,
             0
         );
+        if (this.visible) {
+            this.topCard.visible();
+            this.pendingCards.forEach(card => card.visible());
+        }
+        else {
+            this.topCard.unknown();
+            this.topCard.info = null;
+            this.pendingCards.forEach(card => {
+                card.unknown();
+                card.info = null;
+            });
+        }
     },
 
     move: function(x, y, z) {
@@ -122,15 +136,13 @@ Pile.prototype = {
         return this.topCard.getHeight() + this.size;
     },
 
-    append: function(card, info) {
+    append: function(card) {
         this.tagRoot.appendChild(card.tagRoot);
 
         this.pendingCards.push(card);
         let size = (this.size + this.pendingCards.length);
-        card.transitionZ(Math.max(this.z + Pile.depth, card.z + 1));
+        card.transitionZ(this.z + Pile.depth + 10000);
         requestAnimationFrame(() => setTimeout(() => {
-            if (!this.info || this.info.length === undefined) card.unknown();
-            else card.setInfo(info);
             card.move(
                 this.x,
                 this.y - size,
@@ -143,7 +155,7 @@ Pile.prototype = {
     _completePendingCard: function() {
         let card = this.pendingCards.splice(0, 1)[0];
         this.tagRoot.removeChild(card.tagRoot);
-        if (this.info && this.info.length !== undefined) this.info.push(card.info);
+        if (this.visible) this.info.push(card.info);
         else this.info++;
         this._updateToInfo();
         this._updateToSize();
@@ -162,13 +174,13 @@ Pile.prototype = {
         this.topCard = new Card();
         this.topCard.tagRoot.classList.add('top');
 
-        if (this.info && this.info.length !== undefined) this.info.pop();
+        if (this.visible) this.info.pop();
         else this.info--;
         this.setInfo(this.info);
 
         this.tagRoot.appendChild(this.topCard.tagRoot);
 
-        return oldTop;
+        return oldTop.setInfo(info);
     }
 }
 

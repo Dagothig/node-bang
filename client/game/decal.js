@@ -34,7 +34,9 @@ Decal.prototype = {
         }
         else if (
             name === 'CardChoiceEvent' ||
-            name === 'CardTypeEvent'
+            name === 'CardTypeEvent' ||
+            name === 'CardTypesEvent' ||
+            name === 'RemoveOtherCardEvent'
         ) {
             this.eventType.className = 'type choice';
             this.eventType.innerHTML = '';

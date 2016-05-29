@@ -56,7 +56,7 @@ var pregame = require('./client/pre-game')(
         });
     }
 );
-var game = require('./client/game.js')(settings,
+var game = window.game = require('./client/game.js')(settings,
     function onAction(action, arg) {
         socket.emit(msgs.action, {
             token: user.token,
@@ -66,6 +66,7 @@ var game = require('./client/game.js')(settings,
     }
 );
 
+/*
 var icon = require('./client/icon.js')(
     ['favicon.ico', 'favicon-alert.ico'],
     ['¡Bang!', '!Bang¡'],
@@ -74,17 +75,18 @@ icon.state = {
     _focus: false,
     _stuff: false,
 
-    set focus(focus) {/*
+    set focus(focus) {
         this._focus = focus;
         icon.flash((this._stuff = (this._stuff && !focus)) && user);
-    */},
-    set stuff(stuff) {/*
+    },
+    set stuff(stuff) {
         icon.flash((this._stuff = (stuff && !this._focus)) && user);
-    */}
+    }
 };
 
 window.onfocus = () => icon.state.focus = true;
 window.onblur = () => icon.state.focus = false;
+*/
 
 ui.hide(roots);
 
@@ -98,7 +100,7 @@ var lastTime;
 
 var on = (key, func) => socket.on(key, function() {
     console.log(key, arguments);
-    icon.state.stuff = true;
+    //icon.state.stuff = true;
     if (func) func.apply(this, arguments);
 });
 on('connect', () => {});

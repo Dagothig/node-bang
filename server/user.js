@@ -10,7 +10,7 @@ function User(name, password) {
     this.token = crypto.randomBytes(48).toString('hex');
     this.name = name;
     this.joining = false;
-    this.disconnectTimout = null;
+    this.disconnectTimeout = null;
 }
 
 misc.merge(User.prototype, {
@@ -26,9 +26,9 @@ misc.merge(User.prototype, {
         else warn('Attempting to add used socket to ', this.name);
         log(this.name, 'at', this.sockets.length, 'socket(s)');
         // Clear the timeout
-        if (this.disconnectTimout) {
-            clearTimeout(this.disconnectTimout);
-            this.disconnectTimout = null;
+        if (this.disconnectTimeout) {
+            clearTimeout(this.disconnectTimeout);
+            this.disconnectTimeout = null;
         }
     },
     removeSocket: function(socket, disconnectCallback) {
@@ -38,7 +38,7 @@ misc.merge(User.prototype, {
         log(this.name ,'at', this.sockets.length, 'socket(s)');
 
         if (this.sockets.length) return;
-        this.disconnectTimout = setTimeout(() => {
+        this.disconnectTimeout = setTimeout(() => {
             disconnectCallback();
         }, consts.disconnectTimeout * 1000);
     },

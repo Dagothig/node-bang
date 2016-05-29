@@ -86,7 +86,7 @@ function handleGame(io, users, user, socket) {
 function handleJoining(io, users, user, socket, msg) {
     if (!msg || user.token !== msg.token || game) return;
     var joining = formattedJoining(users);
-    if (user.joining !== msg.joining) {
+    if (msg.joining !== undefined && user.joining !== msg.joining) {
         user.joining = !user.joining && msg.joining
             && joining.users.length < consts.maxPlayers;
         log(user.name, user.joining ? 'is' : 'is not', 'joining');

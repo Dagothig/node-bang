@@ -39,7 +39,7 @@ Game.prototype = {
             ui.show(this.tagRoot);
             this.displayGame(game, current);
             if (this.settings.ai)
-                setTimeout(() => this.handleAI(game, current), 500);
+                setTimeout(() => this.handleAI(game, current), 1000);
         } else {
             ui.hide(this.tagRoot);
             if (this.game) this.clearGame();
@@ -77,39 +77,32 @@ Game.prototype = {
             this.players.find(p => p.info.name === msg.player);
         let target = msg.target &&
             this.players.find(p => p.info.name === msg.target);
-        let func = null, source = null;
+        let func = null, drawTarget = null, source = null;
         switch (msg.name) {
             case 'draw':
-                func = arg => player.hand.append(source.draw(arg), arg);
-                source = (msg.from === 'pile' ? this.pile :
+            case 'pile':
+            case 'discard':
+                target = target || player;
+
+                drawTarget =
+                    (msg.name === 'draw' ? player.hand :
+                    (msg.name === 'pile' ? this.pile :
+                    (msg.name === 'discard' ? this.discard :
+                    null)));
+
+                source =
+                    (msg.from === 'pile' ? this.pile :
                     (msg.from === 'discard' ? this.discard :
                     (msg.from === 'hand' ? target.hand :
                     (msg.from === 'equipped' ? target.equipped :
                     (msg.from === 'choice' ? this.choice :
                     null)))));
 
-                if (msg.amount) for (let i = 0; i < msg.amount; i++) func();
-                else if (msg.card) func(msg.card);
-                else if (msg.cards) msg.cards.forEach(c => func(c));
-                break;
-
-            case 'discard':
-                func = arg => this.discard.append(source.draw(arg), arg);
-                source = (player ? player[msg.from] :
-                    (msg.from === 'pile' ? this.pile :
-                    (msg.from === 'choice' ? this.choice :
-                    null)));
+                func = arg => drawTarget.append(source.draw(arg), arg);
 
                 if (msg.amount) for (let i = 0; i < msg.amount; i++) func();
                 else if (msg.card) func(msg.card);
                 else if (msg.cards) msg.cards.forEach(c => func(c));
-
-                break;
-
-            case 'pile':
-                ((msg.card && [msg.card]) || msg.cards).forEach(c =>
-                    this.pile.append(player[msg.from].draw(c), c)
-                );
                 break;
 
             case 'equipped':
@@ -150,7 +143,12 @@ Game.prototype = {
                 break;
 
             case 'choice':
+                this.choice.visible = true;
                 msg.cards.forEach(c => this.choice.append(this.pile.draw(c), c));
+                break;
+
+            case 'damage':
+                target.shake();
                 break;
 
             case 'reshuffling':
@@ -245,7 +243,8 @@ Game.prototype = {
             this.tagGame.appendChild(this.choice.tagRoot);
         }
         if (what === 'choice') {
-            this.choice.setInfo(game.turn.step.event.cards);
+            if (this.choice.cards.length !== game.turn.step.event.cards.length)
+                this.choice.setInfo(game.turn.step.event.cards);
             ui.show(this.choice);
         } else {
             this.choice.setInfo();
@@ -326,7 +325,7 @@ Game.prototype = {
         if (this.choice) {
             this.choice.move(
                 halfSize.x,
-                halfSize.y,
+                halfSize.y - this.choice.getHeight() * 0.1,
                 playersDepth + Pile.depth + Decal.depth,
                 0, 1.1
             );

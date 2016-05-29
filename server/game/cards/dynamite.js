@@ -26,16 +26,14 @@ misc.extend(Equipment, Dynamite, {
             undefined,
             // format
             () => ({
-                name: 'dynamite',
-                what: 'draw',
-                dynamite: this.format(),
-                player: step.player.name
+                for: 'dynamite',
+                dynamite: this.format()
             })
         ));
     },
     handleCard: function(step, card, onResolved, onSkip) {
-        step.phase.cards.discarded.push(card);
         step.player.equipped.remove(this.id);
+        step.phase.cards.discarded.push(card);
         if (this.shouldExplode(card)) {
             this.handleExplode(step, card, onResolved, onSkip);
         } else {

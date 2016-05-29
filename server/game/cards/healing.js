@@ -1,3 +1,5 @@
+'use strict';
+
 var Card = aReq('server/game/cards/card'),
     misc = aReq('server/misc');
 
@@ -7,7 +9,8 @@ function Beer(suit, rank) {
 misc.extend(Card, Beer, {
     handlePlay: function(step, onResolved) {
         step.player.hand.discard(this.id);
-        step.player.heal(1);
+        let alive = step.game.players.filter(p => p.alive);
+        if (alive.length > 2) step.player.heal(1);
         step.game.onGameEvent({
             name: 'beer',
             player: step.player.name,
@@ -23,9 +26,8 @@ function Saloon(suit, rank) {
 misc.extend(Card, Saloon, {
     handlePlay: function(step, onResolved) {
         step.player.hand.discard(this.id);
-        step.game.players
-            .filter(p => p.alive)
-            .forEach(p => p.heal(1));
+        let alive = step.game.players.filter(p => p.alive);
+        if (alive.length > 2) alive.forEach(p => p.heal(1));
         step.game.onGameEvent({
             name: 'saloon',
             player: step.player.name,

@@ -36,6 +36,7 @@ misc.extend(Equipment, Prigione, {
             card => this.handleCard(step, card, onResolved, onSkip),
             // Cannot cancel this draw
             undefined,
+            // format
             () => ({
                 for: 'prigione',
                 prigione: this.format()
@@ -43,8 +44,8 @@ misc.extend(Equipment, Prigione, {
         ));
     },
     handleCard: function(step, card, onResolved, onSkip) {
-        step.phase.cards.discarded.push(card);
         step.player.equipped.discard(this.id);
+        step.phase.cards.discarded.push(card);
 
         if (this.shouldBeReleased(card)) {
             this.handleReleased(step, card, onResolved, onSkip);

@@ -43,24 +43,26 @@ Player.prototype = {
 
         this.infoName.innerHTML = playerInfo.name;
 
-        if (playerInfo.hand) {
+        if (playerInfo.hand && (!this.info || !this.info.hand)) {
             this.hand.name = 'hand' + playerInfo.name;
             this.hand.infoFunc = 'setInfo';
+            this.hand.setInfo(playerInfo.hand.cards);
             ui.show(this.hand.tagRoot);
-        } else if (playerInfo.characters) {
+        }
+        else if (playerInfo.characters && (!this.info || !this.info.characters)) {
             this.hand.name = 'characters' + playerInfo.name;
             this.hand.infoFunc = 'setCharacter';
+            this.hand.setInfo(playerInfo.characters);
             ui.show(this.hand.tagRoot);
-        } else ui.hide(this.hand.tagRoot);
-        this.hand.setInfo(
-            (playerInfo.hand && playerInfo.hand.cards) || playerInfo.characters
-        );
+        }
+        else if (!playerInfo.hand && !playerInfo.characters)
+            ui.hide(this.hand.tagRoot);
 
-        if (playerInfo.equipped) {
+        if (playerInfo.equipped && (!this.info || !this.info.equipped)) {
             this.equipped.name = 'equipped' + playerInfo.name;
+            this.equipped.setInfo(playerInfo.equipped);
             ui.show(this.equipped.tagRoot);
-        } else ui.hide(this.equipped.tagRoot);
-        this.equipped.setInfo(playerInfo.equipped);
+        } else if(!playerInfo.equipped) ui.hide(this.equipped.tagRoot);
 
         if (playerInfo.character)
             this.character.setCharacter(playerInfo.character);
@@ -130,6 +132,7 @@ Player.prototype = {
         let cHeight = this.character.getHeight();
 
         let yInfoShift = cHeight * Player.infoShift;
+        let infoPlateX = this.x + yDirX * yInfoShift;
         ui.move(this.infoPlate,
             this.x +
             yDirX * yInfoShift,
@@ -189,6 +192,8 @@ Player.prototype = {
 
             rotAngle
         );
+        if (this.info.character) this.character.visible();
+        else this.character.unknown();
 
         let xRoleShift = this.role.getWidth() * 0.1;
         let yRoleShift = -cHeight * 0.2;
@@ -207,12 +212,18 @@ Player.prototype = {
 
             rotAngle
         );
+        if (this.info.role && this.info.role.name !== 'Unknown') this.role.visible();
+        else this.role.unknown();
 
         return this;
     },
     getHeight: function() {
         // The division per two is roughly the overlap
         return this.infoPlate.offsetHeight / 2 + this.character.getHeight() * (Player.characterShift - Player.equippedShift + 1);
+    },
+
+    shake: function() {
+        ui.shake(this.tagRoot);
     }
 }
 

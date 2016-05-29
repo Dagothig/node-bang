@@ -29,9 +29,9 @@ module.exports = new Phase('Character pick', {
 
     begin: function(game) {
         var chars = aReq('server/game/characters').slice();
-        game.players.forEach(p => {
-            p.characters = misc.gen(() => misc.spliceRand(chars), consts.characterChoices);
-        });
+        game.players.forEach(p => p.characters =
+            misc.gen(() => misc.spliceRand(chars), consts.characterChoices)
+        );
 
         this.startTimer(game, consts.characterPickMaxTime);
     },
@@ -80,8 +80,8 @@ module.exports = new Phase('Character pick', {
     formatPlayer: function(game, player, other, formatted) {
         return misc.merge(formatted, {
             characters: (player === other) ?
-                player.characters.map(c => c.format()) :
-                player.characters.length
+                other.characters.map(c => c.format()) :
+                other.characters.length
         });
     },
 

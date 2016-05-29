@@ -20,7 +20,10 @@ module.exports = function(onJoin) {
         handleJoining: function(current, msg) {
             var users = msg ? msg.users : null;
             tagPreError.innerHTML = msg.reason ? msg.reason : '';
-            tagPreJoin.checked = !!users.find((user) => misc.isCurrent(current, user));
+
+            tagPreJoin.checked =
+                !!users.find((user) => misc.isCurrent(current, user));
+
             tagPreCount.innerHTML =
                 users.reduce((acc, user) => acc + 1, 0) +
                 " / " +

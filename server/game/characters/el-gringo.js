@@ -26,7 +26,7 @@ module.exports = new Character("El Gringo", {
                     target: source.name,
                     amount: 1
                 };
-                step.game.onGameEvent(player =>
+                step.game.onGameEvent(p =>
                     (p === source || p === target) ? specific : unspecific
                 );
             }

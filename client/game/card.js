@@ -17,7 +17,9 @@ function Card() {
 
     this.tagBack = ui.create('div', 'back', this.tagRoot);
 
+    this.movingTimeout = null;
     this.onMoveFinish = () => {
+        this.movingTimeout = null;
         if (this.tempZ !== null) {
             this.tagRoot.style.zIndex = this.z;
             this.tempZ = null;
@@ -26,6 +28,7 @@ function Card() {
     };
 
     this.tempZ = null;
+    this.isVisible = false;
     this.move(0, 0, 0, 0);
 }
 Card.hoverScale = 1.5;
@@ -47,7 +50,7 @@ Card.prototype = {
     },
 
     setInfo: function(card) {
-        if (this.info && card && this.info.id === card.id) return this;
+        if (this.is(card)) return this;
 
         this.tagRoot.classList.remove('character', 'role');
         this.tagBack.innerHTML = '';
@@ -73,7 +76,6 @@ Card.prototype = {
             else ui.hide(this.tagFaceDraw);
             this.tagFaceTypeSuit.className = 'suit ' + split[1];
             this.tagFaceTypeRank.className = 'rank ' + split[2];
-            this.visible();
         } else {
             this.tagFace.className = 'face';
             this.tagFaceName.innerHTML = '';
@@ -82,7 +84,6 @@ Card.prototype = {
             ui.hide(this.tagFaceRange);
             this.tagFaceTypeSuit.className = 'suit';
             this.tagFaceTypeRank.className = 'rank';
-            this.unknown();
         }
 
         return this;
@@ -103,11 +104,11 @@ Card.prototype = {
             this.tagFaceName.innerHTML = char.name;
             this.tagFaceDescription.innerHTML = charInfo.description;
             this.setImage(char.name);
-            return this.visible();
+            return this;
         }
 
         this.setImage();
-        return this.unknown();
+        return this;
     },
 
     setRole: function(role) {
@@ -125,11 +126,11 @@ Card.prototype = {
                 this.tagFaceName.innerHTML = roleInfo.name;
                 this.tagFaceDescription.innerHTML = roleInfo.description;
                 this.setImage(role.name);
-                return this.visible();
+                return this;
             }
         }
         this.setImage();
-        return this.unknown();
+        return this;
     },
     setImage: function(img) {
         let imgName = img ? img.replace(/\s/g, '-').toLowerCase() : '';
@@ -146,17 +147,21 @@ Card.prototype = {
         this.tagRoot.onclick = null;
         return this;
     },
-    known: function() {
-        this.tagRoot.classList.remove('visible');
-        this.tagRoot.classList.add('known');
+    clearAnim: function() {
+        if (!this.animTimeout) return this;
+        clearTimeout(this.animTimeout);
+        this.animTimeout = null;
         return this;
     },
     unknown: function() {
-        this.tagRoot.classList.remove('known', 'visible');
+        if (!this.isVisible) return this;
+        this.isVisible = false;
+        this.tagRoot.classList.remove('visible');
         return this;
     },
     visible: function() {
-        this.tagRoot.classList.remove('known');
+        if (this.isVisible) return this;
+        this.isVisible = true;
         this.tagRoot.classList.add('visible');
         return this;
     },
@@ -178,7 +183,8 @@ Card.prototype = {
         this.tagRoot.style.transform =
             'scale(' + (1/Card.hoverScale) + ') ' +
             'rotateZ(' + (this.angle = angle) + 'rad) ';
-        setTimeout(this.onMoveFinish, Card.transitionTime);
+        if (this.movingTimeout) clearTimeout(this.movingTimeout);
+        this.movingTimeout = setTimeout(this.onMoveFinish, Card.transitionTime);
 
         return this;
     },

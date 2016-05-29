@@ -46,7 +46,13 @@ module.exports = new Character("Kit Carlson", {
                             p === step.player ? spec : unspec
                         );
                         onSkip();
-                    }
+                    },
+                    // onCancel
+                    undefined,
+                    // format
+                    () => ({
+                        for: 'Kit-Carlson'
+                    })
                 ))
             }
         ));
