@@ -8,7 +8,7 @@ var actions = aReq('server/actions'),
 function TargetEvent(player, targets, onTarget, onCancel, format) {
     Event.call(this, player, [
         onTarget && new Choice(actions.target, targets, t => t.name),
-        onCancel && new Choice(actions.cancel)
+        onCancel && new Choice(actions.cancel, onCancel.arg && [onCancel.arg])
     ], format);
     this.onTarget = onTarget;
     this.onCancel = onCancel;

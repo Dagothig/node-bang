@@ -32,7 +32,7 @@ function Card() {
     this.move(0, 0, 0, 0);
 }
 Card.hoverScale = 1.5;
-Card.transitionTime = 350;
+Card.transitionTime = 500;
 Card.prototype = {
     constructor: Card,
 
@@ -189,8 +189,7 @@ Card.prototype = {
         return this;
     },
     transitionZ: function(z) {
-        this.tagRoot.style.zIndex = z;
-        this.tempZ = z;
+        this.tagRoot.style.zIndex = this.tempZ = z;
         if (this.movingTimeout) {
             clearTimeout(this.movingTimeout);
             this.movingTimeout = null;

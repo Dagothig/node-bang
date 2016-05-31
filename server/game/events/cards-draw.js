@@ -8,7 +8,7 @@ var actions = aReq('server/actions'),
 function CardsDrawEvent(player, cards, amount, onDraw, onCancel, format) {
     Event.call(this, player, [
         onDraw && new Choice(actions.draw, ['pile']),
-        onCancel && new Choice(actions.cancel)
+        onCancel && new Choice(actions.cancel, onCancel.arg && [onCancel.arg])
     ], format);
     this.cards = cards;
     this.amount = amount;

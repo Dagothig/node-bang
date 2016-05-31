@@ -30,7 +30,7 @@ module.exports = new Character("Calamity Janet", {
                 Bang.prototype.handlePlay.call(card, step, onSkip) :
                 card.handlePlay(step, onSkip),
             // onCancel
-            () => step.finalize(),
+            misc.merge(() => step.finalize(), { arg: 'end turn' }),
             // format
             () => ({
                 for: 'play'

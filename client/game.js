@@ -17,7 +17,7 @@ function Game(settings, onAction) {
     this.tagCancel.name = 'cancel';
     this.tagCancel.onclick = () => {
         ui.hide(this.tagCancel);
-        this.onAction('cancel', 'cancel');
+        this.onAction('cancel', this.tagCancel.value);
     };
     ui.hide(this.tagCancel);
 
@@ -266,7 +266,7 @@ Game.prototype = {
                 this.choice.setActions(actions, this.onAction);
 
             if (game.actions.cancel) {
-                this.tagCancel.innerHTML = game.actions.cancel;
+                this.tagCancel.value = game.actions.cancel[0];
                 ui.show(this.tagCancel);
             } else ui.hide(this.tagCancel);
         }

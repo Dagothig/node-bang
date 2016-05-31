@@ -470,8 +470,8 @@ textarea {
     padding: 0.25em 0.5em;
     position: absolute;
     transition:
-        left 0.35s ease-in-out,
-        top 0.35s ease-in-out;
+        left 0.5s ease-in-out,
+        top 0.5s ease-in-out;
     border: solid 0.25em #853;
     border-radius: 0.5em;
 }
@@ -546,9 +546,9 @@ input.cancel-btn:active {
     z-index: 0;
 
     transition:
-        left 0.35s ease-in-out,
-        top 0.35s ease-in-out,
-        transform 0.35s ease-in-out,
+        left 0.5s ease-in-out,
+        top 0.5s ease-in-out,
+        transform 0.5s ease-in-out,
         z-index 0s;
 
     transform-style: preserve-3d;
@@ -561,10 +561,10 @@ input.cancel-btn:active {
 .card.visible:not(.moving):hover,
 .card.known:not(.moving):hover {
     transition:
-        left 0.35s ease-in-out,
-        top 0.35s ease-in-out,
-        0.35s transform 0.35s ease-in-out,
-        0.35s z-index 0s;
+        left 0.5s ease-in-out,
+        top 0.5s ease-in-out,
+        0.5s transform 0.5s ease-in-out,
+        0.5s z-index 0s;
 
     transform: scale(1.0) rotateZ(0deg) !important;
     /* Yes it is absurdly large; there is a lot of z-index fudging in the code */
@@ -588,7 +588,7 @@ input.cancel-btn:active {
     bottom: 0;
     padding: 0.25em;
     border-radius: 0.5em;
-    transition: transform 0.35s ease-in-out;
+    transition: transform 0.5s ease-in-out;
     backface-visibility: hidden;
 }
 .card.actionable,
@@ -855,7 +855,7 @@ input.cancel-btn:active {
     transition:
         left 0s ease-in-out,
         top 0s ease-in-out,
-        transform 0.35s ease-in-out;
+        transform 0.5s ease-in-out;
 }
 .card-pile .bottom, .card-pile .size {
     position: absolute;

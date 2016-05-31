@@ -29,7 +29,10 @@ misc.extend(Card, Duel, {
                 this.handleDuel(step, target, source, onResolved);
             },
             // onCancel; target takes damage
-            () => handles.damage(step, source, target, 1, onResolved),
+            misc.merge(
+                () => handles.damage(step, source, target, 1, onResolved),
+                { arg: 'lose duel' }
+            ),
             // format; who is banging who
             () => ({
                 for: 'duel',

@@ -79,8 +79,11 @@ var handleDying = (step, killer, player, amount, onResolved) => {
             });
             handleDying(step, killer, player, amount, onResolved);
         },
-        // Player didn't drink beer; they are dead
-        () => handleBeforeDeath(step, killer, player, amount, onResolved),
+        // onCancel: Player didn't drink beer, they are dead
+        misc.merge(
+            () => handleBeforeDeath(step, killer, player, amount, onResolved),
+            { arg: 'die' }
+        ),
         // Format
         p => ({
             name: 'dying',
@@ -129,7 +132,10 @@ var handleAttackAvoid = (
                 handleAttackAvoid(name, step, card, target, avoidCards, avoid, avoidCardType, onResolved);
             },
             // onCancel; the damage goes through
-            () => handleDamage(step, step.player, target, 1, onResolved),
+            misc.merge(
+                () => handleDamage(step, step.player, target, 1, onResolved),
+                { arg: 'take hit' }
+            ),
             // format
             p => ({
                 for: name,

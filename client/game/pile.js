@@ -137,16 +137,16 @@ Pile.prototype = {
     },
 
     append: function(card) {
+        card.transitionZ(this.z + Pile.depth + 10000);
         this.tagRoot.appendChild(card.tagRoot);
 
         this.pendingCards.push(card);
         let size = (this.size + this.pendingCards.length);
-        card.transitionZ(this.z + Pile.depth + 10000);
         requestAnimationFrame(() => setTimeout(() => {
             card.move(
                 this.x,
                 this.y - size,
-                this.z + Pile.sizeZ + size,
+                this.z + Pile.depth + 10000,
                 0
             );
             card.pilePendingTimeout =

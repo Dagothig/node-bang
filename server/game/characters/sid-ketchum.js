@@ -19,7 +19,7 @@ module.exports = new Character("Sid Ketchum", {
                 this.handleHeal(step, onResolved, onSkip) :
                 card.handlePlay(step, onSkip),
             // onCancel
-            () => step.finalize(),
+            misc.merge(() => step.finalize(), { arg: 'end turn' }),
             // format
             () => ({
                 for: 'play'
@@ -27,7 +27,10 @@ module.exports = new Character("Sid Ketchum", {
         ));
     },
     handleHeal: function(step, onResolved, onSkip) {
-        let onFinished = () => this.beforePlay(step, onResolved, onSkip);
+        let onFinished = misc.merge(
+            () => this.beforePlay(step, onResolved, onSkip),
+            { arg: 'don\'t heal' }
+        );
         onResolved(events('cardChoice')(
             step.player,
             step.player.hand,

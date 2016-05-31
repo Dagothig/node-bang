@@ -129,7 +129,7 @@ Play.prototype = misc.merge(Object.create(Step.prototype), {
                 // onPlay
                 card => card.handlePlay(this, this.onResolved),
                 // onCancel
-                () => this.finalize(),
+                misc.merge(() => this.finalize(), { arg: 'end turn'}),
                 // format
                 player => ({
                     for: 'play'

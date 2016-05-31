@@ -18,10 +18,16 @@ misc.extend(Equipment, Barile, {
             return onResolved();
         Barile.prototype.tryAvoid.apply(this, arguments);
     },
+    beforeGatlingResponse: function(step, card, target, attack, onResolved, onSkip) {
+        if (!target.equipped.find(c => c === this))
+            return onResolved();
+        Barile.prototype.tryAvoid.apply(this, arguments);
+    },
     tryAvoid: function(step, card, target, attack, onResolved, onSkip) {
         if (attack.avoid === attack.required) return onResolved();
         onResolved(events('cardDraw', target, step)(
             target, step.phase.cards,
+            // onDraw; try to avoid
             card => {
                 step.phase.cards.discarded.push(card);
 
@@ -32,7 +38,8 @@ misc.extend(Equipment, Barile, {
                     step, card, target, attack, onResolved, onSkip
                 );
             },
-            () => onResolved(),
+            // onCance; don't use barrel
+            misc.merge(() => onResolved(), { arg: 'don\'t use barile' }),
             () => ({
                 for: 'barile',
                 source: step.player.name,
