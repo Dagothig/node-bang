@@ -169,9 +169,11 @@ Game.prototype = {
         return portion * Math.TWO_PI;
     },
     displayGame: function(game, current) {
+        let newGame = false;
         if (!this.game || this.game.identifier !== game.identifier) {
             this.clearGame();
             this.game = game;
+            newGame = true;
         }
 
         if (game.players) {
@@ -271,11 +273,12 @@ Game.prototype = {
             } else ui.hide(this.tagCancel);
         }
 
-        this.requestPositions();
+        if (!newGame) this.requestPositions();
+        else this.updatePositions();
     },
 
     requestPositions: function() {
-        if (this.resizeTimeout) return;
+        if (this.resizeTimeout) clearTimeout(this.resizeTimeout);
         this.resizeTimeout = setTimeout(this.resizeFunc, this.resizeTime);
     },
     updatePositions: function() {

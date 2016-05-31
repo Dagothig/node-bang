@@ -24,7 +24,7 @@ function Card() {
             this.tagRoot.style.zIndex = this.z;
             this.tempZ = null;
         }
-        this.tagRoot.classList.remove('moving');
+        this.tagRoot.classList.remove('moving', 'no-transition');
     };
 
     this.tempZ = null;
@@ -190,6 +190,14 @@ Card.prototype = {
     },
     transitionZ: function(z) {
         this.tagRoot.style.zIndex = this.tempZ = z;
+        if (this.movingTimeout) {
+            clearTimeout(this.movingTimeout);
+            this.movingTimeout = null;
+        }
+        return this;
+    },
+    noTransition: function() {
+        this.tagRoot.classList.add('no-transition');
         if (this.movingTimeout) {
             clearTimeout(this.movingTimeout);
             this.movingTimeout = null;

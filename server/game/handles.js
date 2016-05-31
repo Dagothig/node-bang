@@ -111,16 +111,14 @@ var handleDamage = (step, source, target, amount, onResolved) => {
 };
 
 var handleAttackAvoid = (
-    name, step, card, target, avoidCards, avoid, avoidCardType, onResolved
+    name, step, card, target, avoid, avoidCardType, onResolved
 ) => {
-    if (avoidCards.length >= avoid) {
-        avoidCards.forEach(card => target.hand.discard(card.id));
+    if (avoid <= 0) {
         step.game.onGameEvent({
             name: 'avoid',
             for: name,
             source: step.player.name,
-            target: target.name,
-            cards: avoidCards.map(c => c.format())
+            target: target.name
         });
         onResolved();
     } else {
@@ -128,8 +126,10 @@ var handleAttackAvoid = (
             target, avoidCardType,
             // onCard; consider the card for the avoiding
             avoidCard => {
-                avoidCards.push(avoidCard);
-                handleAttackAvoid(name, step, card, target, avoidCards, avoid, avoidCardType, onResolved);
+                target.hand.discard(avoidCard.id);
+                handleAttackAvoid(
+                    name, step, card, target, avoid - 1, avoidCardType, onResolved
+                );
             },
             // onCancel; the damage goes through
             misc.merge(
@@ -141,9 +141,10 @@ var handleAttackAvoid = (
                 for: name,
                 source: step.player.name,
                 target: target.name,
-                card: card.format()
+                card: card.format(),
+                avoid: avoid
             })
-        ).filterCards(card => avoidCards.indexOf(card) === -1));
+        ));
     }
 };
 
@@ -157,7 +158,7 @@ handleEvent('before' + name + 'Response',
     // onFollowing
     (step, card, target, attack) => handleAttackAvoid(
         name, step, card, target,
-        [], attack.required - attack.avoid,
+        attack.required - attack.avoid,
         avoidCardType,
         onResolved
     ),

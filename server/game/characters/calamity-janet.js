@@ -3,6 +3,7 @@
 var Character = aReq('server/game/characters/character'),
 
     events = aReq('server/game/events'),
+    misc = aReq('server/misc'),
 
     attacking = aReq('server/game/cards/attacking'),
     Bang = attacking.Bang,

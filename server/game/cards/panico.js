@@ -24,7 +24,7 @@ misc.extend(Card, Panico, {
             // onCancel; panico wasn't used
             () => onResolved(),
             // format
-            p => ({ for: 'panico' })
+            p => ({ for: (p === step.player) ? 'panico' : '' })
         ));
     },
     handleCard: function(step, target, from, card, onResolved) {

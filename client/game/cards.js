@@ -22,12 +22,12 @@ Cards.prototype = {
         this.cards.length = 0;
         this.visible = cardsInfo && cardsInfo.length !== undefined;
         if (this.visible) cardsInfo.forEach(cardInfo => {
-            let card = new Card()[this.infoFunc](cardInfo);
+            let card = new Card()[this.infoFunc](cardInfo).noTransition();
             this.cards.push(card);
             this.tagRoot.appendChild(card.tagRoot);
         });
         else for (var i = 0; i < cardsInfo; i++) {
-            let card = new Card()[this.infoFunc]();
+            let card = new Card()[this.infoFunc]().noTransition();
             this.cards.push(card);
             this.tagRoot.appendChild(card.tagRoot);
         }

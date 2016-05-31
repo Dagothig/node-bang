@@ -91,7 +91,7 @@ module.exports = {
         },
         dynamite: {
             name: "Dynamite",
-            description: "\"Draw!\" at the start of your turn. If it is a 2-9 of spades lose 3 life points. Else pass the Dynamite on your left.",
+            description: "\"Draw!\" at the start of your turn. On 2-9 of spades lose 3 life points. Else pass the Dynamite.",
             type: "blue"
         },
         barile: {
@@ -183,7 +183,7 @@ module.exports = {
         duel: {
             name: "Duello",
             type: "brown",
-            description: "A target player discards a BANG!, then you, etc. First player failing to discard a BANG! loses 1 life point."
+            description: "A target player discards a BANG!, then you, etc. First to fail loses 1 life point."
         },
         emporio: {
             name: "Emporio",

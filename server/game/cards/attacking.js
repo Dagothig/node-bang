@@ -27,7 +27,9 @@ misc.extend(Card, Bang, {
                 handleBang(step, this, target, onResolved);
             },
             // onCancel; no card was used
-            () => onResolved()
+            () => onResolved(),
+            // format
+            p => ({ for: (p === step.player) ? 'bang' : '' })
         ))
     }
 });

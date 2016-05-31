@@ -56,7 +56,10 @@ Decal.prototype = {
 
         if (event.for) ui.show(this.eventReason);
         else ui.hide(this.eventReason);
-        this.eventReason.innerHTML = event.for;
+        this.eventReason.innerHTML = event.for +
+            (event.avoid ?
+                ' ' + event.avoid + ' avoid needed' :
+                '');
     },
 
     move: function(z) {

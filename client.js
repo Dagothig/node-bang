@@ -20,7 +20,8 @@ window.socket = socket;
 
 var roots = ui.many('body>*'),
     loader = ui.one('#loader'),
-    connectedContainer = ui.one('#connected-container');
+    connectedContainer = ui.one('#connected-container'),
+    connectedUnknown = ui.one(connectedContainer, '#unknown');
 
 var login = require('./client/login.js')(settings,
     function onLogin(name, password) {
@@ -105,7 +106,7 @@ var on = (key, func) => socket.on(key, function() {
 });
 on('connect', () => {});
 on('disconnect', () => {
-    ui.hide(roots);
+    ui.hide(roots, connectedUnknown);
     ui.show(loader);
 });
 on(msgs.alert, msg => alert(msg));
@@ -158,6 +159,7 @@ on(msgs.users, msg => {
 on(msgs.message, m => lobby.handleMessage(m.name, m.message));
 on(msgs.joining, msg => pregame.handleJoining(user, msg));
 on(msgs.game, msg => {
+    ui.hide(connectedUnknown);
     pregame.handleGame(msg, user);
     game.handleGame(msg, user);
     if (msg && msg.turn && msg.turn.step && msg.turn.step.event)

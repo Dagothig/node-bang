@@ -13,10 +13,10 @@ function Player() {
     this.equipped = new Cards('equipped');
     this.tagRoot.appendChild(this.equipped.tagRoot);
 
-    this.role = new Card();
+    this.role = new Card().noTransition();
     this.tagRoot.appendChild(this.role.tagRoot);
 
-    this.character = new Card();
+    this.character = new Card().noTransition();
     this.tagRoot.appendChild(this.character.tagRoot);
 
     this.hand = new Cards('hand');

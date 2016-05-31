@@ -26,7 +26,7 @@ misc.extend(Equipment, Prigione, {
     getTarget: (player, players, onTarget, onCancel, format) => events('target')(
         player,
         players.filter(p => p.alive && p.role !== roles.sheriff),
-        onTarget, onCancel, format
+        onTarget, onCancel, p => ({ for: (p === player) ? 'prigione' : '' })
     ),
     beforeDraw: function(step, onResolved, onSkip) {
         if (!step.player.equipped.find(c => c === this)) return onResolved();

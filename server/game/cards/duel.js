@@ -17,7 +17,9 @@ misc.extend(Card, Duel, {
                 this.handleDuel(step, step.player, target, onResolved);
             },
             // onCancel; no card was used
-            () => onResolved()
+            () => onResolved(),
+            // format
+            p => ({ for: (p === step.player) ? 'duel' : '' })
         ));
     },
     handleDuel: function(step, source, target, onResolved) {

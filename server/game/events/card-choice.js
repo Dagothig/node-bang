@@ -16,13 +16,7 @@ function CardChoiceEvent(player, cards, onChoice, onCancel, format) {
 CardChoiceEvent.prototype = misc.merge(Object.create(Event.prototype), {
     constructor: CardChoiceEvent,
     handleChoose: function(player, choice) { this.onChoice(choice); },
-    handleCancel: function(player, arg) { this.onCancel(); },
-    filterCards: function(filter) {
-        Event.call(this, this.player, this.choices.filter(choice =>
-            choice.action !== actions.choose || choice.args.filter(filter)
-        ), this.formatExtra);
-        return this;
-    }
+    handleCancel: function(player, arg) { this.onCancel(); }
 });
 
 module.exports = CardChoiceEvent;

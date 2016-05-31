@@ -21,15 +21,22 @@ module.exports = new Character("Lucky Duke", {
                     player, choices,
                     // onChoice
                     card => {
+                        let unchosen = choices.filter(c => c !== card);
+                        cards.discarded.push.apply(cards.discarded, unchosen);
                         step.game.onGameEvent({
                             name: 'discard',
                             from: 'choice',
                             for: 'lucky-duke',
-                            result: card.format(),
-                            cards: choices.map(c => c.format())
-                        })
-                        misc.remove(choices, card);
-                        cards.discarded.push.apply(cards.discarded, choices);
+                            cards: unchosen.map(c => c.format())
+                        });
+
+                        step.game.onGameEvent({
+                            name: 'pile',
+                            from: 'choice',
+                            for: 'lucky-duke',
+                            card: card.format()
+                        });
+
                         onDraw(card);
                     },
                     // onCancel

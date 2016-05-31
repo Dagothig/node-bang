@@ -29,7 +29,7 @@ misc.extend(Card, CatBalou, {
             // onCancel; cat-balou wasn't used
             () => onResolved(),
             // format
-            p => ({ for: 'catbalou' })
+            p => ({ for: (p === step.player) ? 'catbalou' : '' })
         ));
     }
 });
