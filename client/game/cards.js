@@ -59,6 +59,22 @@ Cards.prototype = {
 
         return this;
     },
+    actionable: function(verb, ids, onAction) {
+        if (ids.indexOf(this.name) !== -1) this.cards.forEach(card =>
+            card.actionable(() => onAction(verb, this.name)));
+        else if (this.visible) this.cards.forEach(card => {
+            let arg = ids.find(id => card.isId(id));
+            if (arg) card.actionable(() => onAction(verb, arg));
+            else card.unactionable();
+        });
+
+        return this;
+    },
+    unactionable: function() {
+        this.cards.forEach(card => card.unactionable());
+
+        return this;
+    },
 
     move: function(x, y, z, angle, density) {
         return this

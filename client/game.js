@@ -265,8 +265,10 @@ Game.prototype = {
             if (this.choice)
                 this.choice.setActions(actions, this.onAction);
 
-            if (game.actions.cancel) ui.show(this.tagCancel);
-            else ui.hide(this.tagCancel);
+            if (game.actions.cancel) {
+                this.tagCancel.innerHTML = game.actions.cancel;
+                ui.show(this.tagCancel);
+            } else ui.hide(this.tagCancel);
         }
 
         this.requestPositions();

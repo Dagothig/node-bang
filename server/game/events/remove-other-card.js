@@ -3,24 +3,38 @@
 var actions = aReq('server/actions'),
     misc = aReq('server/misc'),
     Event = require('./event'),
-    CCE = require('./card-choice');
+    Choice = require('./choice');
 
 function RemoveOtherCardEvent(
-    player, target, withHand, withEquipment, onChoice, onCancel, format
+    player, targets, withHand, withEquipment, onChoice, onCancel, format
 ) {
-    CCE.call(this, player, misc.fromArrays(
-        (withHand && target.hand.length) ? [{ id: 'hand' + target.name }] : [],
-        withEquipment ? target.equipped : []
-    ), onChoice, onCancel, format);
-    this.target = target;
+    Event.call(this, player, targets.reduce((choices, target) => {
+        if (!onChoice) return choices;
+
+        let action = actions.choose + '-' + target.name;
+        choices.push(new Choice(action, misc.fromArrays(
+            withHand ? [{ id: 'hand' }] : [],
+            withEquipment ? target.equipped : []
+        ), c => c.id))
+
+        this['handle' + misc.capitalize(action)] = (player, choice) =>
+            this.handleChoose(player, target, choice);
+
+        return choices;
+    }, [onCancel && new Choice(actions.cancel)]), format);
+    this.onChoice = onChoice;
+    this.onCancel = onCancel;
 }
-RemoveOtherCardEvent.prototype = misc.merge(Object.create(CCE.prototype), {
+RemoveOtherCardEvent.prototype = misc.merge(Object.create(Event.prototype), {
     constructor: RemoveOtherCardEvent,
-    handleChoose: function(player, choice) {
-        if (choice.id === ('hand' + this.target.name))
-            this.onChoice('hand', this.target.hand.removeRand());
+    handleChoose: function(player, target, choice) {
+        if (choice.id === 'hand')
+            this.onChoice(target, 'hand', target.hand.removeRand());
         else
-            this.onChoice('equipped', this.target.equipped.remove(choice.id));
+            this.onChoice(target, 'equipped', target.equipped.remove(choice.id));
+    },
+    handleCancel: function() {
+        this.onCancel();
     }
 });
 

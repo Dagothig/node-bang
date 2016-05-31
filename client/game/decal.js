@@ -35,8 +35,7 @@ Decal.prototype = {
         else if (
             name === 'CardChoiceEvent' ||
             name === 'CardTypeEvent' ||
-            name === 'CardTypesEvent' ||
-            name === 'RemoveOtherCardEvent'
+            name === 'CardTypesEvent'
         ) {
             this.eventType.className = 'type choice';
             this.eventType.innerHTML = '';
@@ -44,7 +43,8 @@ Decal.prototype = {
         else if (
             name === 'TargetRangeEvent' ||
             name === 'TargetOthersEvent' ||
-            name === 'TargetEvent'
+            name === 'TargetEvent' ||
+            name === 'RemoveOtherCardEvent'
         ) {
             this.eventType.className = 'type target';
             this.eventType.innerHTML = '';

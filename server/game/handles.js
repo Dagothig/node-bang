@@ -69,10 +69,16 @@ var handleDying = (step, killer, player, amount, onResolved) => {
         player, Beer,
         // When a beer is played, we check if we are dying again
         // (we override the onResolved so that events are still properly handled)
-        card => card.handlePlay(step, event => event ?
-            onResolved(event) :
-            handleDying(step, killer, player, amount, onResolved)
-        ),
+        card => {
+            player.heal(1);
+            player.hand.discard(card.id);
+            step.game.onGameEvent({
+                name: 'beer',
+                player: player.name,
+                card: this.id
+            });
+            handleDying(step, killer, player, amount, onResolved);
+        },
         // Player didn't drink beer; they are dead
         () => handleBeforeDeath(step, killer, player, amount, onResolved),
         // Format

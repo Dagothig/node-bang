@@ -149,16 +149,22 @@ Pile.prototype = {
                 this.z + Pile.sizeZ + size,
                 0
             );
-            setTimeout(() => this._completePendingCard(), Card.transitionTime);
+            card.pilePendingTimeout =
+                setTimeout(() => this._completePendingCard(), Card.transitionTime);
         }, 0));
     },
     _completePendingCard: function() {
         let card = this.pendingCards.splice(0, 1)[0];
+        delete card.pilePendingTimeout;
+
         this.tagRoot.removeChild(card.tagRoot);
+
         if (this.visible) this.info.push(card.info);
         else this.info++;
+
         this._updateToInfo();
         this._updateToSize();
+
         if (!this.pendingCards.length) {
             this.info = this.pendingInfo;
             this.pendingInfo = null;
@@ -166,6 +172,14 @@ Pile.prototype = {
     },
 
     draw: function(info) {
+        if (this.pendingCards.length) {
+            let card = this.pendingCards.pop();
+            clearTimeout(card.pilePendingTimeout);
+            delete card.pilePendingTimeout;
+            this.tagRoot.removeChild(card.tagRoot);
+            return card.setInfo(info);
+        }
+
         this.unactionable();
         let oldTop = this.topCard;
         oldTop.tagRoot.classList.remove('top');
@@ -176,7 +190,9 @@ Pile.prototype = {
 
         if (this.visible) this.info.pop();
         else this.info--;
-        this.setInfo(this.info);
+
+        this._updateToInfo();
+        this._updateToSize();
 
         this.tagRoot.appendChild(this.topCard.tagRoot);
 

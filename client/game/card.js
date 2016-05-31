@@ -191,6 +191,10 @@ Card.prototype = {
     transitionZ: function(z) {
         this.tagRoot.style.zIndex = z;
         this.tempZ = z;
+        if (this.movingTimeout) {
+            clearTimeout(this.movingTimeout);
+            this.movingTimeout = null;
+        }
         return this;
     },
 

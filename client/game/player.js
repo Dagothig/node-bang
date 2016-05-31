@@ -44,13 +44,13 @@ Player.prototype = {
         this.infoName.innerHTML = playerInfo.name;
 
         if (playerInfo.hand && (!this.info || !this.info.hand)) {
-            this.hand.name = 'hand' + playerInfo.name;
+            this.hand.name = 'hand';
             this.hand.infoFunc = 'setInfo';
             this.hand.setInfo(playerInfo.hand.cards);
             ui.show(this.hand.tagRoot);
         }
         else if (playerInfo.characters && (!this.info || !this.info.characters)) {
-            this.hand.name = 'characters' + playerInfo.name;
+            this.hand.name = 'characters';
             this.hand.infoFunc = 'setCharacter';
             this.hand.setInfo(playerInfo.characters);
             ui.show(this.hand.tagRoot);
@@ -59,7 +59,7 @@ Player.prototype = {
             ui.hide(this.hand.tagRoot);
 
         if (playerInfo.equipped && (!this.info || !this.info.equipped)) {
-            this.equipped.name = 'equipped' + playerInfo.name;
+            this.equipped.name = 'equipped';
             this.equipped.setInfo(playerInfo.equipped);
             ui.show(this.equipped.tagRoot);
         } else if(!playerInfo.equipped) ui.hide(this.equipped.tagRoot);
@@ -70,7 +70,7 @@ Player.prototype = {
             this.character.setCharacter();
 
         this.infoLife.innerHTML = '';
-        if (playerInfo.life) {
+        if (playerInfo.stats && playerInfo.stats.life) {
             this.lifeLevel = playerInfo.life;
             for (let i = 0; i < playerInfo.stats.life; i++)
                 this.infoLife.innerHTML +=
@@ -91,13 +91,17 @@ Player.prototype = {
     },
 
     setActions: function(acts, onAction) {
-        // hand and equipped
-        this.hand.setActions(acts, onAction);
-        this.equipped.setActions(acts, onAction);
-
-        this.character.unactionable();
+        this.hand.unactionable();
+        this.equipped.unactionable();
+        for (var verb in acts) {
+            if (!verb.endsWith(this.info.name) && verb !== 'choose') continue;
+            this.hand.actionable(verb, acts[verb], onAction);
+            this.equipped.actionable(verb, acts[verb], onAction);
+            break;
+        };
 
         // Check for targetting
+        this.character.unactionable();
         target: if (acts['target']) {
             let args = acts['target'];
             if (args.indexOf(this.info.name) === -1) break target;
@@ -105,7 +109,7 @@ Player.prototype = {
         }
 
         // Check for sid's heal
-        choose: if (
+        if (
             acts['choose'] &&
             acts['choose'].indexOf('heal') !== -1 &&
             this.character.info &&

@@ -467,7 +467,7 @@ textarea {
     font-size: 0.8em;
 
     margin-top: -1.75em;
-    padding: 0.25em;
+    padding: 0.25em 0.5em;
     position: absolute;
     transition:
         left 0.35s ease-in-out,
@@ -476,7 +476,7 @@ textarea {
     border-radius: 0.5em;
 }
 .info-plate.turn {
-    box-shadow: 0 0 0 0.125em #08f;
+    border-color: #4af;
 }
 .info-plate .name, .info-plate .life {
     display: block;
@@ -522,7 +522,7 @@ input.cancel-btn:disabled {
     color: #888;
 }
 input.cancel-btn:not(:disabled) {
-    box-shadow: 0 0 0 0.125em #08f;
+    animation: brown-flash 0.5s infinite linear alternate;
 }
 input.cancel-btn:not(:disabled):hover {
     background-color: #d83;
@@ -595,10 +595,22 @@ input.cancel-btn:active {
 .card-pile .bottom.actionable {
     cursor: pointer;
 }
+
 .card.actionable.visible .face,
-.card.actionable:not(.visible) .back,
-.card-pile .bottom.actionable {
-    box-shadow: 0 0 0 0.125em #08f;
+.card.actionable:not(.visible) .back {
+    animation: brown-flash 0.5s infinite linear alternate;
+}
+.card.actionable.visible .face.blue {
+    animation: blue-flash 0.5s infinite linear alternate;
+}
+
+@keyframes brown-flash {
+    from { border-color: #853; }
+    to { border-color: #4af; }
+}
+@keyframes blue-flash {
+    from { border-color: #1B66C1; }
+    to { border-color: #4af; }
 }
 
 .card .face {
@@ -858,6 +870,13 @@ input.cancel-btn:active {
     height: 7.5em;
     margin-top: -3.75em;
     box-shadow: 0 0 0 0.1em rgba(0, 0, 0, 0.3);
+}
+.card-pile .bottom.actionable {
+    animation: bottom-flash 0.5s infinite linear alternate;
+}
+@keyframes bottom-flash {
+    from { box-shadow: 0 0 0 0.1em rgba(0, 0, 0, 0.3); }
+    to { box-shadow: 0 0 0 0.25em #4af; }
 }
 .card-pile .size {
     /* The negative margin of cards -1 because of padding */

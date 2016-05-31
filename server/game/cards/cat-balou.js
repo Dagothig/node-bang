@@ -7,29 +7,29 @@ function CatBalou(suit, rank) {
 }
 misc.extend(Card, CatBalou, {
     handlePlay: function(step, onResolved) {
-        onResolved(events('targetOthers')(
-            step.player, step.game.players,
-            // onTarget; removing someone's card
-            target => {
-                onResolved(events('removeOtherCard')(
-                    step.player, target, true, true,
-                    (from, card) => {
-                        step.player.hand.discard(this.id);
-                        step.phase.cards.discarded.push(card);
-                        step.game.onGameEvent({
-                            name: 'discard',
-                            from: from,
-                            player: target.name,
-                            card: card.format()
-                        });
-                        onResolved();
-                    },
-                    // on cancel; the cat-balou was not used
-                    () => onResolved()
-                ))
+        onResolved(events('removeOtherCard')(
+            step.player,
+            step.game.players.filter(p => p.alive),
+            // withHand
+            true,
+            // withEquipment
+            true,
+            // onChoice
+            (target, from, card) => {
+                step.player.hand.discard(this.id);
+                step.phase.cards.discarded.push(card);
+                step.game.onGameEvent({
+                    name: 'discard',
+                    from: from,
+                    player: target.name,
+                    card: card.format()
+                });
+                onResolved();
             },
-            // onCancel; the catbalou was not used
-            () => onResolved()
+            // onCancel; cat-balou wasn't used
+            () => onResolved(),
+            // format
+            p => ({ for: 'catbalou' })
         ));
     }
 });

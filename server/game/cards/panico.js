@@ -9,19 +9,22 @@ function Panico(suit, rank) {
 }
 misc.extend(Card, Panico, {
     handlePlay: function(step, onResolved) {
-        onResolved(events('targetRange')(
-            step.player, step.game.players, step.player.stat('range'),
-            // onTarget; panicking someone
-            target => onResolved(events('removeOtherCard')(
-                step.player, target, true, true,
-                // onPlay; the panico was used and we have gained a card
-                (from, card) =>
-                    this.handleCard(step, target, from, card, onResolved),
-                // onCancel; the panico was not used
-                () => onResolved()
-            )),
-            // onCancel; the panico was not used
-            () => onResolved()
+        let player = step.player;
+        let alive = step.game.players.filter(p => p.alive);
+        let range = player.stat('range');
+        onResolved(events('removeOtherCard')(
+            player, alive.filter(p => player.distanceTo(alive, p) <= range),
+            // withHand
+            true,
+            // withEquipment
+            true,
+            // onChoice
+            (target, from, card) =>
+                this.handleCard(step, target, from, card, onResolved),
+            // onCancel; panico wasn't used
+            () => onResolved(),
+            // format
+            p => ({ for: 'panico' })
         ));
     },
     handleCard: function(step, target, from, card, onResolved) {
