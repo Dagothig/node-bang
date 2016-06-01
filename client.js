@@ -67,37 +67,7 @@ var game = window.game = require('./client/game.js')(settings,
     }
 );
 
-/*
-var icon = require('./client/icon.js')(
-    ['favicon.ico', 'favicon-alert.ico'],
-    ['¡Bang!', '!Bang¡'],
-    1000);
-icon.state = {
-    _focus: false,
-    _stuff: false,
-
-    set focus(focus) {
-        this._focus = focus;
-        icon.flash((this._stuff = (this._stuff && !focus)) && user);
-    },
-    set stuff(stuff) {
-        icon.flash((this._stuff = (stuff && !this._focus)) && user);
-    }
-};
-
-window.onfocus = () => icon.state.focus = true;
-window.onblur = () => icon.state.focus = false;
-*/
-
 ui.hide(roots);
-
-var lastTime;
-(function updater() {
-    var time = performance.now();
-    game.update((time - lastTime)/1000);
-    lastTime = time;
-    requestAnimationFrame(updater);
-}());
 
 var on = (key, func) => socket.on(key, function() {
     console.log(key, arguments);

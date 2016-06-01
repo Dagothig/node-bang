@@ -158,10 +158,6 @@ Game.prototype = {
         }
     },
 
-    update: function(delta) {
-
-    },
-
     angleFor: function(i, playerCount) {
         let portion = i / playerCount;
         while (portion > 0.5) portion = portion - 1;
