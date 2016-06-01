@@ -91,6 +91,25 @@ a {
     outline: none;
 }
 
+/* === [INTRO] === */
+.intro {
+    text-align: center;
+    line-height: 1.5em;
+    margin-bottom: 1em;
+}
+.intro .top {
+    font-size: 1.2em;
+    font-weight: 800;
+}
+.intro .name {
+    text-transform: uppercase;
+    color: #f00;
+}
+.intro a {
+    display: inline-block;
+    margin: 0em 0.1em;
+}
+
 /* === [TREE] === */
 .tree-root {
     font-size: 90%;

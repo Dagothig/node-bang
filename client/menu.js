@@ -57,6 +57,13 @@ module.exports = function(settings, onDisconnect) {
     disconnectContainer.appendChild(disconnect);
     list.appendChild(disconnectContainer);
 
+    var sourceContainer = document.createElement('div');
+    var source = document.createElement('a');
+    source.href = 'http://github.com/dagothig/node-bang';
+    source.innerHTML = 'Source';
+    sourceContainer.appendChild(source);
+    list.appendChild(sourceContainer);
+
     return {
         element: element,
         disconnect: disconnect
