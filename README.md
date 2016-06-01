@@ -9,6 +9,7 @@ A version of the game is currently up on [my ever-so-dubious website](http://ban
 
 As of now the game is fully implemented and supports disconnects and things of the such; while it's missing a handful of quality of life changes, it's mostly functional.
 
-The constants of the file server/consts.js can be overriden by giving the snake-case arguments corresponding to the constants:
-For instance, the minimum amount of players can be changed to 6 by passing the argument --min-players=6 when running the node server (this also works when running through gulp). A sample command could be:
+The constants of the file server/consts.js can be overriden by giving the snake-case arguments corresponding to the constants:  
+For instance, the minimum amount of players can be changed to 6 by passing the argument --min-players=6 when running the node server (this also works when running through gulp).  
+A sample command could be:  
 node server --min-players=6 --game-start-timer=30 --character-choices=3
