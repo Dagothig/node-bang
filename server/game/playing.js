@@ -9,7 +9,8 @@ var misc = aReq('server/misc'),
 
     Phase = aReq('server/game/phase'),
     CardPile = aReq('server/game/card-pile'),
-    Turn = aReq('server/game/turn');
+    Turn = aReq('server/game/turn'),
+    End = aReq('server/game/end');
 
 module.exports = new Phase('Playing', {
 
@@ -206,6 +207,7 @@ module.exports = new Phase('Playing', {
             delete p.stat;
             delete p.distanceTo;
             delete p.stats;
+            delete p.handlers;
 
             delete p.life;
             delete p.heal;
@@ -261,21 +263,26 @@ module.exports = new Phase('Playing', {
         var aliveCount = {};
         Object.keys(roles).forEach(key => aliveCount[key] = 0);
         alive.forEach(p => aliveCount[p.role.key]++);
+        game.players.forEach(p => p.winner = false);
         // If the sheriff is dead, then either a renegade or the outlaws have won
         if (!aliveCount.sheriff) {
             // If there is one alive and it's a renegade; they have won
             if (alive.length === 1 && alive[0].role === roles.renegade) {
-                game.end();
+                game.players.forEach(p => p.winner = p.alive);
+                game.switchToPhase(End);
             }
             // Otherwise, outlaws have won
             else {
-                game.end();
+                game.players.forEach(p => p.winner = (p.role === roles.outlaw));
+                game.switchToPhase(End);
             }
         }
         // If no outlaws and no renegades have won,
         // then the sheriff and deputies have won
         else if (!(aliveCount.outlaw + aliveCount.renegade)) {
-            game.end();
+            game.players.forEach(p =>
+                p.winner = (p.role === roles.sheriff || p.role === roles.deputy));
+            game.switchToPhase(End);
         }
     }
 });

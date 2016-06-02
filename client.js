@@ -70,7 +70,9 @@ var game = window.game = require('./client/game.js')(settings,
 ui.hide(roots);
 
 var on = (key, func) => socket.on(key, function() {
-    console.log(key, arguments);
+    console.log(key, 'args:');
+    for (var arg of arguments) console.log(arg);
+    console.log('---');
     //icon.state.stuff = true;
     if (func) func.apply(this, arguments);
 });

@@ -4,6 +4,9 @@ html, body {
     font-family: sans-serif;
     line-height: 1em;
 }
+html {
+    background-color: #aaa;
+}
 
 a {
     color: #08f;
@@ -64,10 +67,6 @@ a {
     overflow: hidden;
 }
 
-.root-bg {
-    background: #aaa;
-}
-
 .box {
     box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.5);
 }
@@ -95,15 +94,15 @@ a {
 .intro {
     text-align: center;
     line-height: 1.5em;
-    margin-bottom: 1em;
+    margin-bottom: 2em;
 }
 .intro .top {
     font-size: 1.2em;
     font-weight: 800;
 }
 .intro .name {
-    text-transform: uppercase;
     color: #f00;
+    text-transform: uppercase;
 }
 .intro a {
     display: inline-block;
@@ -335,6 +334,7 @@ textarea {
     width: 18%;
     min-width: 11.5rem;
     font-size: 0.8rem;
+    background-color: white;
 }
 
 /* === [LOADER] === */
@@ -479,6 +479,16 @@ textarea {
     height: 100%;
     min-width: 40em;
     min-height: 40em;
+}
+
+
+.winner .info-plate,
+.winner .card .face {
+    animation: winner-flash 0.5s infinite linear alternate;
+}
+@keyframes winner-flash {
+    from { box-shadow: 0 0 0.25em 0.25em #4af; }
+    to { box-shadow: 0 0 0.25em 0.5em #4af; }
 }
 
 .info-plate {

@@ -52,10 +52,12 @@ function startTimer(io, users) {
 }
 
 function stopTimer(io, users) {
-    if (gameStartInterval) clearInterval(gameStartInterval);
-    gameStartInterval = null;
-    gameStartTimer = null;
-    io.emit(msgs.joining, formattedJoining(users));
+    if (gameStartInterval) {
+        clearInterval(gameStartInterval);
+        io.emit(msgs.joining, formattedJoining(users));
+        gameStartInterval = null;
+        gameStartTimer = null;
+    }
 }
 
 function startGame(io, users) {
@@ -95,9 +97,10 @@ function handleJoining(io, users, user, socket, msg) {
             if (canStart(users)) startTimer(io, users);
             else stopTimer(io, users);
         }
+        io.emit(msgs.joining, formattedJoining(users));
+    } else {
+        socket.emit(msgs.joining, formattedJoining(users));
     }
-
-    io.emit(msgs.joining, formattedJoining(users));
 }
 
 function handleAction(io, users, user, socket, msg) {

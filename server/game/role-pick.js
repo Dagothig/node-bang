@@ -54,9 +54,9 @@ module.exports = new Phase('Role pick', {
         }
     },
     actionsFor: function(game, player) {
+        if (!player || player.confirmedRole) return {};
         var acts = {};
-        if (!player) return acts;
-        if (!player.confirmedRole) acts[actions.cancel] = ['confirm'];
+        acts[actions.cancel] = ['confirm'];
         return acts;
     },
     handleAction: function(game, player, msg) {

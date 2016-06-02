@@ -168,9 +168,11 @@ Game.prototype = {
         let newGame = false;
         if (!this.game || this.game.identifier !== game.identifier) {
             this.clearGame();
-            this.game = game;
             newGame = true;
         }
+        this.game = game;
+
+        if (game.phase === 'End') return this.displayEnd(game, newGame);
 
         if (game.players) {
             if (this.players) {
@@ -272,6 +274,38 @@ Game.prototype = {
         if (!newGame) this.requestPositions();
         else this.updatePositions();
     },
+    displayEnd: function(game, newGame) {
+        ['pile', 'discard', 'decal', 'choice']
+            .filter(k => this[k])
+            .forEach(k => {
+                let obj = this[k];
+                this.tagGame.removeChild(obj.tagRoot);
+                this[k] = null;
+            });
+
+        if (game.players) {
+            if (this.players) {
+                this.players.forEach(player => player.setInfo(
+                    game.players.find(p => p.name === player.info.name),
+                    game.turn
+                ));
+            } else {
+                this.players = game.players.map(playerInfo => {
+                    let player = new Player().setInfo(playerInfo);
+                    this.tagGame.appendChild(player.tagRoot);
+                    return player;
+                });
+            }
+        }
+
+        if (game.actions && game.actions.cancel) {
+            this.tagCancel.value = game.actions.cancel[0];
+            ui.show(this.tagCancel);
+        } else ui.hide(this.tagCancel);
+
+        if (!newGame) this.requestPositions();
+        else this.updatePositions();
+    },
 
     requestPositions: function() {
         if (this.resizeTimeout) clearTimeout(this.resizeTimeout);
@@ -288,7 +322,17 @@ Game.prototype = {
         };
         let centerSize = this.pile ? this.pile.tagBottom.offsetHeight * 0.6 : 0;
 
-        if (this.players) this.players.forEach(p => {
+        if (this.players) this.players.forEach((p, i) => {
+            if (this.game.phase === 'End') {
+                let nwidth = Math.ceil(Math.sqrt(this.players.length));
+                let x = (i%nwidth - (nwidth-1)/2) * 1.25;
+                let y = (Math.floor(i/nwidth) - (nwidth-1)/2) * 1.25;
+                let width = p.character.getWidth() + p.role.getWidth();
+                let height = p.character.getHeight() + p.infoPlate.offsetHeight;
+                p.endPhaseMove(halfSize.x + x * width, halfSize.y + y * height);
+                return;
+            }
+
             let dirX = p.dirX;
             let dirY = p.dirY;
 

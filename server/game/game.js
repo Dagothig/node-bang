@@ -84,6 +84,7 @@ misc.merge(Game.prototype, {
     handleDisconnect: function(user) {
         var player = this.findPlayer(user);
         if (!player) return;
+        player.disconnected = true;
         this.phase.handleDisconnect(this, player);
         this.onGameUpdate();
     }

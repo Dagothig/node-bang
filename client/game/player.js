@@ -71,16 +71,25 @@ Player.prototype = {
 
         this.infoLife.innerHTML = '';
         if (playerInfo.stats && playerInfo.stats.life) {
+            ui.show(this.infoLife);
             this.lifeLevel = playerInfo.life;
             for (let i = 0; i < playerInfo.stats.life; i++)
                 this.infoLife.innerHTML +=
                     (i < playerInfo.life ? "\uf004" : "\uf08a");
+        } else {
+            ui.hide(this.infoLife);
         }
 
         if (turn && (turn.player === playerInfo.name)) {
             this.infoPlate.classList.add('turn');
         } else {
             this.infoPlate.classList.remove('turn');
+        }
+
+        if (playerInfo.winner) {
+            this.tagRoot.classList.add('winner');
+        } else {
+            this.tagRoot.classList.remove('winner');
         }
 
         this.role.setRole(playerInfo.role);
@@ -119,6 +128,37 @@ Player.prototype = {
         }
 
         return this;
+    },
+
+    endPhaseMove: function(x, y) {
+        this.x = x;
+        this.y = y;
+        this.z = this.dirX = this.dirY = this.angle = 0;
+
+        let width = this.character.getWidth();
+        let height = this.character.getHeight();
+
+        ui.move(this.infoPlate,
+            this.x,
+            this.y + height / 2 + this.infoPlate.offsetHeight/2,
+            this.z + Player.infoPlateZ
+        );
+        this.infoPlate.style.marginLeft = (-this.infoPlate.offsetWidth / 2) + 'px';
+        this.infoPlate.style.transform = '';
+
+        this.character.move(
+            this.x - width/3,
+            this.y,
+            this.z + Player.characterZ,
+            -0.1
+        ).visible();
+
+        this.role.move(
+            this.x + width/3,
+            this.y,
+            this.z + Player.roleZ,
+            0.1
+        ).visible();
     },
 
     move: function(x, y, z, angle) {
