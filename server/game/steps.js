@@ -44,7 +44,7 @@ Step.prototype = {
         if (this.event) return this.event.actionsFor(player);
     },
     handleAction: function(player, msg) {
-        if (this.event) return this.event.handleAction(player, msg);
+        return this.event && this.event.handleAction(player, msg);
     },
     handleDisconnect: function(zombie) {
         if (this.event) this.event.handleDefault(zombie);

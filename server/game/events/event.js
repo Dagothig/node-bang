@@ -38,15 +38,16 @@ Event.prototype = {
     },
 
     handleAction: function(player, msg) {
-        if (player !== this.player) return;
+        if (player !== this.player) return false;
 
         var choice = this.choices.find(c => c.is(msg));
-        if (!choice) return;
+        if (!choice) return false;
 
         var arg = choice.args.find(a => choice.argFunc(a) === msg.arg);
-        if (!arg) return;
+        if (!arg) return false;
 
         this['handle' + misc.capitalize(choice.action)](player, arg);
+        return true;
     },
 
     handleDefault: function(player) {

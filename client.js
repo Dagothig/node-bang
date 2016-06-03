@@ -49,7 +49,7 @@ var menu = require('./client/menu.js')(settings,
         }
     }
 );
-var pregame = require('./client/pre-game')(
+var pregame = require('./client/pre-game')(settings,
     function onJoin(joining) {
         socket.emit(msgs.joining, {
             token: user.token,
@@ -73,7 +73,6 @@ var on = (key, func) => socket.on(key, function() {
     console.log(key, 'args:');
     for (var arg of arguments) console.log(arg);
     console.log('---');
-    //icon.state.stuff = true;
     if (func) func.apply(this, arguments);
 });
 on('connect', () => {});

@@ -3,7 +3,7 @@ var ui = require('./ui'),
 
 var gameEvents = [];
 
-module.exports = function(onJoin) {
+module.exports = function(settings, onJoin) {
     var tagPre = ui.one('#pre-game'),
         tagPreForm = ui.one(tagPre, 'form'),
         tagPreHeader = ui.one(tagPreForm, '.form-header'),
@@ -28,6 +28,10 @@ module.exports = function(onJoin) {
                 users.reduce((acc, user) => acc + 1, 0) +
                 " / " +
                 msg.minPlayers + "-" + msg.maxPlayers;
+
+            if (settings.ai && !tagPreJoin.checked) {
+                onJoin(true);
+            }
         },
 
         handleGame: function(game, current) {

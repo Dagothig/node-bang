@@ -59,11 +59,14 @@ module.exports = new Phase('Character pick', {
     },
 
     handleAction: function(game, player, msg) {
-        if (!player || msg.action !== actions.choose) return;
-        player.character =
-            player.characters.find((c) => c.name === msg.arg)
-            || player.character;
-        this.checkForEnd(game);
+        if (!player || msg.action !== actions.choose) return false;
+        let char = player.characters.find((c) => c.name === msg.arg);
+        if (char && char !== player.character) {
+            player.character = char;
+            this.checkForEnd(game);
+            return true;
+        }
+        return false;
     },
 
     handleDisconnect: function(game, player) {

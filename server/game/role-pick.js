@@ -60,14 +60,14 @@ module.exports = new Phase('Role pick', {
         return acts;
     },
     handleAction: function(game, player, msg) {
-        if (!player) return;
+        if (!player || player.confirmedRole) return false;
         switch (msg.action) {
             case actions.cancel:
                 player.confirmedRole = true;
                 this.checkForEnd(game);
-                break;
+                return true;
             default:
-                return;
+                return false;
         }
     },
     handleDisconnect: function(game, player) {

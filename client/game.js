@@ -39,7 +39,7 @@ Game.prototype = {
             ui.show(this.tagRoot);
             this.displayGame(game, current);
             if (this.settings.ai)
-                setTimeout(() => this.handleAI(game, current), 1000);
+                setTimeout(() => this.handleAI(game, current), 100);
         } else {
             ui.hide(this.tagRoot);
             if (this.game) this.clearGame();
@@ -308,7 +308,7 @@ Game.prototype = {
     },
 
     requestPositions: function() {
-        if (this.resizeTimeout) clearTimeout(this.resizeTimeout);
+        if (this.resizeTimeout) return;
         this.resizeTimeout = setTimeout(this.resizeFunc, this.resizeTime);
     },
     updatePositions: function() {

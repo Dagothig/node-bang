@@ -26,6 +26,8 @@ misc.merge(Game.prototype, {
         this.onGameEnd();
     },
     update: function(delta) {
+        if (!this.shouldUpdate) return;
+
         var currentTick = process.hrtime();
         delta: {
             if (!this.lastTick) break delta;
@@ -78,8 +80,8 @@ misc.merge(Game.prototype, {
     handleAction: function(user, msg) {
         var player = this.findPlayer(user);
         if (!player || !msg.action) return;
-        this.phase.handleAction(this, player, msg);
-        this.onGameUpdate();
+        if (this.phase.handleAction(this, player, msg))
+            this.onGameUpdate();
     },
     handleDisconnect: function(user) {
         var player = this.findPlayer(user);

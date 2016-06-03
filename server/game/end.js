@@ -37,21 +37,23 @@ module.exports = new Phase('End', {
         return acts;
     },
     handleAction: function(game, player, msg) {
-        if (!player) return;
+        if (!player) return false;
         switch(msg.action) {
             case actions.cancel:
-                this.confirmEnd(game, player);
+                return this.confirmEnd(game, player);
                 break;
             default:
-                return;
+                return false;
         }
     },
     handleDisconnect: function(game, player) {
         this.confirmEnd(game, player);
     },
     confirmEnd(game, player) {
+        if (player.confirmedEnd) return false;
         player.confirmedEnd = true;
         if (!game.players.find(p => !p.confirmedEnd)) game.end();
+        return true;
     },
 
     format: function(game, player, formatted) {

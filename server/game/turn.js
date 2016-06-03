@@ -38,8 +38,8 @@ misc.merge(Turn.prototype, {
         };
     },
     handleAction: function(player, msg) {
-        if (!this.step) return;
-        this.step.handleAction(player, msg);
+        if (!this.step) return false;
+        return this.step.handleAction(player, msg);
     },
     handleDisconnect: function(player) {
         if (!this.step) return;

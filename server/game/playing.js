@@ -225,8 +225,8 @@ module.exports = new Phase('Playing', {
     },
 
     handleAction: function(game, player, msg) {
-        if (!player || !this.turn) return;
-        this.turn.handleAction(player, msg);
+        if (!player || !this.turn) return false;
+        return this.turn.handleAction(player, msg);
     },
 
     handleDisconnect: function(game, player) {

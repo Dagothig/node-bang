@@ -35,7 +35,8 @@ ComposedEvent.prototype = {
     },
 
     handleAction: function(player, msg) {
-        return this._map('handleAction', player, msg);
+        let map = this._map('handleAction', player, msg);
+        return map.find(handle => handle);
     },
 
     handleDefault: function(player) {
