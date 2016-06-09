@@ -1,3 +1,5 @@
+'use strict';
+
 var misc = aReq('server/misc'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),

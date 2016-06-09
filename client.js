@@ -71,7 +71,7 @@ ui.hide(roots);
 
 var on = (key, func) => socket.on(key, function() {
     console.log(key, 'args:');
-    for (var arg of arguments) console.log(arg);
+    for (var arg in arguments) console.log(arguments[arg]);
     console.log('---');
     if (func) func.apply(this, arguments);
 });
