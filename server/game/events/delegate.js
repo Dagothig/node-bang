@@ -19,7 +19,14 @@ DelegateEvent.prototype = misc.merge({
         value: function() {
             return this._delegateCall(name, arguments);
         }
-    }), {})
+    }), {
+        get player() {
+            return this.event.player;
+        },
+        set player(player) {
+            this.event.player = player;
+        }  
+    })
 );
 
 module.exports = DelegateEvent;

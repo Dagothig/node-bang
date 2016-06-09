@@ -250,6 +250,7 @@ form .form-group label[for] {
     cursor: pointer;
 }
 input, textarea, input+.check {
+    color: #333;
     background: rgba(0, 0, 0, 0.05);
     padding: 0.75rem;
     border-radius: 0.5rem;

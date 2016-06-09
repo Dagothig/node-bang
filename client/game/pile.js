@@ -196,7 +196,9 @@ Pile.prototype = {
 
         this.tagRoot.appendChild(this.topCard.tagRoot);
 
-        return oldTop.setInfo(info);
+        if (info) oldTop.setInfo(info);
+        else oldTop.info = info;
+        return oldTop;
     }
 }
 

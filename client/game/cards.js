@@ -198,7 +198,10 @@ Cards.prototype = {
 
         if (!card) card = this.cards.pop();
         this.tagRoot.removeChild(card.tagRoot);
-        return card.setInfo(info).unactionable();
+        
+        if (info) card.setInfo(info);
+        else card.info = info;
+        return card.unactionable();
     }
 }
 
