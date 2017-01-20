@@ -43,6 +43,7 @@ handleEvent('beforeDeath',
     [step, killer, player, amount],
     // onFollowing
     () => {
+        player.dead = true;
         player.hand.discard();
         player.equipped.discard();
 
@@ -54,7 +55,7 @@ handleEvent('beforeDeath',
 );
 
 var handleDying = (step, killer, player, amount, onResolved) => {
-    if (player.alive) {
+    if (!player.dying) {
         handleEvent('afterDamage',
             step.game.players.filter(p => p.alive),
             [step, killer, player, amount],
@@ -100,7 +101,7 @@ var handleDamage = (step, source, target, amount, onResolved) => {
         target: target.name,
         amount: amount
     });
-    if (target.dead) handleDying(step, source, target, amount, onResolved);
+    if (target.dying) handleDying(step, source, target, amount, onResolved);
     else handleEvent('afterDamage',
         step.game.players.filter(p => p.alive),
         [step, source, target, amount],

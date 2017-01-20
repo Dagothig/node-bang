@@ -117,12 +117,10 @@ module.exports = new Phase('Playing', {
             heal: function(amount) {
                 this.life = Math.min(this.life + amount, this.stat('life'));
             },
-            get dead() {
-                return this.life <= 0;
-            },
-            get alive() {
-                return this.life > 0;
-            },
+            get dead() { return !this.alive; },
+            set dead(val) { this.alive = !val; },
+            alive: true,
+            get dying() { return this.life <= 0 },
             get zombie() {
                 return this.alive && this.user.isDisconnected;
             }
@@ -213,6 +211,7 @@ module.exports = new Phase('Playing', {
             delete p.heal;
             delete p.dead;
             delete p.alive;
+            delete p.dying;
             delete p.zombie;
 
             delete p.hand;
