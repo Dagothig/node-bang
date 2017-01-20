@@ -140,6 +140,9 @@ a {
 }
 .list div {
     padding: 0.25rem 0.5rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 .list .alive {
     color: #1e3;
