@@ -154,9 +154,11 @@ a {
     font-weight: 600;
 }
 .list em::before {
+    color: #aaa;
     content: "[";
 }
 .list em::after {
+    color: #aaa;
     content: "]";
 }
 /* === [FLEX] === */

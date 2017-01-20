@@ -44,7 +44,7 @@ module.exports = function(onMessage) {
         },
         handleMessage: function(name, message) {
             messagesList.innerHTML =
-                '<div>' + name + ' : ' + message + '</div>' +
+                '<div><em>' + name + '</em> ' + message + '</div>' +
                 messagesList.innerHTML;
         }
     };
