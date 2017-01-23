@@ -36,7 +36,7 @@ Event.prototype = {
     isTrivial: function() {
         var acts = this.actionsFor(this.player);
         var keys = Object.keys(acts);
-        return keys.length === 1 && acts[keys[0]].args.length === 1;
+        return keys.length === 1 && acts[keys[0]].length === 1;
     },
 
     truncateIfTrivial: function() {
