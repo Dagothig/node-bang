@@ -13,8 +13,15 @@ DelegateEvent.prototype = misc.merge({
         return this.event[func].apply(this.event, args);
     }
 },
-    ['actionsFor', 'handleAction', 'handleDefault', 'format', 'update']
-    .reduce((proto, name) => Object.defineProperty(proto, name, {
+    [
+        'isTrivial',
+        'truncateIfTrivial',
+        'actionsFor',
+        'handleAction',
+        'handleDefault',
+        'format',
+        'update'
+    ].reduce((proto, name) => Object.defineProperty(proto, name, {
         enumerable: true,
         value: function() {
             return this._delegateCall(name, arguments);
@@ -25,7 +32,7 @@ DelegateEvent.prototype = misc.merge({
         },
         set player(player) {
             this.event.player = player;
-        }  
+        }
     })
 );
 

@@ -9,5 +9,6 @@ module.exports = {
     characterPickMaxTime: 60,
     rolePickMaxTime: 10,
     eventMaxTime: 30,
+    eventTrivialTime: 1,
     endMaxTime: 60
 };

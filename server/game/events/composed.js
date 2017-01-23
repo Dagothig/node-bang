@@ -1,6 +1,7 @@
 'use strict';
 
-var misc = aReq('server/misc');
+var misc = aReq('server/misc'),
+    consts = aReq('server/consts');
 
 function ComposedEvent(elements, generator, onResolved) {
     this.events = new Array(elements.length);
@@ -23,6 +24,16 @@ ComposedEvent.prototype = {
                 obj,
             {}
         );
+    },
+
+    isTrivial: function() {
+        return this.events.every(ev => ev.isTrivial());
+    },
+
+    truncateIfTrivial: function() {
+        if (this.isTrivial)
+            this.events.forEach(ev => ev.time = consts.eventTrivialTime);
+        return this;
     },
 
     resolveEvent: function(i, newEvent) {

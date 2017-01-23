@@ -33,6 +33,17 @@ Event.prototype = {
         };
     },
 
+    isTrivial: function() {
+        var acts = this.actionsFor(this.player);
+        var keys = Object.keys(acts);
+        return keys.length === 1 && acts[keys[0]].args.length === 1;
+    },
+
+    truncateIfTrivial: function() {
+        if (this.isTrivial()) this.time = consts.eventTrivialTime;
+        return this;
+    },
+
     actionsFor: function(player) {
         return player === this.player ? this._actions : {};
     },

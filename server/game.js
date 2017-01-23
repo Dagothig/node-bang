@@ -112,9 +112,14 @@ function handleAction(io, users, user, socket, msg) {
 
 module.exports = (io, users) => ({
     onConnected: (user, socket) => {
-        socket.on(msgs.game, () => handleGame(io, users, user, socket));
-        socket.on(msgs.joining, msg => handleJoining(io, users, user, socket, msg));
-        socket.on(msgs.action, msg => handleAction(io, users, user, socket, msg));
+        socket.on(msgs.game, () =>
+            handleGame(io, users, user, socket));
+
+        socket.on(msgs.joining, msg =>
+            handleJoining(io, users, user, socket, msg));
+
+        socket.on(msgs.action, msg =>
+            handleAction(io, users, user, socket, msg));
     },
     onDisconnected: (user, socket) => {
         if (game) game.handleDisconnect(user);

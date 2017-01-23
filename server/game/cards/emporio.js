@@ -47,7 +47,7 @@ misc.extend(Card, Emporio, {
                 for: 'emporio',
                 cards: cards.map(c => c.format())
             })
-        ));
+        ).truncateIfTrivial());
     }
 });
 
