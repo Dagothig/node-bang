@@ -5,7 +5,11 @@ require('./global');
 var log = aReq('server/log'),
     warn = aReq('server/warn'),
     misc = aReq('server/misc'),
-    msgs = aReq('shared/messages');
+    msgs = aReq('shared/messages'),
+    consts = aReq('server/consts'),
+    strs = aReq('shared/strings');
+
+misc.parseArgs(process.argv, consts, log, warn);
 
 // Setup the server itself
 var http = require('http'),
@@ -34,6 +38,30 @@ var io = require('socket.io')(server),
     lobby = aReq('server/lobby')(io, users),
     game = aReq('server/game')(io, users);
 
+io.use((socket, next) => {
+    if (socket.allowance)
+        throw new Error('socket.allowance already defined!');
+    socket.allowance = consts.socketAllowance;
+    socket.use((ev, next) => {
+        let now = new Date().getTime();
+
+        socket.allowance--;
+        if (socket.lastAccess)
+            socket.allowance = Math.min(
+                consts.socketAllowance,
+                socket.allowance +
+                    (now - socket.lastAccess) * consts.socketRate / 1000
+            );
+        socket.lastAccess = now;
+        if (socket.allowance >= 0) next();
+        else next(new Error(
+            strs.allowanceExceeded + ': wait ' +
+            Math.ceil((1 + -socket.allowance) / consts.socketRate) + ' secs'
+        ));
+    });
+    next();
+});
+
 login.addHandlers(lobby, game);
 
 // Listen on port
@@ -57,23 +85,3 @@ stdin.on('data', cmd => {
             warn('Command unknown', '"' + cmd + '"');
     }
 });
-
-var consts = aReq('server/consts');
-process.argv.slice(2)
-    .map(arg => arg.split("="))
-    .filter(arg => arg.length === 2 && arg[0].startsWith("--"))
-    .forEach(arg => {
-        let param = arg[0].slice(2);
-        let value = arg[1];
-        let index = -1;
-        while ((index = param.indexOf('-')) !== -1) {
-            param =
-                param.substring(0, index) +
-                param[index + 1].toUpperCase() +
-                param.slice(index + 2);
-        }
-        if (consts[param] === undefined) return;
-        if (Number.isInteger(consts[param])) value = Number.parseInt(value);
-        log('Override const', param, ':', consts[param], '->', value);
-        consts[param] = value;
-    });

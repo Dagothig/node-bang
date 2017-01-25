@@ -10,5 +10,7 @@ module.exports = {
     rolePickMaxTime: 10,
     eventMaxTime: 30,
     eventTrivialTime: 1,
-    endMaxTime: 60
+    endMaxTime: 60,
+    socketAllowance: 10,
+    socketRate: 3
 };

@@ -1,27 +1,23 @@
 var msgs = require('./shared/messages'),
+    strs = require('./shared/strings'),
     ui = require('./client/ui'),
     misc = window.misc = require('./client/misc');
 
 var strat = require('./client/local-storage-strat');
 var settings = require('./client/settings')(strat, {
     saveToken: [true, 'bool', 'user'],
-    ai: [false, 'bool', 'user'],
     name: ['', 'str', 'sys'],
     token: ['', 'str', 'sys']
 });
-settings.bind('saveToken', val => {
-    if (!val) settings.name = settings.token = '';
-});
+settings.bind('saveToken', val => !val ? settings.clear('name', 'token') : 0);
 
 var socket = io(),
-    user,
-    users;
+    user, users, joining, ongoing;
 window.socket = socket;
 
 var roots = ui.many('body>*'),
     loader = ui.one('#loader'),
-    connectedContainer = ui.one('#connected-container'),
-    connectedUnknown = ui.one(connectedContainer, '#unknown');
+    connectedContainer = ui.one('#connected-container');
 
 var login = require('./client/login.js')(settings,
     function onLogin(name, password) {
@@ -30,6 +26,15 @@ var login = require('./client/login.js')(settings,
         socket.emit(msgs.auth, {
             name: name,
             password: password
+        });
+    }
+);
+var unknown = require('./client/unknown.js')(
+    function onRetry() {
+        ui.hide(roots);
+        ui.show(loader);
+        socket.emit(msgs.joining, {
+            token: user.token
         });
     }
 );
@@ -67,71 +72,88 @@ var game = window.game = require('./client/game.js')(settings,
     }
 );
 
-ui.hide(roots);
+function udpateVisbility() {
+    ui.hide(roots);
+    if (!user) {
+        ui.show(login.element);
+    } else {
+        ui.show(connectedContainer);
+        ui.hide(game.tagRoot, pregame.tagRoot, unknown.element);
+        if (ongoing) ui.show(game.tagRoot);
+        else if (joining) ui.show(pregame.tagRoot);
+        else ui.show(unknown.element);
+    }
 
-var on = (key, func) => socket.on(key, function() {
-    console.log(key, 'args:');
-    for (var arg in arguments) console.log(arguments[arg]);
-    console.log('---');
-    if (func) func.apply(this, arguments);
-});
+}
+ui.hide(roots);
+ui.show(loader);
+
+var on = (key, func) => socket.on(key, func);
 on('connect', () => {});
 on('disconnect', () => {
-    ui.hide(roots, connectedUnknown);
+    ui.hide(roots);
     ui.show(loader);
+});
+on('error', msg => {
+    if (user) lobby.handleError(msg);
+    else login.handleAuth({ reason: msg });
+    udpateVisbility();
 });
 on(msgs.alert, msg => alert(msg));
 on(msgs.reload, () => window.location.reload());
 on(msgs.auth, msg => {
-    if (!user) {
-        var name = settings.name;
-        var token = settings.token;
-        if (name && token) user = { name: name, token: token };
-    }
-    if (user) {
-        socket.emit(msgs.auth, {
-            name: user.name,
-            token: user.token
-        });
-        user = null;
-        settings.clear('name', 'token');
+    // If there is a msg, then it is an answer to a previous communication and should be handled as such: Otherwise, it is just an auth challenge and we can check if we aren't already able to complete it without user input
+    if (msg) {
+        if (msg.reason === strs.authToken) {
+            user = null;
+            settings.clear('token')
+        }
     } else {
-        login.handleAuth(msg);
-        ui.hide(roots);
-        ui.show(login.element);
-        login.name.focus();
+        if (!user && settings.name && settings.token)
+            user = {
+                name: settings.name,
+                token: settings.token
+            };
+
+        if (user)
+            socket.emit(msgs.auth, {
+                name: user.name,
+                token: user.token
+            });
     }
+
+    login.handleAuth(msg);
+    udpateVisbility();
 });
 on(msgs.user, msg => {
-    if (user && !msg) {
-        ui.hide(roots);
-        ui.show(login.element);
-        login.name.focus();
-    }
-    if (!user && msg) {
-        ui.hide(roots);
-        ui.show(connectedContainer);
-        lobby.message.focus();
-    }
     user = msg;
-    if (settings.saveToken) {
-        settings.name = (msg && msg.name) || '';
-        settings.token = (msg && msg.token) || '';
-    }
-    lobby.handleUsers(user, users);
+    if (user && settings.saveToken) {
+        settings.name = user.name;
+        settings.token = user.token;
+    } else settings.clear('token');
+    if (user && !ongoing && !joining)
+        socket.emit(msgs.joining, { token: user.token });
 
-    socket.emit(msgs.joining, { token: user.token });
-    socket.emit(msgs.game, { token: user.token });
+    lobby.handleUsers(user, users);
+    udpateVisbility();
 });
 on(msgs.users, msg => {
     users = msg;
     lobby.handleUsers(user, users);
 });
 on(msgs.message, m => lobby.handleMessage(m.name, m.message));
-on(msgs.joining, msg => pregame.handleJoining(user, msg));
+on(msgs.joining, msg => {
+    ongoing = null;
+    joining = msg;
+
+    pregame.handleJoining(user, msg)
+    udpateVisbility();
+});
 on(msgs.game, msg => {
-    ui.hide(connectedUnknown);
-    pregame.handleGame(msg, user);
+    ongoing = msg;
+    joining = null;
+    udpateVisbility();
+
     game.handleGame(msg, user);
     if (msg && msg.turn && msg.turn.step && msg.turn.step.event)
         game.handleEvent(msg.turn.step.event);

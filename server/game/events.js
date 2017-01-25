@@ -5,9 +5,10 @@ var misc = aReq('server/misc'),
     Choice = aReq('server/game/events/choice');
 
 var events = misc.merge((eventName, player, step) => {
-    // Since we want to return a function that behaves as if called on the proper
-    // object and since lambdas cannot reference the arguments object, then we must
-    // create a function to delegate the call on the proper object
+    // Since we want to return a function that behaves as if called on
+    // the proper object and since lambdas cannot reference the arguments
+    // object, then we must create a function to delegate the call on the
+    // proper object
     return (player && player.character[eventName]) ?
         function() {
             return player.character[eventName]
@@ -26,11 +27,12 @@ var events = misc.merge((eventName, player, step) => {
     raw: require('fs')
     .readdirSync(__dirname + '/events')
     .map(f => aReq('server/game/events/' + f))
+    // filter out Choice because it isn't an event type
     .filter(ev => ev !== Choice)
     .reduce((raw, ev) => Object.defineProperty(
-            raw,
-            misc.camelCase(ev === Event ? ev.name : ev.name.replace('Event', '')),
-            { enumerable: true, value: ev }
-        ), {})
+        raw,
+        misc.camelCase(ev === Event ? ev.name : ev.name.replace('Event', '')),
+        { enumerable: true, value: ev }
+    ), {})
 });
 module.exports = events;

@@ -31,9 +31,9 @@ handleEvent('afterDeath',
     [step, killer, player, amount],
     // onFollowing
     () => {
+        if (step.phase.checkForEnd(step.game)) return;
         if (player === step.player) step.phase.goToNextTurn(step.game);
         else onResolved();
-        step.phase.checkForEnd(step.game);
     },
     onResolved
 );

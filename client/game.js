@@ -35,27 +35,8 @@ Game.prototype = {
     constructor: Game,
 
     handleGame: function(game, current) {
-        if (game) {
-            ui.show(this.tagRoot);
-            this.displayGame(game, current);
-            if (this.settings.ai)
-                setTimeout(() => this.handleAI(game, current), 100);
-        } else {
-            ui.hide(this.tagRoot);
-            if (this.game) this.clearGame();
-        }
-    },
-    handleAI: function(game, current) {
-        let keys = Object.keys(game.actions)
-        let n = keys.reduce((n, act) => n + game.actions[act].length, 0);
-        if (!n) return;
-        let val = (Math.random() * n)|0;
-        for (let i = 0; i < keys.length; i++) {
-            let act = keys[i];
-            let actLen = game.actions[act].length;
-            if (val >= actLen) val -= actLen;
-            else return this.onAction(act, game.actions[act][val]);
-        }
+        if (game) this.displayGame(game, current);
+        else if (this.game) this.clearGame();
     },
 
     clearGame: function() {
@@ -106,7 +87,6 @@ Game.prototype = {
                 break;
 
             case 'equipped':
-                let target = this.players.find(p => p.info.name === msg.target);
                 target.equipped.append(player.hand.draw(msg.card), msg.card);
                 break;
 

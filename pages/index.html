@@ -8,7 +8,18 @@
     </head>
     <body>
         <div id="connected-container" class="hidden absolute full-width full-height flex horizontal">
-            <div id="unknown" class="grow-1"></div>
+            <div id="unknown" class="hidden grow-1 flex vertical scroll">
+                <div class="grow-1"></div>
+                <form class="form-box box flex horizontal">
+                    <div class="grow-1"></div>
+                    <div class="form-group">
+                        <label for="retry">Could not get state</label>
+                        <input id="retry" type="button" name="retry" class="ico-after" /><label for="retry" class="fa fa-refresh"></label>
+                    </div>
+                    <div class="grow-1"></div>
+                </form>
+                <div class="grow-1"></div>
+            </div>
             <div id="game" class="hidden grow-1 scroll">
                 <div class="container relative no-scroll"></div>
             </div>
@@ -29,6 +40,8 @@
                             <input id="join" type="checkbox" name="join" />
                             <label for="join" class="check fa fa-check"></label>
                         </span>
+                    </div>
+                    <div class="form-group list" id="joining">
                     </div>
                 </form>
                 <div class="grow-1"></div>

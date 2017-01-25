@@ -4,12 +4,13 @@ var ui = require('./ui'),
 var gameEvents = [];
 
 module.exports = function(settings, onJoin) {
-    var tagPre = ui.one('#pre-game'),
-        tagPreForm = ui.one(tagPre, 'form'),
+    var tagRoot = ui.one('#pre-game'),
+        tagPreForm = ui.one(tagRoot, 'form'),
         tagPreHeader = ui.one(tagPreForm, '.form-header'),
         tagPreError = ui.one(tagPreForm, '.form-error'),
         tagPreCount = ui.one(tagPreForm, '#player-count'),
-        tagPreJoin = ui.one(tagPreForm, '[name=join]');
+        tagPreJoin = ui.one(tagPreForm, '[name=join]'),
+        tagPlayers = ui.one(tagPreForm, '#joining');
 
     tagPreJoin.onchange = function(e) {
         onJoin(e.target.checked);
@@ -17,8 +18,12 @@ module.exports = function(settings, onJoin) {
 
     return {
 
+        tagRoot: tagRoot,
+
         handleJoining: function(current, msg) {
-            var users = msg ? msg.users : null;
+            if (!msg) return;
+
+            var users = msg.users;
             tagPreError.innerHTML = msg.reason ? msg.reason : '';
 
             tagPreJoin.checked =
@@ -29,14 +34,11 @@ module.exports = function(settings, onJoin) {
                 " / " +
                 msg.minPlayers + "-" + msg.maxPlayers;
 
-            if (settings.ai && !tagPreJoin.checked) {
-                onJoin(true);
-            }
-        },
-
-        handleGame: function(game, current) {
-            if (game) ui.hide(tagPre);
-            else ui.show(tagPre);
+            tagPlayers.innerHTML =
+                users.length ?
+                    users.reduce((acc, user) =>
+                        acc + '<div><em>' + user.name + '</em></div>', '') :
+                    '<div>No players yet</div>';
         }
     };
 }

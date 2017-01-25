@@ -75,8 +75,8 @@ function startGame(io, users) {
         // On end
         () => {
             game = null;
+            log('Game finished!');
             io.emit(msgs.game, null);
-            io.emit(msgs.joining, formattedJoining(users));
         }
     );
     users.forEach(user => user.joining = false);
@@ -88,7 +88,8 @@ function handleGame(io, users, user, socket) {
 }
 
 function handleJoining(io, users, user, socket, msg) {
-    if (!msg || user.token !== msg.token || game) return;
+    if (game) return handleGame(io, users, user, socket);
+    if (!msg || user.token !== msg.token) return;
     var joining = formattedJoining(users);
     if (msg.joining !== undefined && user.joining !== msg.joining) {
         user.joining = !user.joining && msg.joining
@@ -101,7 +102,7 @@ function handleJoining(io, users, user, socket, msg) {
         }
         io.emit(msgs.joining, formattedJoining(users));
     } else {
-        socket.emit(msgs.joining, formattedJoining(users));
+        socket.emit(msgs.joining, joining);
     }
 }
 

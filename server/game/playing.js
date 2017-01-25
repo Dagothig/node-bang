@@ -269,19 +269,23 @@ module.exports = new Phase('Playing', {
             if (alive.length === 1 && alive[0].role === roles.renegade) {
                 game.players.forEach(p => p.winner = p.alive);
                 game.switchToPhase(End);
+                return true;
             }
             // Otherwise, outlaws have won
             else {
                 game.players.forEach(p => p.winner = (p.role === roles.outlaw));
                 game.switchToPhase(End);
+                return true;
             }
         }
         // If no outlaws and no renegades have won,
         // then the sheriff and deputies have won
         else if (!(aliveCount.outlaw + aliveCount.renegade)) {
-            game.players.forEach(p =>
-                p.winner = (p.role === roles.sheriff || p.role === roles.deputy));
+            game.players.forEach(p => p.winner =
+                (p.role === roles.sheriff || p.role === roles.deputy));
             game.switchToPhase(End);
+            return true;
         }
+        return false;
     }
 });

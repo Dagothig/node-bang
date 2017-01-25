@@ -5,5 +5,6 @@ module.exports = {
     authToken: 'Token is invalid',
     playerCapped: 'The game is full',
     notEnoughPlayers: 'The game needs more players to start',
-    startTimer: (timer) => 'Starting in ' + timer + ' seconds'
+    startTimer: (timer) => 'Starting in ' + timer + ' seconds',
+    allowanceExceeded: 'Allowance exceeded'
 };

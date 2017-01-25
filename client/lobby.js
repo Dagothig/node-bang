@@ -29,11 +29,14 @@ module.exports = function(onMessage) {
             if (!users) return;
 
             function surroundWith(tag, clazz, obj) {
-                return '<' + tag + ' class="' + clazz + '">' + obj + '</' + tag + '>';
+                return '<' + tag + ' class="' + clazz + '">' +
+                        obj +
+                    '</' + tag + '>';
             }
             function getTag(user) {
                 var tag = user.name
-                if (misc.isCurrent(current, user)) tag = surroundWith('em', '', tag);
+                if (misc.isCurrent(current, user))
+                    tag = surroundWith('em', '', tag);
                 return surroundWith('div', '', tag);
             }
             var html = '';
@@ -45,6 +48,11 @@ module.exports = function(onMessage) {
         handleMessage: function(name, message) {
             messagesList.innerHTML =
                 '<div><em>' + name + '</em> ' + message + '</div>' +
+                messagesList.innerHTML;
+        },
+        handleError: function(msg) {
+            messagesList.innerHTML =
+                '<div class="error">' + msg + '</div>' +
                 messagesList.innerHTML;
         }
     };

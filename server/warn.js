@@ -1,7 +1,7 @@
 var chalk = require('chalk'),
     misc = aReq('server/misc');
 
-module.exports = function log() {
+module.exports = function warn() {
     console.log.call(this, chalk.bgRed(
         chalk.gray(misc.simpleTime()) +
         ' [' + chalk.yellow('Bang') + ']' +

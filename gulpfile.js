@@ -17,7 +17,7 @@ function errorHandler(prefix) {
 	};
 }
 
-gulp.task('server', function() {
+gulp.task('server', function(cb) {
 	if (node) {
 		node.kill();
 		log('Server killed');
@@ -31,6 +31,7 @@ gulp.task('server', function() {
 		misc.fromArrays(['server.js'], process.argv.slice(2)),
 		{ stdio: ['pipe', process.stdout, process.stderr] }
 	);
+	cb();
 });
 
 gulp.task('watch-server', function(cb) {
@@ -40,7 +41,7 @@ gulp.task('watch-server', function(cb) {
 		"./global.js",
 		"./shared/**/*.js",
 		"./server/**/*.js"
-	], ['server']);
+	], gulp.series('server'));
 });
 
 gulp.task('client', function(cb) {
@@ -72,12 +73,13 @@ gulp.task('watch-client', function(cb) {
 		"./client.js",
 		"./shared/**/*.js",
 		"./client/**/*.js"
-	], ['client']);
+	], gulp.series('client'));
 });
 
-gulp.task('public', function() {
+gulp.task('public', function(cb) {
 	log('Public files changed');
 	if (node) node.stdin.write('reload\n');
+	cb();
 });
 
 gulp.task('watch-public', function(cb) {
@@ -85,7 +87,7 @@ gulp.task('watch-public', function(cb) {
 	return gulp.watch([
 		"./public/**",
 		"./pages/**"
-	], ['public']);
+	], gulp.series('public'));
 });
 
 gulp.task('sloc', function(cb) {
@@ -99,10 +101,10 @@ gulp.task('sloc', function(cb) {
 	]).pipe(require('gulp-sloc')());
 });
 
-gulp.task('default', [
+gulp.task('default', gulp.parallel(
 	'server', 'client',
 	'watch-server', 'watch-client', 'watch-public'
-]);
+));
 
 process.on("exit", function() {
 	if (node) node.kill();

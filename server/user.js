@@ -6,8 +6,13 @@ var crypto = require('crypto'),
 
 function User(name, password) {
     this.sockets = [];
-    this.hash = crypto.createHash('md5').update(name.toLowerCase() + ':' + password).digest('hex');
-    this.token = crypto.randomBytes(48).toString('hex');
+    this.hash = crypto
+        .createHash('md5')
+        .update(name.toLowerCase() + ':' + password)
+        .digest('hex');
+    this.token = crypto
+        .randomBytes(48)
+        .toString('hex');
     this.name = name;
     this.joining = false;
     this.disconnectTimeout = null;
