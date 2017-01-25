@@ -72,7 +72,7 @@ var game = window.game = require('./client/game.js')(settings,
     }
 );
 
-function udpateVisbility() {
+function updateVisbility() {
     ui.hide(roots);
     if (!user) {
         ui.show(login.element);
@@ -97,7 +97,7 @@ on('disconnect', () => {
 on('error', msg => {
     if (user) lobby.handleError(msg);
     else login.handleAuth({ reason: msg });
-    udpateVisbility();
+    updateVisbility();
 });
 on(msgs.alert, msg => alert(msg));
 on(msgs.reload, () => window.location.reload());
@@ -123,7 +123,7 @@ on(msgs.auth, msg => {
     }
 
     login.handleAuth(msg);
-    udpateVisbility();
+    updateVisbility();
 });
 on(msgs.user, msg => {
     user = msg;
@@ -135,7 +135,7 @@ on(msgs.user, msg => {
         socket.emit(msgs.joining, { token: user.token });
 
     lobby.handleUsers(user, users);
-    udpateVisbility();
+    updateVisbility();
 });
 on(msgs.users, msg => {
     users = msg;
@@ -147,12 +147,12 @@ on(msgs.joining, msg => {
     joining = msg;
 
     pregame.handleJoining(user, msg)
-    udpateVisbility();
+    updateVisbility();
 });
 on(msgs.game, msg => {
     ongoing = msg;
     joining = null;
-    udpateVisbility();
+    updateVisbility();
 
     game.handleGame(msg, user);
     if (msg && msg.turn && msg.turn.step && msg.turn.step.event)
