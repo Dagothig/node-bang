@@ -11,6 +11,6 @@ module.exports = {
     eventMaxTime: 30,
     eventTrivialTime: 1,
     endMaxTime: 60,
-    socketAllowance: 10,
-    socketRate: 3
+    socketAllowance: 18,
+    socketRate: 6
 };
