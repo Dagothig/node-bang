@@ -9,6 +9,8 @@ var misc = aReq('server/misc'),
 
     Phase = aReq('server/game/phase'),
     CardPile = aReq('server/game/card-pile'),
+    Equipped = aReq('server/game/equipped'),
+    Hand = aReq('server/game/hand'),
     Turn = aReq('server/game/turn'),
     End = aReq('server/game/end');
 
@@ -36,43 +38,7 @@ module.exports = new Phase('Playing', {
         var phase = this;
 
         // Equipped first: it's needed for stat calculations
-        player.equipped = misc.merge([], {
-            stat: function(stat) {
-                return this.reduce((sum, equipment) => {
-                    return sum + (equipment[stat]|0);
-                }, 0);
-            },
-            remove: function(cardId) {
-                var index = this.indexOf(this.find(card => card.id === cardId));
-                return (index >= 0 && index < this.length) ?
-                    this.splice(index, 1)[0] : null;
-            },
-            discard: function(cardId) {
-                if (!arguments.length) {
-                    let discarded = this.slice();
-                    this.length = 0;
-                    cards.discarded.push.apply(cards.discarded, discarded);
-                    game.onGameEvent({
-                        name: 'discard',
-                        from: 'equipped',
-                        player: player.name,
-                        cards: discarded.map(c => c.format())
-                    });
-                    return;
-                }
-
-                var card = this.remove(cardId);
-                if (card) {
-                    cards.discarded.push(card);
-                    game.onGameEvent({
-                        name: 'discard',
-                        from: 'equipped',
-                        player: player.name,
-                        card: card.format()
-                    });
-                }
-            }
-        });
+        player.equipped = new Equipped(game, player, this.cards);
 
         // Distance second: it's needed for the remainder of the player values
         misc.merge(player, {
@@ -95,9 +61,10 @@ module.exports = new Phase('Playing', {
             },
 
             stats: function() {
-                var obj = {};
-                Object.keys(stats).forEach(stat => obj[stat] = this.stat(stat));
-                return obj;
+                return Object.keys(stats).reduce((obj, stat) => {
+                    obj[stat] = this.stat(stat);
+                    return obj;
+                }, {});
             },
 
             handlers: function(eventName) {
@@ -114,83 +81,17 @@ module.exports = new Phase('Playing', {
         // Life third: it's used in the hand limit calculations
         misc.merge(player, {
             life: player.stat('life'),
+            alive: true,
             heal: function(amount) {
                 this.life = Math.min(this.life + amount, this.stat('life'));
             },
             get dead() { return !this.alive; },
             set dead(val) { this.alive = !val; },
-            alive: true,
             get dying() { return this.life <= 0 },
-            get zombie() {
-                return this.alive && this.disconnected;
-            }
+            get zombie() { return this.alive && this.disconnected; }
         });
 
-        // Hand
-        var cards = this.cards;
-        player.hand = misc.merge(cards.draw(player.stat('initCards')), {
-            drawFromPile: function(amount) {
-                amount = amount || 1;
-                let drawn = cards.draw(amount);
-                drawn.forEach(card => this.push(card));
-                let specific = {
-                    name: 'draw',
-                    from: 'pile',
-                    player: player.name,
-                    cards: drawn.map(c => c.format())
-                };
-                let unspecific = {
-                    name: 'draw',
-                    from: 'pile',
-                    player: player.name,
-                    amount: amount
-                };
-                game.onGameEvent(p => p === player ? specific : unspecific);
-            },
-            remove: function(cardId) {
-                var index = this.indexOf(this.find(card => card.id === cardId));
-                return (index >= 0 && index < this.length) ?
-                    this.splice(index, 1)[0] : null;
-            },
-            removeRand: function() {
-                return misc.spliceRand(this);
-            },
-            discard: function(cardId) {
-                if (!arguments.length) {
-                    let discarded = this.slice();
-                    this.length = 0;
-                    cards.discarded.push.apply(cards.discarded, discarded);
-                    game.onGameEvent({
-                        name: 'discard',
-                        from: 'hand',
-                        player: player.name,
-                        cards: discarded.map(c => c.format())
-                    });
-                    return;
-                }
-
-                var card = this.remove(cardId);
-                if (card) {
-                    cards.discarded.push(card);
-                    game.onGameEvent({
-                        name: 'discard',
-                        from: 'hand',
-                        player: player.name,
-                        card: card.format()
-                    });
-                }
-            },
-
-            get cardMax() {
-                return player.life;
-            },
-            get cardCount() {
-                return player.hand ? player.hand.length : 0;
-            },
-            get isTooLarge() {
-                return this.cardCount > this.cardMax;
-            }
-        });
+        player.hand = new Hand(game, player, this.cards);
     },
 
     update: function(game, delta) {
@@ -208,9 +109,9 @@ module.exports = new Phase('Playing', {
             delete p.handlers;
 
             delete p.life;
+            delete p.alive;
             delete p.heal;
             delete p.dead;
-            delete p.alive;
             delete p.dying;
             delete p.zombie;
 

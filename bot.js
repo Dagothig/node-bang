@@ -78,7 +78,7 @@ var msgHandlers = {
         if (!user) ongoing = null;
         if (user && !ongoing) {
             console.log('Asking about game');
-            emit(msgs.game, { token: user.token });
+            emit(msgs.joining, { token: user.token });
         }
     },
     game: game => {

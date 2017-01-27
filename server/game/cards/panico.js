@@ -14,42 +14,15 @@ misc.extend(Card, Panico, {
         let range = player.stat('range');
         onResolved(events('removeOtherCard')(
             player, alive.filter(p => player.distanceTo(alive, p) <= range),
-            // withHand
-            true,
-            // withEquipment
-            true,
-            // onChoice
-            (target, from, card) =>
-                this.handleCard(step, target, from, card, onResolved),
-            // onCancel; panico wasn't used
-            () => onResolved(),
-            // format
-            p => ({ for: (p === step.player) ? 'panico' : '' })
+            true, true, // with hand & equipment
+            (target, from, card) => { // onChoice
+                player.hand.discard(this.id);
+                player.hand.add(card, { from: from, target: target.name });
+                onResolved();
+            },
+            onResolved, // onCancel; panico wasn't used
+            p => ({ for: (p === player) ? 'panico' : '' }) // format
         ));
-    },
-    handleCard: function(step, target, from, card, onResolved) {
-        step.player.hand.push(card);
-        step.player.hand.discard(this.id);
-
-        let specific = {
-            name: 'draw',
-            from: from,
-            player: step.player.name,
-            target: target.name,
-            card: card.format()
-        };
-        let unspecific = {
-            name: 'draw',
-            from: from,
-            player: step.player.name,
-            target: target.name,
-            amount: 1
-        };
-        step.game.onGameEvent(player =>
-            (player === step.player || player === target) ? specific : unspecific
-        );
-
-        onResolved();
     }
 });
 

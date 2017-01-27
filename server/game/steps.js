@@ -80,22 +80,7 @@ Draw.prototype = misc.merge(Object.create(Step.prototype), {
         this.onResolved(events('cardsDraw')(
             this.player, this.phase.cards, 2,
             cards => {
-                Array.prototype.push.apply(this.player.hand, cards);
-                let specific = {
-                    name: 'draw',
-                    from: 'pile',
-                    player: this.player.name,
-                    cards: cards.map(card => card.format())
-                };
-                let unspecific = {
-                    name: 'draw',
-                    from: 'pile',
-                    player: this.player.name,
-                    amount: 2
-                };
-                this.game.onGameEvent(p =>
-                    p === this.player ? specific : unspecific
-                );
+                this.player.hand.add(cards, { from: 'pile' });
                 this.handleAfterDraw(cards);
             }
         ));

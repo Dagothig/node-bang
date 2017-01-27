@@ -11,20 +11,7 @@ module.exports = new Character("Kit Carlson", {
         onResolved(events('cardsDraw')(
             step.player, step.phase.cards, 3,
             cards => {
-                Array.prototype.push.apply(step.player.hand, cards);
-                let spec = {
-                    name: 'draw',
-                    from: 'pile',
-                    player: step.player.name,
-                    cards: cards.map(c => c.format())
-                };
-                let unspec = {
-                    name: 'draw',
-                    from: 'pile',
-                    player: step.player.name,
-                    amount: 3
-                };
-                step.game.onGameEvent(p => p === step.player ? spec : unspec);
+                step.player.hand.add(cards, { from: 'pile' });
                 onResolved(events('cardChoice')(
                     step.player, cards,
                     card => {

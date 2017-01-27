@@ -10,34 +10,11 @@ module.exports = new Character("Vulture Sam", {
 
         let sam = step.game.players.find(p => p.character === this);
 
-        let specific = {
-            name: 'draw',
-            from: 'hand',
-            player: sam.name,
-            target: player.name,
-            cards: player.hand.map(c => c.format())
-        };
-        let unspecific = {
-            name: 'draw',
-            from: 'hand',
-            player: sam.name,
-            target: player.name,
-            amount: player.hand.length
-        };
-        step.game.onGameEvent(p =>
-            (p === sam || p === player) ? specific : unspecific
-        );
-        sam.hand.push.apply(sam.hand, player.hand);
+        sam.hand.add(player.hand, { from: 'hand', target: player.name });
         player.hand.length = 0;
 
-        step.game.onGameEvent({
-            name: 'draw',
-            from: 'equipped',
-            player: sam.name,
-            target: player.name,
-            cards: player.equipped.map(c => c.format())
-        });
-        sam.hand.push.apply(sam.hand, player.equipped);
+        sam.hand.add(player.equipped,
+            { from: 'equipped', target: player.name }, true);
         player.equipped.length = 0;
 
         // Since the players hand will be empty afterwards anyway, we might as well

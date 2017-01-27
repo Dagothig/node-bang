@@ -28,14 +28,11 @@ misc.extend(Card, Emporio, {
             player, cards,
             // onChoice
             card => {
-                player.hand.push(misc.remove(cards, card));
-                step.game.onGameEvent({
-                    name: 'draw',
-                    from: 'choice',
-                    for: 'emporio',
-                    player: player.name,
-                    card: card.format()
-                });
+                player.hand.add(
+                    misc.remove(cards, card),
+                    { from: 'choice', for: 'emporio' },
+                    true // card visible to all
+                );
                 let next = misc.after(players, player);
                 this.handleEmporio(step, players, next, cards, onResolved);
             },

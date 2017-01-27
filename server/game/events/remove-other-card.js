@@ -8,27 +8,24 @@ var actions = aReq('server/actions'),
 function RemoveOtherCardEvent(
     player, targets, withHand, withEquipment, onChoice, onCancel, format
 ) {
-    Event.call(this,
-        player,
-        targets.reduce(
-            (choices, target) => {
-                if (!onChoice) return choices;
+    Event.call(this, player, targets.reduce(
+        (choices, target) => {
+            if (!onChoice) return choices;
 
-                let action = actions.choose + '-' + target.name;
-                choices.push(new Choice(action, misc.fromArrays(
-                    (withHand && target.hand.length) ? [{ id: 'hand' }] : [],
-                    withEquipment ? target.equipped : []
-                ), c => c.id))
+            let action = actions.choose + '-' + target.name;
+            choices.push(new Choice(action, misc.fromArrays(
+                (withHand && target.hand.length) ? [{ id: 'hand' }] : [],
+                withEquipment ? target.equipped : []
+            ), c => c.id))
 
-                this['handle' + misc.capitalize(action)] = (player, choice) =>
-                    this.handleChoose(player, target, choice);
+            this['handle' + misc.capitalize(action)] = (player, choice) =>
+                this.handleChoose(player, target, choice);
 
-                return choices;
-            },
-            [onCancel && new Choice(actions.cancel, onCancel.arg && [onCancel.arg])]
-        ),
-        format
-    );
+            return choices;
+        },
+        [onCancel &&
+            new Choice(actions.cancel, onCancel.arg && [onCancel.arg])]
+    ), format);
     this.onChoice = onChoice;
     this.onCancel = onCancel;
 }
@@ -44,9 +41,7 @@ RemoveOtherCardEvent.prototype = misc.merge(Object.create(Event.prototype), {
             if (card) this.onChoice(target, 'equipped', card);
         }
     },
-    handleCancel: function() {
-        this.onCancel();
-    }
+    handleCancel: function() { this.onCancel(); }
 });
 
 module.exports = RemoveOtherCardEvent;

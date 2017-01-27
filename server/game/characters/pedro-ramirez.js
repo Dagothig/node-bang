@@ -2,7 +2,9 @@
 
 var actions = aReq('server/actions'),
     Character = aReq('server/game/characters/character'),
-    events = aReq('server/game/events');
+    events = aReq('server/game/events'),
+    log = aReq('server/log'),
+    warn = aReq('server/warn');
 
 module.exports = new Character("Pedro Ramirez", {
     priority: -1,
@@ -14,10 +16,13 @@ module.exports = new Character("Pedro Ramirez", {
         onResolved(events('simple')(
             step.player, actions.draw, ['pile', 'discard'],
             function(p, arg) {
-                if (arg === 'pile')
-                    self.handleDrawPile(step, onResolved, onSkip);
+                if (arg === 'pile') step.player.hand.drawFromPile();
                 else if (arg === 'discard')
-                    self.handleDrawDiscard(step, onResolved, onSkip);
+                    step.player.hand.add(
+                        step.phase.cards.discarded.pop(),
+                        { from: 'discard' }, true);
+                step.player.hand.drawFromPile();
+                onSkip();
             },
             // format
             () => ({
@@ -25,21 +30,5 @@ module.exports = new Character("Pedro Ramirez", {
                 for: 'Pedro Ramirez'
             })
         ));
-    },
-    handleDrawPile: function(step, onResolved, onSkip) {
-        step.player.hand.drawFromPile(2);
-        onSkip();
-    },
-    handleDrawDiscard: function(step, onResolved, onSkip) {
-        step.player.hand.drawFromPile();
-        let card = step.phase.cards.discarded.pop();
-        step.player.hand.push(card);
-        step.game.onGameEvent({
-            name: 'draw',
-            from: 'discard',
-            player: step.player.name,
-            card: card.format()
-        });
-        onSkip();
     }
 });
