@@ -7,6 +7,7 @@ module.exports = {
     gameStartTimer: 10,
     characterChoices: 2,
     characterPickMaxTime: 60,
+    characterGraceTime: 3,
     rolePickMaxTime: 10,
     eventMaxTime: 30,
     eventTrivialTime: 1,

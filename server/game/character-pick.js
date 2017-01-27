@@ -92,7 +92,7 @@ module.exports = new Phase('Character pick', {
 
     checkForEnd: function(game) {
         var unchosen = game.players.filter((player) => !player.character);
-        if (!unchosen.length && this.remainingTime > 3)
-            this.startTimer(game, 3);
+        if (!unchosen.length && this.remainingTime > consts.characterGraceTime)
+            this.startTimer(game, consts.characterGraceTime);
     }
 });
