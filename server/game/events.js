@@ -17,9 +17,7 @@ var events = misc.merge((eventName, player, step) => {
         function() {
             let event = events.raw[eventName];
             let args = Array.from(arguments);
-            function Tempo() {
-                event.apply(this, args);
-            }
+            function Tempo() { event.apply(this, args); }
             Tempo.prototype = event.prototype;
             return new Tempo();
         };

@@ -10,7 +10,8 @@ const io = require('socket.io-client'),
 var params = misc.parseArgs(process.argv, {
     server: 'http://localhost:8080',
     userName: 'botty',
-    userPassword: 'bots'
+    userPassword: 'bots',
+    delay: 0
 }, console.log, console.log);
 
 const socket = io.connect(params.server, {reconnect: true});
@@ -25,7 +26,7 @@ function emit(key, msg = null, delay = moratorium) {
                 ongoingMsgTimer = null;
                 if (msgQueue.length) emit.apply(null, msgQueue.shift());
             },
-            delay
+            delay + params.delay
         );
     }
 }

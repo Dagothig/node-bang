@@ -122,7 +122,7 @@ module.exports = new Phase('Playing', {
             alive: true,
             get dying() { return this.life <= 0 },
             get zombie() {
-                return this.alive && this.user.isDisconnected;
+                return this.alive && this.disconnected;
             }
         });
 

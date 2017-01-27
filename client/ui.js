@@ -20,6 +20,9 @@ function hide() {
         else if (arg.classList) arg.classList.add('hidden');
     }
 }
+function hidden(element) {
+    return element.classList.contains('hidden');
+}
 function findParentBefore(node, before) {
     if (node.parentElement === before) return node;
     return findParentBefore(node.parentElement, before);
@@ -61,5 +64,6 @@ module.exports = {
     findParentBefore: findParentBefore,
     create: create,
     move: move,
-    shake: shake
+    shake: shake,
+    hidden: hidden
 };

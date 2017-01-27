@@ -4,6 +4,7 @@ var crypto = require('crypto'),
     misc = aReq('server/misc'),
     log = aReq('server/log'),
     warn = aReq('server/warn'),
+    actions = aReq('server/actions'),
 
     Player = aReq('server/game/player'),
     CharacterPick = aReq('server/game/character-pick');
@@ -72,6 +73,7 @@ misc.merge(Game.prototype, {
                             other.role.name :
                             other.role.publicName
                     } : undefined,
+                    disconnected: other.disconnected
                 })
             ),
             actions: this.phase.actionsFor(this, player)
@@ -80,6 +82,8 @@ misc.merge(Game.prototype, {
     handleAction: function(user, msg) {
         var player = this.findPlayer(user);
         if (!player || !msg.action) return;
+        if (msg.action === actions.resign && !player.zombie)
+            return this.handleDisconnect(user);
         if (this.phase.handleAction(this, player, msg))
             this.onGameUpdate();
     },

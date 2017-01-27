@@ -11,7 +11,19 @@ function Game(settings, onAction) {
     this.settings = settings;
     this.tagRoot = ui.one('#game');
     this.tagGame = ui.one(this.tagRoot, '.container');
-    this.tagCancel = ui.create('input', 'cancel-btn');
+
+    this.tagButtons = ui.create('div', 'absolute bottom left');
+
+    this.tagResign = ui.create('input', '', this.tagButtons);
+    this.tagResign.type = 'button';
+    this.tagResign.value = 'Resign';
+    this.tagResign.name = 'resign';
+    this.tagResign.onclick = () =>
+        confirm('Are you sure you want to resign?') &&
+            this.onAction('resign', 'resign');
+    ui.hide(this.tagResign);
+
+    this.tagCancel = ui.create('input', 'flash', this.tagButtons);
     this.tagCancel.type = 'button';
     this.tagCancel.value = 'Cancel';
     this.tagCancel.name = 'cancel';
@@ -41,7 +53,7 @@ Game.prototype = {
 
     clearGame: function() {
         this.tagGame.innerHTML = '';
-        this.tagGame.appendChild(this.tagCancel);
+        this.tagGame.appendChild(this.tagButtons);
 
         this.game = null;
         this.players = null;
@@ -251,6 +263,11 @@ Game.prototype = {
             } else ui.hide(this.tagCancel);
         }
 
+        let player = this.players.find(player =>
+            player.info.name === current.name);
+        if (player && !player.info.disconnected) ui.show(this.tagResign);
+        else ui.hide(this.tagResign);
+
         if (!newGame) this.requestPositions();
         else this.updatePositions();
     },
@@ -282,6 +299,8 @@ Game.prototype = {
             this.tagCancel.value = game.actions.cancel[0];
             ui.show(this.tagCancel);
         } else ui.hide(this.tagCancel);
+
+        ui.hide(this.tagResign);
 
         if (!newGame) this.requestPositions();
         else this.updatePositions();

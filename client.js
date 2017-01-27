@@ -72,28 +72,49 @@ var game = window.game = require('./client/game.js')(settings,
     }
 );
 
-function updateVisbility() {
-    ui.hide(roots);
-    if (!user) {
-        ui.show(login.element);
-    } else {
-        ui.show(connectedContainer);
-        ui.hide(game.tagRoot, pregame.tagRoot, unknown.element);
-        if (ongoing) ui.show(game.tagRoot);
-        else if (joining) ui.show(pregame.tagRoot);
-        else ui.show(unknown.element);
+var all = Array.from(roots)
+    .concat([game.tagRoot, pregame.tagRoot, unknown.element]);
+function updateVisbility(limbo) {
+    if (limbo) {
+        ui.hide(roots);
+        ui.show(loader);
+        return;
     }
 
-}
-ui.hide(roots);
-ui.show(loader);
+    let toHide = all.slice();
+    let toShow = [
+        user ? connectedContainer :
+        login.element,
 
-var on = (key, func) => socket.on(key, func);
-on('connect', () => {});
-on('disconnect', () => {
-    ui.hide(roots);
-    ui.show(loader);
+        ongoing ? game.tagRoot :
+        joining ? pregame.tagRoot :
+        unknown.element
+    ];
+    toHide = toHide.filter(e => !ui.hidden(e) && toShow.indexOf(e) === -1);
+    toShow = toShow.filter(e => ui.hidden(e));
+    ui.hide(toHide);
+    ui.show(toShow);
+    if (toShow.indexOf(connectedContainer) >= 0)
+        lobby.message.focus();
+    else (toShow.indexOf(login.element) >= 0)
+        login.name.focus();
+}
+updateVisbility(true);
+
+var on = (key, func) => socket.on(key, function() {
+    console.log('received', key, 'args:');
+    for (var arg in arguments) console.log(arguments[arg]);
+    if (func) func.apply(this, arguments);
 });
+socket.__emit = socket.emit;
+socket.emit = function(key) {
+    console.log('sent', key, 'args:');
+    for (var arg in arguments) console.log(arguments[arg]);
+    socket.__emit.apply(socket, arguments);
+}
+//var on = (key, func) => socket.on(key, func);
+on('connect', () => {});
+on('disconnect', () => updateVisbility(true));
 on('error', msg => {
     if (user) lobby.handleError(msg);
     else login.handleAuth({ reason: msg });
@@ -109,17 +130,19 @@ on(msgs.auth, msg => {
             settings.clear('token')
         }
     } else {
-        if (!user && settings.name && settings.token)
-            user = {
-                name: settings.name,
-                token: settings.token
-            };
-
         if (user)
             socket.emit(msgs.auth, {
                 name: user.name,
                 token: user.token
             });
+        else if (!user && settings.name && settings.token) {
+            // Because we have no way of knowing if this handle is fine, we must got to lmb
+            socket.emit(msgs.auth, {
+                name: settings.name,
+                token: settings.token
+            });
+            return updateVisbility(true);
+        }
     }
 
     login.handleAuth(msg);
@@ -131,11 +154,11 @@ on(msgs.user, msg => {
         settings.name = user.name;
         settings.token = user.token;
     } else settings.clear('token');
-    if (user && !ongoing && !joining)
-        socket.emit(msgs.joining, { token: user.token });
-
     lobby.handleUsers(user, users);
-    updateVisbility();
+    if (user && !ongoing && !joining) {
+        socket.emit(msgs.joining, { token: user.token });
+        updateVisbility(true);
+    } else updateVisbility();
 });
 on(msgs.users, msg => {
     users = msg;
@@ -143,19 +166,24 @@ on(msgs.users, msg => {
 });
 on(msgs.message, m => lobby.handleMessage(m.name, m.message));
 on(msgs.joining, msg => {
-    ongoing = null;
-    joining = msg;
+    if (msg) {
+        ongoing = null;
+        joining = msg;
 
-    pregame.handleJoining(user, msg)
+        pregame.handleJoining(user, msg)
+    } else joining = null;
     updateVisbility();
 });
 on(msgs.game, msg => {
-    ongoing = msg;
-    joining = null;
-    updateVisbility();
+    if (msg) {
+        ongoing = msg;
+        joining = null;
+        updateVisbility();
 
-    game.handleGame(msg, user);
-    if (msg && msg.turn && msg.turn.step && msg.turn.step.event)
-        game.handleEvent(msg.turn.step.event);
+        game.handleGame(msg, user);
+        if (msg && msg.turn && msg.turn.step && msg.turn.step.event)
+            game.handleEvent(msg.turn.step.event);
+    } else ongoing = null;
+    updateVisbility();
 });
 on(msgs.event, msg => game.handleEvent(msg));

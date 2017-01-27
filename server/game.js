@@ -76,7 +76,7 @@ function startGame(io, users) {
         () => {
             game = null;
             log('Game finished!');
-            io.emit(msgs.game, null);
+            io.emit(msgs.joining, formattedJoining(users));
         }
     );
     users.forEach(user => user.joining = false);
