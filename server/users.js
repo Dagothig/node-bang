@@ -9,5 +9,8 @@ module.exports = misc.merge([], {
     },
     remove: function(user) {
         this.splice(this.indexOf(user), 1);
+    },
+    emit: function() {
+        this.forEach(user => user.emit.apply(user, arguments));
     }
 });

@@ -39,6 +39,26 @@ Player.depth = Player.infoPlateZ + 1;
 Player.prototype = {
     constructor: Player,
 
+    computeAngle: function(players, i, shift) {
+        // The angle is shifted by a quarter-circle because we want to
+        // start center-bottom
+        this.angle = (shift !== -1 ?
+                this.angleFor(i - shift, players.length) :
+                i * Math.TWO_PI / players.length
+            ) + Math.HALF_PI;
+        this.dirX = Math.cos(this.angle);
+        this.dirY = Math.sin(this.angle);
+        let dist = Math.abs(shift - i);
+        dist = Math.min(dist, players.length - dist);
+        this.z = (players.length - dist - 1) * Player.depth;
+    },
+    angleFor: function(i, playerCount) {
+        let portion = i / playerCount;
+        while (portion > 0.5) portion = portion - 1;
+        if (portion !== 0) portion = Math.sign(portion) * 0.025 + portion * 0.95;
+        return portion * Math.TWO_PI;
+    },
+
     setInfo: function(playerInfo, turn) {
 
         this.infoName.innerHTML = playerInfo.name;

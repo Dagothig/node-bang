@@ -189,18 +189,13 @@ Cards.prototype = {
     },
 
     draw: function(info) {
-        let card = null;
-        for (let i = 0; i < this.cards.length; i++) {
-            if (!this.cards[i].is(info)) continue;
-            card = this.cards.splice(i, 1)[0];
-            break;
-        }
+        let i = this.cards.findIndex(c => c.is(info));
+        let card = i === -1 ? this.cards.pop() : this.cards.splice(i, 1)[0];
 
-        if (!card) card = this.cards.pop();
         this.tagRoot.removeChild(card.tagRoot);
-        
         if (info) card.setInfo(info);
         else card.info = info;
+
         return card.unactionable();
     }
 }

@@ -35,7 +35,10 @@ setInterval(() => moratorium > 0 ? moratorium -= 50 : moratorium = 0, 100);
 // String keys
 Object.entries(misc.merge({
     connect: () => console.log('Connected'),
-    disconnect: () => console.log('Disconnected'),
+    disconnect: () => {
+        ongoing = null;
+        console.log('Disconnected');
+    },
     error: msg => {
         console.error(chalk.red(msg));
         if (msg.startsWith(strs.allowanceExceeded)) {
@@ -92,8 +95,10 @@ var msgHandlers = {
                 for (let i = 0; i < keys.length; i++) {
                     let act = keys[i];
                     let actLen = game.actions[act].length;
-                    if (val >= actLen) val -= actLen;
-                    else {
+                    if (val >= actLen) {
+                        val -= actLen;
+                    } else {
+                        msgQueue.length = 0;
                         return emit(msgs.action, {
                             token: user.token,
                             action: act,

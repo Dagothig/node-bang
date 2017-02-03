@@ -18,7 +18,6 @@ module.exports = new Phase('End', {
         if (this.remainingTime <= 0) game.end();
     },
 
-    // In practice end won't actually be called because game.end() just gets rid of the game object and its' players altogether
     end: function(game) {
         game.players.forEach(p => {
             delete p.confirmedEnd;

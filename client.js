@@ -94,14 +94,15 @@ function updateVisbility(limbo) {
     toShow = toShow.filter(e => ui.hidden(e));
     ui.hide(toHide);
     ui.show(toShow);
+
     if (toShow.indexOf(connectedContainer) >= 0)
         lobby.message.focus();
-    else (toShow.indexOf(login.element) >= 0)
+    else if (toShow.indexOf(login.element) >= 0)
         login.name.focus();
 }
 updateVisbility(true);
 
-var on = (key, func) => socket.on(key, function() {
+/*var on = (key, func) => socket.on(key, function() {
     console.log('received', key, 'args:');
     for (var arg in arguments) console.log(arguments[arg]);
     if (func) func.apply(this, arguments);
@@ -111,8 +112,8 @@ socket.emit = function(key) {
     console.log('sent', key, 'args:');
     for (var arg in arguments) console.log(arguments[arg]);
     socket.__emit.apply(socket, arguments);
-}
-//var on = (key, func) => socket.on(key, func);
+}*/
+var on = (key, func) => socket.on(key, func);
 on('connect', () => {});
 on('disconnect', () => updateVisbility(true));
 on('error', msg => {

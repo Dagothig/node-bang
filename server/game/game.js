@@ -23,6 +23,7 @@ misc.merge(Game.prototype, {
         this.update();
     },
     end: function() {
+        this.phase.end(this);
         this.shouldUpdate = false;
         this.onGameEnd();
     },
@@ -37,7 +38,8 @@ misc.merge(Game.prototype, {
             var nanoDelta = currentTick[1] - this.lastTick[1];
             var delta = secDelta + nanoDelta / (1000 * 1000 * 1000);
 
-            if (this.phase && this.phase.update(this, delta)) this.onGameUpdate();
+            if (this.phase && this.phase.update(this, delta))
+                this.onGameUpdate();
         }
         this.lastTick = currentTick;
 

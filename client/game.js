@@ -4,7 +4,8 @@ var ui = require('./ui'),
     Cards = require('./game/cards'),
     Pile = require('./game/pile'),
     Player = require('./game/player'),
-    Decal = require('./game/decal');
+    Decal = require('./game/decal'),
+    info = require('./game/info');
 
 function Game(settings, onAction) {
     this.onAction = onAction;
@@ -150,12 +151,6 @@ Game.prototype = {
         }
     },
 
-    angleFor: function(i, playerCount) {
-        let portion = i / playerCount;
-        while (portion > 0.5) portion = portion - 1;
-        if (portion !== 0) portion = Math.sign(portion) * 0.025 + portion * 0.95;
-        return portion * Math.TWO_PI;
-    },
     displayGame: function(game, current) {
         let newGame = false;
         if (!this.game || this.game.identifier !== game.identifier) {
@@ -167,41 +162,48 @@ Game.prototype = {
         if (game.phase === 'End') return this.displayEnd(game, newGame);
 
         if (game.players) {
+            let calculateAngles = false;
             if (this.players) {
-                this.players.forEach(player => player.setInfo(
-                    game.players.find(p => p.name === player.info.name),
-                    game.turn
-                ));
-            } else {
-                this.players = [];
-
-                // Find the shift so that the current player is centered
-                let shift = null;
-                if (current) for (let i = 0; i < game.players.length; i++) {
-                    if (game.players[i].name === current.name) {
-                        shift = i;
-                        break;
+                for (let i = 0; i < this.players.length; i++) {
+                    let player = this.players[i];
+                    let info = game.players.find(p =>
+                        p.name === player.info.name);
+                    if (info) {
+                        if (info.role && !player.info.role)
+                            calculateAngles = true;
+                        player.setInfo(info, game.turn);
+                    } else {
+                        calculateAngles = true;
+                        this.tagGame.removeChild(player.tagRoot);
+                        this.players.splice(i, 1);
+                        i--;
+                        continue;
                     }
                 }
-
+            } else {
+                this.players = [];
+                calculateAngles = true;
                 for (let i = game.players.length - 1; i >= 0; i--) {
                     let playerInfo = game.players[i];
                     let player = new Player().setInfo(playerInfo, game.turn);
                     this.tagGame.appendChild(player.tagRoot);
-
-                    // The angle is shifted by a quarter-circle because we want to
-                    // start center-bottom
-                    player.angle = shift !== null ?
-                        this.angleFor(i - shift, game.players.length) :
-                        i * Math.TWO_PI / game.players.length;
-                    player.angle += Math.HALF_PI;
-                    player.dirX = Math.cos(player.angle);
-                    player.dirY = Math.sin(player.angle);
-                    let dist = Math.abs(shift - i);
-                    dist = Math.min(dist, game.players.length - dist);
-                    player.z = (game.players.length - dist - 1) * Player.depth;
                     this.players[i] = player;
                 }
+            }
+
+            if (calculateAngles) {
+
+                // Find the shift so that the current player is centered
+                let shift = current ?
+                    this.players.findIndex(p =>
+                        p.info.name === current.name) : -1;
+                if (shift === -1)
+                    shift = this.players.findIndex(p => p.info.role &&
+                        p.info.role.name === 'Sheriff');
+
+                this.players.forEach((player, i) =>
+                    player.computeAngle(game.players, i, shift));
+
             }
         }
 

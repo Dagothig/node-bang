@@ -106,8 +106,7 @@ Pile.prototype = {
         if (this.visible) {
             this.topCard.visible();
             this.pendingCards.forEach(card => card.visible());
-        }
-        else {
+        } else {
             this.topCard.unknown();
             this.topCard.info = null;
             this.pendingCards.forEach(card => {
@@ -142,7 +141,7 @@ Pile.prototype = {
 
         this.pendingCards.push(card);
         let size = (this.size + this.pendingCards.length);
-        requestAnimationFrame(() => setTimeout(() => {
+        //requestAnimationFrame(() => setTimeout(() => {
             card.move(
                 this.x,
                 this.y - size,
@@ -151,7 +150,7 @@ Pile.prototype = {
             );
             card.pilePendingTimeout =
                 setTimeout(() => this._completePendingCard(), Card.transitionTime);
-        }, 0));
+        //}, 0));
     },
     _completePendingCard: function() {
         let card = this.pendingCards.splice(0, 1)[0];

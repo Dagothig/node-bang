@@ -1,6 +1,7 @@
 'use strict';
 
-var Card = aReq('server/game/cards/card'),
+var log = aReq('server/log'),
+    Card = aReq('server/game/cards/card'),
     events = aReq('server/game/events'),
     misc = aReq('server/misc'),
     healing = aReq('server/game/cards/healing'),
@@ -47,6 +48,7 @@ handleEvent('beforeDeath',
         player.hand.discard();
         player.equipped.discard();
 
+        log(player.name, 'is dead!');
         step.game.onGameEvent({ name: 'dead', player: player.name });
 
         handleAfterDeath(step, killer, player, amount, onResolved);

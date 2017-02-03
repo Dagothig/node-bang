@@ -11,7 +11,7 @@ function handleMsg(io, users, user, socket, msg) {
     msg.message = validator.trim(validator.escape(msg.message));
     if (!msg.message) return;
     log(user.name, "sent", msg.message);
-    io.emit(msgs.message, {
+    users.emit(msgs.message, {
         name: user.name,
         message: msg.message
     });
@@ -25,9 +25,9 @@ module.exports = (io, users) => ({
     onConnected: (user, socket) => {
         socket.on(msgs.message, msg => handleMsg(io, users, user, socket, msg));
         socket.on(msgs.users, () => handleUsers(io, users, user, socket));
-        io.emit(msgs.users, formatted(users));
+        users.emit(msgs.users, formatted(users));
     },
     onDisconnected: (user, socket) => {
-        io.emit(msgs.users, formatted(users));
+        users.emit(msgs.users, formatted(users));
     }
 });

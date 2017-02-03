@@ -48,7 +48,7 @@ misc.merge(User.prototype, {
         }, consts.disconnectTimeout * 1000);
     },
     emit: function() {
-        this.sockets.forEach((socket) => socket.emit.apply(socket, arguments));
+        this.sockets.forEach(socket => socket.emit.apply(socket, arguments));
     },
     isName: function(name) {
         return name.toLowerCase && this.name.toLowerCase() === name.toLowerCase();

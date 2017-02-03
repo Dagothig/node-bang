@@ -38,10 +38,9 @@ function startTimer(io, users) {
     if (gameStartInterval) clearInterval(gameStartInterval);
 
     gameStartTimer = consts.gameStartTimer;
-    io.emit(msgs.joining, formattedJoining(users));
-
     gameStartInterval = setInterval(function() {
-        if (--gameStartTimer > 0) io.emit(msgs.joining, formattedJoining(users));
+        if (--gameStartTimer > 0)
+            users.emit(msgs.joining, formattedJoining(users));
         else {
             clearInterval(gameStartInterval);
             gameStartInterval = null;
@@ -54,7 +53,7 @@ function startTimer(io, users) {
 function stopTimer(io, users) {
     if (gameStartInterval) {
         clearInterval(gameStartInterval);
-        io.emit(msgs.joining, formattedJoining(users));
+        users.emit(msgs.joining, formattedJoining(users));
         gameStartInterval = null;
         gameStartTimer = null;
     }
@@ -68,7 +67,7 @@ function startGame(io, users) {
         () => users.forEach(user => user.emit(msgs.game, formattedGame(user))),
         // On event
         msg => {
-            if (!(msg instanceof Function)) io.emit(msgs.event, msg);
+            if (!(msg instanceof Function)) users.emit(msgs.event, msg);
             else users.forEach(user =>
                 user.emit(msgs.event, msg(game.findPlayer(user))));
         },
@@ -76,7 +75,7 @@ function startGame(io, users) {
         () => {
             game = null;
             log('Game finished!');
-            io.emit(msgs.joining, formattedJoining(users));
+            users.emit(msgs.joining, formattedJoining(users));
         }
     );
     users.forEach(user => user.joining = false);
@@ -100,7 +99,7 @@ function handleJoining(io, users, user, socket, msg) {
             if (canStart(users)) startTimer(io, users);
             else stopTimer(io, users);
         }
-        io.emit(msgs.joining, formattedJoining(users));
+        users.emit(msgs.joining, formattedJoining(users));
     } else {
         socket.emit(msgs.joining, joining);
     }
@@ -129,7 +128,7 @@ module.exports = (io, users) => ({
                 if (canStart(users)) startTimer(io, users);
                 else stopTimer(io, users);
             }
-            io.emit(msgs.joining, formattedJoining(users));
+            users.emit(msgs.joining, formattedJoining(users));
         }
     }
 });

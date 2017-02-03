@@ -485,9 +485,6 @@ textarea {
 }
 
 /* === [CARDS] === */
-#game {
-    background-color: #2E4859;
-}
 #game .container {
     width: 100%;
     height: 100%;
