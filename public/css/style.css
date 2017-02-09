@@ -921,7 +921,7 @@ textarea {
 .choice {
     z-index: 1;
 }
-.choice .card {
+.choice .card .face {
     box-shadow: 0.25em 0.75em 0 0 rgba(0, 0, 0, 0.3);
 }
 

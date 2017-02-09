@@ -27,9 +27,12 @@ function findParentBefore(node, before) {
     if (node.parentElement === before) return node;
     return findParentBefore(node.parentElement, before);
 }
-function create(tagName, className, parent) {
+function create(tagName, info, parent) {
     var tag = document.createElement(tagName);
-    if (className) tag.className = className;
+    if (info) {
+        if (typeof info === 'string') tag.className = info;
+        else for (let key in info) tag[key] = info[key];
+    }
     if (parent) parent.appendChild(tag);
     return tag;
 }

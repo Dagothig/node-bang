@@ -18,21 +18,21 @@ Cards.prototype = {
     constructor: Cards,
 
     setInfo: function(cardsInfo) {
-        this.cards.forEach(card => this.tagRoot.removeChild(card.tagRoot));
-        this.cards.length = 0;
         this.visible = cardsInfo && cardsInfo.length !== undefined;
-        if (this.visible) cardsInfo.forEach(cardInfo => {
-            let card = new Card()[this.infoFunc](cardInfo).noTransition();
-            this.cards.push(card);
-            this.tagRoot.appendChild(card.tagRoot);
-        });
-        else for (var i = 0; i < cardsInfo; i++) {
-            let card = new Card()[this.infoFunc]().noTransition();
-            this.cards.push(card);
-            this.tagRoot.appendChild(card.tagRoot);
+        this.cards.forEach(card => this.tagRoot.removeChild(card.tagRoot));
+        this.cards.length = (this.visible ? cardsInfo.length : cardsInfo)|0;
+        for (let i = 0; i < this.cards.length; i++) {
+            let card = new Card()[this.infoFunc](this.visible && cardsInfo[i]);
+            this.cards[i] = card;
+            this.tagRoot.appendChild(card.noTransition().tagRoot);
         }
 
         return this;
+    },
+    checkInfo: function(cardsInfo) {
+        return (cardsInfo && cardsInfo.length !== undefined) ?
+            this.cards.every(card => cardsInfo.find(info => card.is(info))) :
+            this.cards.length === cardsInfo;
     },
 
     setActions: function(acts, onAction) {
@@ -172,29 +172,29 @@ Cards.prototype = {
     },
 
     getWidth: function() {
-        let card = this.cards[0];
-        if (!card) return 0;
-        let cardWidth = card.getWidth();
+        if (!this.cards.length) return 0;
+        let cardWidth = this.cards[0].getWidth();
         return cardWidth + cardWidth * (this.cards.length - 1) * this.density;
     },
     getHeight: function() {
-        let card = this.cards[0];
-        return this.cards.length ? card.getHeight() : 0;
+        return this.cards.length ? this.cards[0].getHeight() : 0;
     },
 
     append: function(card) {
-        this.tagRoot.appendChild(card.tagRoot);
         this.cards.push(card);
-        card.transitionZ(this.z + this.cards.length + 10000);
+        this.tagRoot.appendChild(card.tagRoot);
+        card.clearMovingTimeout().transitionZ(this.z + this.cards.length + 10000);
+        return this;
     },
 
     draw: function(info) {
         let i = this.cards.findIndex(c => c.is(info));
+        if (this.visible && i === -1)
+            throw "THE CARD WASN'T FOUND; THIS AIN'T SUPPOSED TO HAPPEN!";
         let card = i === -1 ? this.cards.pop() : this.cards.splice(i, 1)[0];
-
+        card.setPositionToVisiblePosition();
         this.tagRoot.removeChild(card.tagRoot);
         if (info) card.setInfo(info);
-        else card.info = info;
 
         return card.unactionable();
     }

@@ -181,10 +181,22 @@ on(msgs.game, msg => {
         joining = null;
         updateVisbility();
 
-        game.handleGame(msg, user);
         if (msg && msg.turn && msg.turn.step && msg.turn.step.event)
             game.handleEvent(msg.turn.step.event);
+        game.handleGame(msg, user);
     } else ongoing = null;
     updateVisbility();
 });
 on(msgs.event, msg => game.handleEvent(msg));
+
+function verifyCheck(c) {
+    return Object.entries(c).find(entry => {
+        if (entry[1] !== true || entry[1] !== false) {
+            let subcheck = verifyCheck(entry[1]);
+            if (subcheck) return entry[0] + ':' + subcheck;
+            return false;
+        }
+        if (entry[1]) return false;
+        return entry[0];
+    });
+}

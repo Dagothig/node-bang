@@ -84,11 +84,6 @@ Player.prototype = {
             ui.show(this.equipped.tagRoot);
         } else if(!playerInfo.equipped) ui.hide(this.equipped.tagRoot);
 
-        if (playerInfo.character)
-            this.character.setCharacter(playerInfo.character);
-        else
-            this.character.setCharacter();
-
         this.infoLife.innerHTML = '';
         if (playerInfo.stats && playerInfo.stats.life) {
             ui.show(this.infoLife);
@@ -112,11 +107,24 @@ Player.prototype = {
             this.tagRoot.classList.remove('winner');
         }
 
+        this.character.setCharacter(playerInfo.character);
         this.role.setRole(playerInfo.role);
 
         this.info = playerInfo;
 
         return this;
+    },
+    checkInfo: function(playerInfo) {
+        return {
+            hand: !playerInfo.hand
+                || this.hand.checkInfo(playerInfo.hand.cards),
+            characters: !playerInfo.characters
+                || this.hand.checkInfo(playerInfo.characters),
+            equipped: !playerInfo.equipped
+                || this.equipped.checkInfo(playerInfo.equipped),
+            character: this.character.is(playerInfo.character),
+            role: this.role.is(playerInfo.role)
+        };
     },
 
     setActions: function(acts, onAction) {
@@ -276,7 +284,8 @@ Player.prototype = {
 
             rotAngle
         );
-        if (this.info.role && this.info.role.name !== 'Unknown') this.role.visible();
+        if (this.info.role && this.info.role.name !== 'Unknown')
+            this.role.visible();
         else this.role.unknown();
 
         return this;

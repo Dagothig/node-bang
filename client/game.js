@@ -8,31 +8,27 @@ var ui = require('./ui'),
     info = require('./game/info');
 
 function Game(settings, onAction) {
+    let self = this;
+
     this.onAction = onAction;
     this.settings = settings;
     this.tagRoot = ui.one('#game');
     this.tagGame = ui.one(this.tagRoot, '.container');
-
     this.tagButtons = ui.create('div', 'absolute bottom left');
+    this.tagResign = ui.create('input', {
+        type: 'button', value: 'Resign', name: 'resign',
+        onclick: () => confirm('Are you sure you want to resign?') &&
+            self.onAction('resign', 'resign')
+    }, this.tagButtons);
+    this.tagCancel = ui.create('input', {
+        className: 'flash', type: 'button', value: 'Cancel', name: 'cancel',
+        onclick: () => {
+            ui.hide(self.tagCancel);
+            self.onAction('cancel', self.tagCancel.value);
+        }
+    }, this.tagButtons);
 
-    this.tagResign = ui.create('input', '', this.tagButtons);
-    this.tagResign.type = 'button';
-    this.tagResign.value = 'Resign';
-    this.tagResign.name = 'resign';
-    this.tagResign.onclick = () =>
-        confirm('Are you sure you want to resign?') &&
-            this.onAction('resign', 'resign');
-    ui.hide(this.tagResign);
-
-    this.tagCancel = ui.create('input', 'flash', this.tagButtons);
-    this.tagCancel.type = 'button';
-    this.tagCancel.value = 'Cancel';
-    this.tagCancel.name = 'cancel';
-    this.tagCancel.onclick = () => {
-        ui.hide(this.tagCancel);
-        this.onAction('cancel', this.tagCancel.value);
-    };
-    ui.hide(this.tagCancel);
+    ui.hide(this.tagResign, this.tagCancel);
 
     this.clearGame();
 
@@ -65,7 +61,7 @@ Game.prototype = {
     },
 
     handleEvent: function(msg) {
-        if (!this.game) return;
+        if (!this.game || !msg) return;
 
         let player = msg.player &&
             this.players.find(p => p.info.name === msg.player);
@@ -145,8 +141,10 @@ Game.prototype = {
                 break;
 
             case 'reshuffling':
-                this.pile.setInfo(msg.pile);
-                this.discard.setInfo(msg.discarded);
+                for (var i = this.discard.pending.length; i--;)
+                    this.pile.append(this.discard.draw());
+                this.pile.fullSize = msg.pile;
+                this.discard.setInfo([]);
                 break;
         }
     },
@@ -207,16 +205,13 @@ Game.prototype = {
             }
         }
 
-        if (!this.pile) {
+        if (game.cards && !this.pile) {
             this.pile = new Pile('pile');
             this.tagGame.appendChild(this.pile.tagRoot);
-        }
-        if (!this.discard) {
+            this.pile.setInfo(game.cards.pile);
+
             this.discard = new Pile('discard');
             this.tagGame.appendChild(this.discard.tagRoot);
-        }
-        if (game.cards) {
-            this.pile.setInfo(game.cards.pile);
             this.discard.setInfo(game.cards.discard);
         }
 
@@ -376,6 +371,28 @@ Game.prototype = {
                 0, 1.1
             );
         }
+    },
+
+    checkInfo: function(msg) {
+        let what = msg.turn
+            && msg.turn.step
+            && msg.turn.step.event
+            && msg.turn.step.event.what;
+        return {
+            players: this.players.reduce((ps, p) => {
+                let info = msg.players.find(i => p.info.name === i.name);
+                ps[info.name] = p.checkInfo(info);
+                return ps;
+            }, {}),
+            choice: (what !== 'choice'
+                || this.choice.checkInfo(msg.turn.step.event.cards)),
+            pile: (!msg.cards
+                || !msg.cards.pile
+                || this.pile.checkInfo(msg.cards.pile)),
+            discard: (!msg.cards
+                || !msg.cards.discard
+                || this.discard.checkInfo(msg.cards.discard))
+        };
     }
 };
 

@@ -14,7 +14,6 @@ function Card() {
     this.tagFaceType = ui.create('div', 'type', this.tagFace);
     this.tagFaceTypeRank = ui.create('div', 'rank', this.tagFaceType);
     this.tagFaceTypeSuit = ui.create('div', 'suit', this.tagFaceType);
-
     this.tagBack = ui.create('div', 'back', this.tagRoot);
 
     this.movingTimeout = null;
@@ -60,20 +59,24 @@ Card.prototype = {
             let split = this.info.id.split(':');
             let name = split[0];
             let cardInfo = info.cards[name];
+
             this.tagFace.className = 'face ' + cardInfo.type;
             this.tagFaceName.innerHTML = cardInfo.name;
             this.setImage(name);
             this.tagFaceDescription.innerHTML = cardInfo.description || '';
+
             if (cardInfo.range) {
                 ui.show(this.tagFaceRange);
                 this.tagFaceRange.innerHTML = cardInfo.range;
             }
             else ui.hide(this.tagFaceRange);
+
             if (cardInfo.draw) {
                 ui.show(this.tagFaceDraw);
                 this.tagFaceDraw.innerHTML = cardInfo.draw + 'x';
             }
             else ui.hide(this.tagFaceDraw);
+
             this.tagFaceTypeSuit.className = 'suit ' + split[1];
             this.tagFaceTypeRank.className = 'rank ' + split[2];
         } else {
@@ -81,7 +84,9 @@ Card.prototype = {
             this.tagFaceName.innerHTML = '';
             this.setImage();
             this.tagFaceDescription.innerHTML = '';
-            ui.hide(this.tagFaceRange);
+
+            ui.hide(this.tagFaceRange, this.tagFaceDraw);
+
             this.tagFaceTypeSuit.className = 'suit';
             this.tagFaceTypeRank.className = 'rank';
         }
@@ -147,12 +152,6 @@ Card.prototype = {
         this.tagRoot.onclick = null;
         return this;
     },
-    clearAnim: function() {
-        if (!this.animTimeout) return this;
-        clearTimeout(this.animTimeout);
-        this.animTimeout = null;
-        return this;
-    },
     unknown: function() {
         if (!this.isVisible) return this;
         this.isVisible = false;
@@ -170,7 +169,7 @@ Card.prototype = {
         angle = (angle !== undefined && angle !== null) ? angle : this.angle;
         x = Math.round(x);
         y = Math.round(y);
-        // we assume the z is an integer
+        z = Math.round(z);
 
         if (x === this.x && y === this.y && z === this.z && angle === this.angle)
             return this;
@@ -190,27 +189,29 @@ Card.prototype = {
     },
     transitionZ: function(z) {
         this.tagRoot.style.zIndex = this.tempZ = z;
-        if (this.movingTimeout) {
-            clearTimeout(this.movingTimeout);
-            this.movingTimeout = null;
-        }
         return this;
     },
     noTransition: function() {
         this.tagRoot.classList.add('no-transition');
+        return this;
+    },
+    clearMovingTimeout: function() {
         if (this.movingTimeout) {
             clearTimeout(this.movingTimeout);
             this.movingTimeout = null;
         }
         return this;
     },
-
-    getWidth: function() {
-        return this.tagRoot.offsetWidth / Card.hoverScale;
+    setPositionToVisiblePosition: function() {
+        this.tagRoot.style.left =
+            this.tagRoot.offsetLeft + this.tagRoot.offsetWidth/2 + 'px';
+        this.tagRoot.style.top =
+            this.tagRoot.offsetTop + this.tagRoot.offsetHeight/2 + 'px';
+        return this;
     },
-    getHeight: function() {
-        return this.tagRoot.offsetHeight / Card.hoverScale;
-    }
+
+    getWidth: function() { return this.tagRoot.offsetWidth / Card.hoverScale; },
+    getHeight: function() { return this.tagRoot.offsetHeight / Card.hoverScale; }
 };
 
 module.exports = Card;

@@ -4,7 +4,6 @@ var ui = require('../ui'),
 
 function Pile(name) {
     this.name = name;
-    this.size = 0;
     this.visible = false;
 
     this.tagRoot = ui.create('div', 'card-pile');
@@ -13,12 +12,20 @@ function Pile(name) {
     this.topCard = new Card();
     this.topCard.tagRoot.classList.add('top');
     this.tagRoot.appendChild(this.topCard.tagRoot);
-
-    this.pendingCards = [];
-    this.pendingInfo = null;
     ui.hide(this.tagSize, this.topCard.tagRoot);
 
+    this.pending = [];
+
     this.move(0, 0, 0);
+    this._onPending = () => {
+        let card = this.pending.shift();
+        delete card._pendingTimeout;
+        this.tagRoot.removeChild(card.tagRoot);
+        if (this.visible) this.info.push(card.info);
+        else this.info++;
+
+        this._updateToInfo()._updateToSize();
+    };
 }
 Pile.bottomZ = 0;
 Pile.sizeZ = Pile.bottomZ + 1;
@@ -27,22 +34,42 @@ Pile.depth = Pile.topCardZ + 1;
 Pile.prototype = {
     constructor: Pile,
 
-    setInfo: function(cardsInfo) {
-        if (this.pendingCards.length) {
-            this.pendingInfo = cardsInfo;
-            return this;
+    get size() { return this.visible ? this.info.length : this.info; },
+    get fullSize() { return this.pending.length + this.size; },
+    set fullSize(val) {
+        if (this.visible) throw "That's just not legit.";
+        // There's a special case where we need to shrink and we have more pending than our new size. We can't actually graciously handle that
+        if (val < this.fullSize && this.pending.length > val)
+            this.setInfo(val);
+        else {
+            this.info = val - this.pending.length;
+            this._updateToSize();
         }
-        this.info = cardsInfo;
+        return val;
+    },
+
+    setInfo: function(cardsInfo) {
         this.visible = cardsInfo && cardsInfo.length !== undefined;
+        this.pending.forEach(card => {
+            clearTimeout(card._pendingTimeout);
+            this.tagRoot.removeChild(card.tagRoot);
+        })
+        this.pending.length = 0;
+        this.info = cardsInfo;
 
-        this._updateToInfo();
-        this._updateToSize();
+        return this._updateToInfo()._updateToSize();
+    },
+    checkInfo: function(cardsInfo) {
+        return (cardsInfo && cardsInfo.length !== undefined) ?
 
-        return this;
+            this.fullSize === cardsInfo.length &&
+            this.pending.every((card, i) => card.is(cardsInfo[i + this.size])) :
+
+            this.fullSize === cardsInfo;
     },
 
     actionable: function(onAction, action, arg) {
-        if (this.size > 0)  {
+        if (this.fullSize > 0)  {
             this.topCard.actionable(() => {
                 onAction(action, arg);
                 this.topCard.unactionable();
@@ -55,40 +82,32 @@ Pile.prototype = {
                 onAction(action, arg);
             }
         }
+
         return this;
     },
     unactionable: function() {
         this.topCard.unactionable();
         this.tagBottom.classList.remove('actionable');
         this.tagBottom.onclick = null;
+
         return this;
     },
     setActions: function(actions, onAction) {
-        let action = null;
-        for (let act in actions) {
-            if (actions[act].indexOf(this.name) !== -1) {
-                action = act;
-                break;
-            }
-        }
+        let action = Object.entries(actions)
+            .find(entry => entry[1].indexOf(this.name) !== -1);
         return action ?
-            this.actionable(onAction, action, this.name) :
+            this.actionable(onAction, action[0], this.name) :
             this.unactionable();
     },
 
     _updateToInfo() {
-        if (this.visible) {
-            if (this.info.length) {
-                this.topCard.setInfo(this.info[this.info.length - 1]);
-                this.size = this.info.length;
-            } else this.size = 0;
-        } else {
-            this.topCard.setInfo(null);
-            this.size = this.info;
-        }
+        this.topCard.setInfo(this.visible && this.info.length
+            && this.info[this.info.length - 1]);
 
         if (this.size > 0) ui.show(this.tagSize, this.topCard.tagRoot);
         else ui.hide(this.tagSize, this.topCard.tagRoot);
+
+        return this;
     },
     _updateToSize() {
         this.tagSize.style.height = this.size + 'px';
@@ -103,17 +122,24 @@ Pile.prototype = {
             this.z + Pile.sizeZ + this.size + 1,
             0
         );
+        this.pending.forEach((card, i) => card.move(
+            this.x,
+            this.y - this.size - 1 - i,
+            this.z + Pile.depth + this.size + 2 + i + 10000,
+            0
+        ));
+        this.pending.filter(c => !c._pendingTimeout).forEach(c =>
+            c._pendingTimeout = setTimeout(this._onPending, Card.transitionTime));
         if (this.visible) {
             this.topCard.visible();
-            this.pendingCards.forEach(card => card.visible());
+            this.pending.forEach(card => card.visible());
         } else {
             this.topCard.unknown();
             this.topCard.info = null;
-            this.pendingCards.forEach(card => {
-                card.unknown();
-                card.info = null;
-            });
+            this.pending.forEach(card => card.unknown().info = null);
         }
+
+        return this;
     },
 
     move: function(x, y, z) {
@@ -127,62 +153,33 @@ Pile.prototype = {
         return this;
     },
 
-    getWidth: function() {
-        return this.tagBottom.offsetWidth;
-    },
-
-    getHeight: function() {
-        return this.topCard.getHeight() + this.size;
-    },
+    getWidth: function() { return this.tagBottom.offsetWidth; },
+    getHeight: function() { return this.topCard.getHeight() + this.size; },
 
     append: function(card) {
-        card.transitionZ(this.z + Pile.depth + 10000);
+        this.pending.push(card);
         this.tagRoot.appendChild(card.tagRoot);
-
-        this.pendingCards.push(card);
-        let size = (this.size + this.pendingCards.length);
-        //requestAnimationFrame(() => setTimeout(() => {
-            card.move(
-                this.x,
-                this.y - size,
-                this.z + Pile.depth + 10000,
-                0
-            );
-            card.pilePendingTimeout =
-                setTimeout(() => this._completePendingCard(), Card.transitionTime);
-        //}, 0));
-    },
-    _completePendingCard: function() {
-        let card = this.pendingCards.splice(0, 1)[0];
-        delete card.pilePendingTimeout;
-
-        this.tagRoot.removeChild(card.tagRoot);
-
-        if (this.visible) this.info.push(card.info);
-        else this.info++;
-
-        this._updateToInfo();
-        this._updateToSize();
-
-        if (!this.pendingCards.length) {
-            this.info = this.pendingInfo;
-            this.pendingInfo = null;
-        }
+        card.clearMovingTimeout().transitionZ(this.z + Pile.depth + 10000);
+        return this;
     },
 
     draw: function(info) {
-        if (this.pendingCards.length) {
-            let card = this.pendingCards.pop();
-            clearTimeout(card.pilePendingTimeout);
-            delete card.pilePendingTimeout;
+        this.unactionable();
+
+        if (this.pending.length) {
+            let card = this.pending.pop();
+            clearTimeout(card._pendingTimeout);
+            delete card._pendingTimeout;
+            card.setPositionToVisiblePosition();
             this.tagRoot.removeChild(card.tagRoot);
-            return card.setInfo(info);
+            if (info) card.setInfo(info);
+            return card;
         }
 
-        this.unactionable();
         let oldTop = this.topCard;
         oldTop.tagRoot.classList.remove('top');
         this.tagRoot.removeChild(oldTop.tagRoot);
+        if (info) oldTop.setInfo(info);
 
         this.topCard = new Card();
         this.topCard.tagRoot.classList.add('top');
@@ -190,13 +187,10 @@ Pile.prototype = {
         if (this.visible) this.info.pop();
         else this.info--;
 
-        this._updateToInfo();
-        this._updateToSize();
+        this._updateToInfo()._updateToSize();
 
         this.tagRoot.appendChild(this.topCard.tagRoot);
 
-        if (info) oldTop.setInfo(info);
-        else oldTop.info = info;
         return oldTop;
     }
 }
