@@ -16,10 +16,10 @@ misc.merge(CardPile.prototype, {
                 log('Reshuffling deck');
                 this._backing = misc.shuffle(this.discarded);
                 this.discarded = [];
+                // When a reshuffle hapens, then we didn't have enough cards, so we drew cards.length many cards so far from pile, and the reshuffled pile before drawing would've had discarded + cards amount.
                 this.game.onGameEvent({
                     name: 'reshuffling',
-                    pile: this.length,
-                    discard: this.discarded.map(c => c.format())
+                    pile: this.length + cards.length
                 });
                 continue;
             }

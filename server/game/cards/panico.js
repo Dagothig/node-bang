@@ -17,7 +17,10 @@ misc.extend(Card, Panico, {
             true, true, // with hand & equipment
             (target, from, card) => { // onChoice
                 player.hand.discard(this.id);
-                player.hand.add(card, { from: from, target: target.name });
+                player.hand.add(card,
+                    { from: from, target: target.name },
+                    from === 'equipped' || (p => p === target || p === player)
+                );
                 onResolved();
             },
             onResolved, // onCancel; panico wasn't used

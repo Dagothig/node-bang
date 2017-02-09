@@ -6,22 +6,24 @@ module.exports = function Hand(game, player, cards) {
         drawFromPile: function(amount) {
             this.add(cards.draw(amount || 1), { from: 'pile' });
         },
+        // We also accept visible as being a function; we must thus check visible specifically against true
         add: function(drawn, extra = {}, visible = false) {
-            if (drawn instanceof Card) return this.add([drawn], extra);
+            if (drawn instanceof Card) return this.add([drawn], extra, visible);
             drawn.forEach(card => this.push(card));
             let specific = misc.merge({
                 name: 'draw',
                 player: player.name,
                 cards: drawn.map(c => c.format())
             }, extra);
-            if (visible) game.onGameEvent(specific);
+            if (visible === true) game.onGameEvent(specific);
             else {
                 let unspecific = misc.merge({
                     name: 'draw',
                     player: player.name,
                     amount: drawn.length
                 }, extra);
-                game.onGameEvent(p => p === player ? specific : unspecific);
+                let visible = p => p === player;
+                game.onGameEvent(p => visible(p) ? specific : unspecific);
             }
         },
         remove: function(cardId) {

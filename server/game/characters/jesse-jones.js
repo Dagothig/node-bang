@@ -36,7 +36,9 @@ module.exports = new Character("Jesse Jones", {
             handleTarget: function(player, target) {
                 player.hand.drawFromPile();
                 player.hand.add(target.hand.removeRand(),
-                    { from: 'hand', target: target.name });
+                    { from: 'hand', target: target.name },
+                    p => p === player || p === target
+                );
                 onSkip();
             }
         }));
