@@ -46,7 +46,7 @@ misc.merge(User.prototype, {
         if (this.sockets.length) return;
         this.disconnectTimeout = setTimeout(() => {
             disconnectCallback();
-        }, consts.disconnectTime * 1000);
+        }, this.disconnectTime * 1000);
     },
     emit: function() {
         this.sockets.forEach(socket => socket.emit.apply(socket, arguments));
