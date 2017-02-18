@@ -14,7 +14,7 @@ function Game(settings, onAction) {
     this.settings = settings;
     this.tagRoot = ui.one('#game');
     this.tagGame = ui.one(this.tagRoot, '.container');
-    this.tagButtons = ui.create('div', 'absolute bottom left');
+    this.tagButtons = ui.create('div', 'buttons absolute bottom left');
     this.tagResign = ui.create('input', {
         type: 'button', value: 'Resign', name: 'resign',
         onclick: () => confirm('Are you sure you want to resign?') &&
@@ -36,6 +36,7 @@ function Game(settings, onAction) {
     this.resizeTime = 100;
     this.resizeFunc = () => {
         this.resizeTimeout = null;
+        this.tagRoot.classList.remove('new');
         this.updatePositions();
     };
     this.resizeTimeout = null;
@@ -265,8 +266,8 @@ Game.prototype = {
         if (player && !player.info.disconnected) ui.show(this.tagResign);
         else ui.hide(this.tagResign);
 
-        if (!newGame) this.requestPositions();
-        else this.updatePositions();
+        if (newGame) this.tagRoot.classList.add('new');
+        this.requestPositions();
     },
     displayEnd: function(game, newGame) {
         ['pile', 'discard', 'decal', 'choice']
@@ -309,9 +310,17 @@ Game.prototype = {
     },
     updatePositions: function() {
         let count = this.players ? this.players.length : 0;
-        this.tagGame.style.minWidth =
+        if (this.pile) {
+            this.tagGame.style.minWidth =
+                this.players[0].getHeight() * 2.1 +
+                    this.pile.tagBottom.offsetWidth * 2.4 + 'px';
             this.tagGame.style.minHeight =
-            (30 + 2 * count) + 'em';
+                this.players[0].getHeight() * 2.1 +
+                    this.pile.tagBottom.offsetHeight * 1.2 + 'px';
+        } else
+            this.tagGame.style.minHeight =
+            this.tagGame.style.minWidth =
+                (28 + 2 * count) + 'em';
         let halfSize = {
             x: this.tagGame.offsetWidth / 2,
             y: this.tagGame.offsetHeight / 2
@@ -339,7 +348,7 @@ Game.prototype = {
                 Math.pow(dirY * halfSize.y, 2)
             ) - centerSize - height, 0);
 
-            let shift = centerSize + height / 2 + remain * 0.9;
+            let shift = centerSize + height / 2 + remain * 0.5;
 
             p.move(
                 halfSize.x + dirX * shift,

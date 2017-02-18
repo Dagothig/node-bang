@@ -6,6 +6,7 @@ var msgs = require('./shared/messages'),
 var strat = require('./client/local-storage-strat');
 var settings = require('./client/settings')(strat, {
     saveToken: [true, 'bool', 'user'],
+    sound: [false, 'bool', 'user'],
     name: ['', 'str', 'sys'],
     token: ['', 'str', 'sys']
 });
@@ -181,13 +182,23 @@ on(msgs.game, msg => {
         joining = null;
         updateVisbility();
 
-        if (msg && msg.turn && msg.turn.step && msg.turn.step.event)
-            game.handleEvent(msg.turn.step.event);
-        game.handleGame(msg, user);
+        try {
+            if (msg && msg.turn && msg.turn.step && msg.turn.step.event)
+                game.handleEvent(msg.turn.step.event);
+            game.handleGame(msg, user);
+        } catch(e) {
+            console.error(e);
+            console.log(game.game, msg);
+        }
     } else ongoing = null;
     updateVisbility();
 });
-on(msgs.event, msg => game.handleEvent(msg));
+on(msgs.event, msg => { try {
+    game.handleEvent(msg)
+} catch(e) {
+    console.error(e);
+    console.log(game.game, msg);
+}});
 
 function verifyCheck(c) {
     return Object.entries(c).find(entry => {

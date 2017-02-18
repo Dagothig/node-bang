@@ -202,7 +202,6 @@ Player.prototype = {
 
         let xShift = -this.character.getWidth() / 2;
         let cHeight = this.character.getHeight();
-
         let yInfoShift = cHeight * Player.infoShift;
         let infoPlateX = this.x + yDirX * yInfoShift;
         ui.move(this.infoPlate,
@@ -292,7 +291,9 @@ Player.prototype = {
     },
     getHeight: function() {
         // The division per two is roughly the overlap
-        return this.infoPlate.offsetHeight / 2 + this.character.getHeight() * (Player.characterShift - Player.equippedShift + 1);
+        return this.infoPlate.offsetHeight / 2 +
+            this.character.getHeight() *
+                (Player.characterShift - Player.equippedShift + 1);
     },
 
     shake: function() {

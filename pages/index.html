@@ -1,32 +1,43 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>¡Bang!</title>
 
-        <meta name="description" content="Node server for playing Bang! the card game">
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <meta name="charset" content="UTF-8">
+        <meta name="description"
+                content="Node server for playing Bang! the card game">
+        <meta name="viewport"
+                content="initial-scale=1">
         <link rel="author" href="https://dagothig.com" />
         <link rel="canonical" href="https://bang.dagothig.com" />
 
         <link rel="icon" type="image/x-icon" href="favicon.ico?ver=2.0" />
         <link rel="stylesheet" type="text/css" href="/css/font-awesome.css" />
         <link rel="stylesheet" type="text/css" href="/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="/css/game.css" />
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
-        <div id="connected-container" class="hidden absolute full-width full-height flex horizontal">
+        <div id="connected-container"
+                class="hidden absolute full-width full-height flex horizontal">
             <div id="unknown" class="hidden grow-1 flex vertical scroll">
                 <div class="grow-1"></div>
                 <form class="form-box box flex horizontal">
                     <div class="grow-1"></div>
                     <div class="form-group">
                         <label for="retry">Could not get state</label>
-                        <input id="retry" type="button" name="retry" class="ico-after" /><label for="retry" class="fa fa-refresh"></label>
+                        <button id="retry" type="button" tabindex="100"
+                                name="retry" value="retry">
+                            <em class="fa fa-refresh"></em>
+                        </button>
                     </div>
                     <div class="grow-1"></div>
                 </form>
                 <div class="grow-1"></div>
             </div>
-            <div id="game" class="hidden grow-1 scroll">
-                <div class="container relative no-scroll"></div>
+            <div id="game" class="hidden grow-1 scroll flex">
+                <div class="container relative grow-1 no-scroll"></div>
             </div>
             <div id="pre-game" class="hidden grow-1 flex vertical scroll">
                 <div class="grow-1"></div>
@@ -35,44 +46,53 @@
                         <span class="form-header">New game</span>
                     </div>
                     <div class="form-group">
-                        <san class="form-error"></span>
+                        <span class="form-error"></span>
                     </div>
                     <div class="form-group flex horizontal">
-                        <label class="grow-1">Players</label>
-                        <span id="player-count" class="grow-1 center">0 / 4-7</span>
-                        <label class="grow-1" for="join">Participate</label>
-                        <span class="grow-1 center">
-                            <input id="join" type="checkbox" name="join" />
-                            <label for="join" class="check fa fa-check"></label>
-                        </span>
+                        <div class="grow-1 flex center">
+                            <label class="grow-1">Players</label>
+                            <span id="player-count" class="grow-1 center"></span>
+                        </div>
+                        <div class="grow-1 flex center">
+                            <label class="grow-1" for="join">Participate</label>
+                            <span class="grow-1 center">
+                                <input id="join" type="checkbox" name="join"
+                                        tabindex="100" />
+                                <label for="join" class="check fa fa-check"></label>
+                            </span>
+                        </div>
                     </div>
-                    <div class="form-group list" id="joining">
-                    </div>
+                    <div class="form-group list" id="joining"></div>
                 </form>
                 <div class="grow-1"></div>
             </div>
 
-            <div id="lobby" class="flex vertical box">
-                <div class="title">Users</div>
-                <div class="users list grow-1 flex vertical"></div>
-                <div class="title">Chat</div>
-                <div class="messages list grow-1 flex vertical-reverse"></div>
-                <form class="flex horizontal">
-                    <input class="grow-1" name="message" autocomplete="off" placeholder="Message" />
-                    <span class="margin"></span>
-                    <input value="Send" type="submit" />
-                </form>
-            </div>
-            <div id="menu" class="top left absolute full-width full-height pass-through">
-                <input id="menu-btn" type="checkbox" name="menu" />
-                <label for="menu-btn" class="check fa fa-bars absolute top right clickable"></label>
-                <div class="container top right absolute clickable full-height flex vertical">
-                    <div class="title flex horizontal">Menu</div>
+            <input id="extra-show" type="checkbox" name="menu" tabindex="199"
+                    class="absolute top right"/>
+            <label for="extra-show" class="check fa absolute top right"></label>
+            <div id="extra" class="box relative">
+                <input id="menu-btn" type="checkbox" name="menu" tabindex="300"
+                        class="absolute top right" />
+                <label for="menu-btn"
+                        class="check fa fa-bars absolute top right"
+                ></label>
+                <div id="lobby" class="full-height flex vertical">
+                    <div class="title">Lobby</div>
+                    <div class="users list grow-1 flex vertical"></div>
+                    <div class="messages list grow-2 flex vertical-reverse"></div>
+                    <form class="flex horizontal">
+                        <input class="grow-1" name="message" tabindex="200"
+                                autocomplete="off" placeholder="Message" />
+                    </form>
+                </div>
+                <div id="menu" class="full-height flex vertical">
+                    <div class="title">Menu</div>
                     <div class="list grow-1 flex-vertical"></div>
                 </div>
             </div>
         </div>
-        <div id="login" class="hidden absolute full-width full-height flex vertical">
+        <div id="login"
+                class="hidden absolute full-width full-height flex vertical">
             <div class="grow-1"></div>
             <form class="form-box box">
                 <div class="intro">
@@ -83,7 +103,6 @@
                     <a href="https://en.wikipedia.org/wiki/Bang!_(card_game)">
                         Bang what?
                     </a>
-
                     <a href="https://github.com/Dagothig/node-bang" target="blank">
                         Source code
                     </a>
@@ -96,24 +115,30 @@
                 </div>
                 <div class="form-group flex horizontal">
                     <label class="grow-1" for="name">Name</label>
-                    <input class="grow-2 center" id="name" name="name" type="text" />
+                    <input id="name"
+                            class="grow-2 center" name="name" type="text" />
                 </div>
                 <div class="form-group flex horizontal">
                     <label class="grow-1" for="password">Secret</label>
-                    <input class="grow-2 center" id="password" name="password" type="password" />
+                    <input id="password"
+                            class="grow-2 center" name="password" type="password" />
                 </div>
                 <div class="form-group flex horizontal">
-                    <label class="grow-1 center" for="save-token-login">Save token</label>
+                    <label class="grow-1 center"
+                            for="save-token-login">Save token</label>
                     <span class="grow-1 center">
-                        <input id="save-token-login" type="checkbox" name="save-token-login" />
-                        <label for="save-token-login" class="check fa fa-check"></label>
+                        <input id="save-token-login"
+                                type="checkbox" name="save-token-login" />
+                        <label for="save-token-login"
+                                class="check fa fa-check"></label>
                     </span>
                     <input class="grow-1" value="Go!" type="submit" />
                 </div>
             </form>
             <div class="grow-1"></div>
         </div>
-        <div id="loader" class="hidden absolute full-width full-height flex vertical">
+        <div id="loader"
+                class="hidden absolute full-width full-height flex vertical">
             <div class="grow-1"></div>
             <div class="element">
                 <div class="background-highlight"></div>
@@ -133,7 +158,6 @@
             Math.HALF_PI = Math.PI / 2;
             Math.QUARTER_PI = Math.PI / 4;
             Math.EIGTH_PI = Math.PI / 8;
-
             Math.TWO_PI = Math.PI * 2;
         </script>
         <script type="text/javascript" src="/polyfill.js"></script>

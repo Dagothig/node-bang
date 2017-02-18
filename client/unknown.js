@@ -3,7 +3,7 @@ var ui = require('./ui'),
 
 module.exports = function(onRetry) {
     var element = ui.one('#unknown'),
-        retryBtn = ui.one(element, 'input');
+        retryBtn = ui.one(element, '#retry');
 
     retryBtn.onclick = function() {
         onRetry();

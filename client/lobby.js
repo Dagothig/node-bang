@@ -6,14 +6,11 @@ module.exports = function(onMessage) {
         usersList = ui.one(element, '.users'),
         messagesList = ui.one(element, '.messages'),
         messageForm = ui.one(element, 'form'),
-        message = ui.one(messageForm, '[name=message]'),
-        messageBtn = ui.one(messageForm, '[type=submit]');
+        message = ui.one(messageForm, '[name=message]');
 
     messageForm.onsubmit = function() {
         onMessage(message.value);
         message.value = '';
-        messageBtn.className += ' active';
-        window.setTimeout(() =>  messageBtn.className = messageBtn.className.replace(' active', ''), 100);
         return false;
     };
 

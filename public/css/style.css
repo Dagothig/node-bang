@@ -1,24 +1,21 @@
-html, body {
+body {
     margin: 0;
     color: #333;
     font-family: sans-serif;
     line-height: 1em;
-}
-html {
     background-color: #2E4859;
 }
 
 a {
-    color: #08f;
+    color: #26f;
+    text-decoration: none
+}
+a:focus, a:hover {
+    outline: none;
+    text-decoration: underline;
 }
 
 /* === [MISC] === */
-.pass-through {
-    pointer-events: none;
-}
-.clickable {
-    pointer-events: all;
-}
 
 .hidden {
     display: none !important;
@@ -43,21 +40,11 @@ a {
     position: relative;
 }
 
-.line {
-    width: 1px;
-    height: 1px;
-    background: #aaa;
-}
-
 .full-width {
     width: 100%;
 }
 .full-height {
     height: 100%;
-}
-
-.margin {
-    margin: 0.5rem;
 }
 
 .scroll {
@@ -68,23 +55,13 @@ a {
 }
 
 .box {
-    background: #fff;
+    background: #f8fdff;
     box-shadow: 0 0.25em 0.5em 0.125em rgba(0, 0, 0, 0.25);
 }
 
 .title {
     padding: 0.5rem 1rem;
     font-size: 1rem;
-    background-color: #fff;
-}
-
-.action {
-    padding: 0.5em;
-}
-.action:focus {
-    color: #fff;
-    background-color: #08f;
-    outline: none;
 }
 
 /* === [INTRO] === */
@@ -106,40 +83,17 @@ a {
     margin: 0em 0.1em;
 }
 
-/* === [TREE] === */
-.tree-root {
-    font-size: 90%;
-}
-.tree-root ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    background-color: rgba(0, 0, 0, 0.05);
-}
-.tree-root li:first-child {
-    margin-top: 0;
-}
-.tree-root ul ul {
-    padding-left: 1em;
-    padding-bottom: 1em;
-}
-
 /* === [LIST] === */
-#lobby .list, #menu .list {
-    border-left: none;
-    border-right: none;
-    border-radius: 0;
-}
 .list {
     overflow: auto;
     background: rgba(0, 0, 0, 0.05);
-    border: none;
-    border-bottom: solid 1px #ddd;
-    border-top: solid 3px #ddd;
-    border-left: solid 1px #ddd;
-    border-right: solid 1px #ddd;
+    border: solid 1px rgba(0, 0, 0, 0.2);
     border-radius: 0.5rem;
     padding: 0.25rem 0;
+    font-size: 0.8em;
+}
+.list+.list {
+    border-top: none;
 }
 .list div {
     padding: 0.25rem 0.5rem;
@@ -147,17 +101,10 @@ a {
     word-wrap: break-word;
     hyphens: auto;
 }
-.list .alive {
-    color: #1e3;
-    text-shadow: 0 1px #088020;
-}
-.list .dead {
-    color: #e31;
-    text-shadow: 0 1px #802008;
-}
 .list em {
     font-style: normal;
     font-weight: 600;
+    text-overflow: ellipsis;
 }
 .list em::before {
     color: #aaa;
@@ -178,7 +125,7 @@ a {
     justify-content: flex-start;
 }
 .flex.center {
-    justify-content: flex-center;
+    justify-content: center;
 }
 .flex.right {
     justify-content: flex-end;
@@ -227,9 +174,15 @@ a {
 .form-box {
     width: 22rem;
     margin: 1rem auto;
-    border: solid 1px rgba(0, 0, 0, 0.1);
-    border-bottom-width: 3px;
     border-radius: 0.5rem;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.3);
+}
+@media only screen and (max-width: 400px) {
+    .form-box {
+        box-sizing: border-box;
+        width: auto;
+        margin: 1rem;
+    }
 }
 form {
     margin: 0;
@@ -241,10 +194,21 @@ form {
 }
 .form-error {
     color: #f00;
-    white-space: pre;
+    white-space: pre-wrap;
 }
 .form-group+.form-group {
     margin-top: 1rem;
+}
+.form-group.list {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+}
+.form-group.list:last-child {
+    border-bottom: none;
+    margin-bottom: -1rem;
 }
 .form-group label {
     text-align: right;
@@ -257,57 +221,64 @@ form {
 .form-group label[for] {
     cursor: pointer;
 }
-input, textarea, input+.check {
+input, textarea, input+.check, button {
     color: #333;
     background: rgba(0, 0, 0, 0.05);
     padding: 0.75rem;
     border-radius: 0.5rem;
     border-style: solid;
-    border-color: rgba(0, 0, 0, 0.10);
-    border-top-width: 3px;
+    border-color: rgba(0, 0, 0, 0.20);
+    border-top-width: 2px;
     border-left-width: 1px;
     border-right-width: 1px;
     border-bottom-width: 1px;
 }
+input+.check { border-radius: 100% }
 input:focus,
 input[type=submit]:hover,
 input[type=button]:hover,
 input:hover+.check,
-input:focus+.check {
+input:focus+.check,
+button:hover,
+button:focus,
+button:focus+.check {
     outline: none;
     background: rgba(0, 0, 0, 0.10);
-    border-color: rgba(0, 0, 0, 0.20);
+    border-color: rgba(0, 0, 0, 0.30);
 }
 input:focus,
+button:focus,
 input:focus+.check {
-    border-color: #08f;
+    border-color: #26f;
 }
-input:disabled {
+input:disabled,
+button:focus {
     cursor: default;
 }
 input:not(:disabled)[type=submit],
 input:not(:disabled)[type=button],
+button:not(:disabled),
 input:not(:disabled)+.check {
     cursor: pointer;
 }
 input[type=submit],
 input[type=button],
+button,
 input+.check {
     border-top-width: 1px;
-    border-bottom-width: 3px;
+    border-bottom-width: 2px;
+}
+input[type=submit] {
+    font-weight: 800;
 }
 input[type=submit]:active,
 input[type=button]:active,
-input:active+.check {
+input:active+.check,
+button:active,
+button:active+.check {
     background: rgba(0, 0, 0, 0.15);
     border-color: rgba(0, 0, 0, 0.20);
-}
-input[type=submit].active,
-input[type=button].active,
-input[type=submit]:active,
-input[type=button]:active,
-input:checked+.check {
-    border-top-width: 3px;
+    border-top-width: 2px;
     border-bottom-width: 1px;
 }
 input[type=checkbox] {
@@ -315,8 +286,8 @@ input[type=checkbox] {
     opacity: 0;
     cursor: pointer;
 }
-input+.check {
-    color: rgba(0, 0, 0, 0.1);
+input+.check, button+.check {
+    color: rgba(0, 0, 0, 0.2);
 
     text-align: center;
     padding: 0;
@@ -331,13 +302,13 @@ input:checked:hover+.check {
     background: rgba(110, 220, 5, 1);
 }
 /* Bug fix linked to font-awesome icons having an unwanted space afterwards */
-input+.fa:after {
+button+.fa:after, input+.fa:after, button label:after {
     display: none;
 }
-input.ico-after {
+.ico-after {
     padding-right: 1.75rem; /*add 1 em for the ico*/
 }
-input.ico-after+.fa {
+.ico-after+.fa {
     cursor: pointer;
     width: 1rem;
     height: 1rem;
@@ -348,26 +319,60 @@ textarea {
     resize: none;
 }
 
-/* === [LOBBY & MENU] === */
-#lobby, #menu .container {
-    width: 20%;
-    min-width: 12rem;
-    font-size: 0.8rem;
-    background-color: white;
+/* === [EXTRA; LOBBY & MENU] === */
+#extra-show, #extra-show+.check { display: none; }
+#extra-show+.check {
+    border: none;
+    background: none;
+    color: #08f;
+    font-size: 1.5em;
 }
-
-#menu {
-    overflow: hidden;
+#extra-show+.check:hover,
+#extra-show:focus+.check {
+    text-shadow: 0 2px #333;
+}
+#extra-show+.check:before { content: "\f177"; }
+#extra-show:checked+.check:before { content: "\f178"; }
+@media only screen and (max-width: 900px) {
+    #extra {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        display: none;
+    }
+    #extra-show, #extra-show+.check { display: initial; }
+    #extra-show:checked, #extra-show:checked+.check { right: 14rem; }
+    #extra-show:checked+.check+#extra { display: initial; }
+}
+#extra {
+    width: 20%;
+    min-width: 14rem;
+    background-color: #f8fdff;
+}
+#extra .list {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+}
+#extra form {
+    padding: 0;
+}
+#extra form input, #menu-btn+.check {
+    border-radius: 0;
+    border-width: 0;
 }
 #menu-btn+.check {
-    margin: 0.125rem 0.5rem;
+    padding: 0.25rem;
     z-index: 1;
+    box-shadow: 1px 0 0 0 rgba(0, 0, 0, 0.2) inset;
 }
-#menu .container {
-    visibility: hidden;
+#menu-btn:focus+.check {
+    box-shadow: 0 0 0 1px #08f inset;
 }
-#menu #menu-btn:checked+.check+.container {
-    visibility: visible;
+#menu-btn:not(:checked)+.check+div+div,
+#menu-btn:checked+.check+div {
+    display: none;
 }
 
 /* === [LOADER] === */
@@ -482,488 +487,4 @@ textarea {
 #loader .pos-6 {
     top: -2.60rem;
     left: 1.5rem;
-}
-
-/* === [CARDS] === */
-#game .container {
-    width: 100%;
-    height: 100%;
-    min-width: 40em;
-    min-height: 40em;
-}
-
-
-.winner .info-plate,
-.winner .card .face {
-    animation: winner-flash 0.5s infinite linear alternate;
-}
-@keyframes winner-flash {
-    from { box-shadow: 0 0 0.25em 0.25em #4af; }
-    to { box-shadow: 0 0 0.25em 0.5em #4af; }
-}
-
-.info-plate {
-    background-color: #efe8e0;
-    font-size: 0.8em;
-
-    margin-top: -1.75em;
-    padding: 0.25em 0.75em;
-    position: absolute;
-    transition:
-        left 0.5s ease-in-out,
-        top 0.5s ease-in-out;
-    border: solid 0.25em #853;
-    border-radius: 0.5em;
-}
-.info-plate.turn {
-    border-color: #4af;
-}
-.info-plate .name, .info-plate .life {
-    display: block;
-    width: 100%;
-    text-align: center;
-    font-size: 1em;
-    line-height: 1em;
-}
-.info-plate .name {
-    font-weight: 800;
-}
-.info-plate .life {
-    font-family: FontAwesome;
-    margin-top: 0.5em;
-    letter-spacing: 0.1em;
-    color: red;
-}
-
-#game input[type=button] {
-    padding: 0.25em 0.75em;
-
-    line-height: 2em;
-    border-radius: 0.5em;
-
-    text-transform: uppercase;
-    font-weight: 800;
-
-    background-color: #d83;
-    border-color: #853;
-    color: #853;
-    transition: box-shadow 0.25s;
-
-    margin: 0.5em;
-    margin-right: 0;
-    z-index: 5000;
-}
-#game input[type=button]:disabled {
-    background-color: #999;
-    border-color: #888;
-    color: #888;
-}
-#game input[type=button].flash:not(:disabled) {
-    animation: brown-flash 0.5s infinite linear alternate;
-}
-#game input[type=button]:active {
-    background-color: #c9772d;
-    border-color: #77482c;
-    color: #77482c;
-}
-
-.card {
-    position: absolute;
-    width: 4.5em;
-    height: 7.5em;
-    border-radius: 0.5em;
-    margin-left: -2.25em;
-    margin-right: -2.25em;
-    margin-top: -3.75em;
-    margin-bottom: -3.75em;
-    z-index: 0;
-
-    transition:
-        left 0.5s ease-in-out,
-        top 0.5s ease-in-out,
-        transform 0.5s ease-in-out,
-        z-index 0s;
-
-    transform-style: preserve-3d;
-    transform-origin: center;
-    perspective: 40em;
-}
-.card * {
-    pointer-events: none;
-}
-.card.visible:not(.moving):hover,
-.card.known:not(.moving):hover {
-    transition:
-        left 0.5s ease-in-out,
-        top 0.5s ease-in-out,
-        0.5s transform 0.5s ease-in-out,
-        0.5s z-index 0s;
-
-    transform: scale(1.0) rotateZ(0deg) !important;
-    /* Yes it is absurdly large; there is a lot of z-index fudging in the code */
-    z-index: 10000 !important;
-}
-.card.visible .face,
-.card.known:hover .face {
-    transform: rotateY(360deg);
-}
-.card.visible .back,
-.card.known:hover .back {
-    transform: rotateY(180deg);
-}
-
-.card .face,
-.card .back {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    padding: 0.25em;
-    border-radius: 0.5em;
-    transition: transform 0.5s ease-in-out;
-    backface-visibility: hidden;
-}
-.card.actionable,
-.card-pile .bottom.actionable {
-    cursor: pointer;
-}
-
-.card.actionable.visible .face,
-.card.actionable:not(.visible) .back {
-    animation: brown-flash 0.5s infinite linear alternate;
-}
-.card.actionable.visible .face.blue {
-    animation: blue-flash 0.5s infinite linear alternate;
-}
-
-@keyframes brown-flash {
-    from { border-color: #853; }
-    to { border-color: #4af; }
-}
-@keyframes blue-flash {
-    from { border-color: #1B66C1; }
-    to { border-color: #4af; }
-}
-
-.card .face, .card .back {
-    border: solid 0.2em #853;
-}
-
-.card .face {
-    transform: rotateY(180deg);
-    background-color: #efe8e0;
-}
-.card .face.blue {
-    border-color: #1B66C1;
-}
-.card .face.brown {
-    border-color: #853;
-}
-
-.card .back {
-    transform: rotateY(0deg);
-    background-color: #d83;
-}
-.card:not(.character):not(.role) .back:after {
-    content: "BANG!";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 20em;
-    margin-left: -10em;
-    text-align: center;
-    line-height: 0;
-    transform: rotateZ(65deg);
-    font-size: 1.4em;
-    font-weight: 800;
-    color: #853;
-}
-
-.card.role .back {
-    background: linear-gradient(90deg, #b62, #d83, #b62, #d83, #b62);
-}
-
-.card.character .back div {
-    width: 2.6em;
-    height: 0.6em;
-    background: linear-gradient(0deg, #c91, #ec1, #ec1, #fe8, #ec1, #c91);
-    border: solid 0.1em #853;
-    border-top-left-radius: 100%;
-    border-bottom-left-radius: 100%;
-    border-top-right-radius: 0.5em;
-    border-bottom-right-radius: 0.5em;
-    margin-left: 0.45em;
-    margin-right: 0.45em;
-    margin-top: 0.5em;
-    transform-origin: center;
-}
-.card.character .back div:first-child {
-    margin-top: 0.35em;
-}
-.card.character .back .bullet-1 { transform: rotateZ(4deg); }
-.card.character .back .bullet-2 { transform: rotateZ(177deg); }
-.card.character .back .bullet-3 { transform: rotateZ(-1deg); }
-.card.character .back .bullet-4 { transform: rotateZ(185deg); }
-.card.character .back .bullet-5 { transform: rotateZ(-3deg); }
-
-.card .name, .card .image, .card .description {
-    width: 100%;
-}
-.card .name {
-    position: relative;
-    width: 12em;
-    height: 10%;
-    left: 50%;
-    margin-left: -6em;
-    text-align: center;
-    font-size: 0.5em;
-    text-transform: uppercase;
-    font-weight: 800;
-    transform: scaleX(0.75);
-}
-.card .image {
-    height: 45%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-
-.image.deputy { background-image: url('/imgs/deputy.png'); }
-.image.outlaw { background-image: url('/imgs/outlaw.png'); }
-.image.renegade { background-image: url('/imgs/renegade.png'); }
-.image.sheriff { background-image: url('/imgs/sheriff.png'); }
-
-.image.bang { background-image: url('/imgs/bang.png'); }
-.image.barile { background-image: url('/imgs/barile.png'); }
-.image.beer { background-image: url('/imgs/beer.png'); }
-.image.carabine { background-image: url('/imgs/carabine.png'); }
-.image.catbalou { background-image: url('/imgs/catbalou.png'); }
-.image.diligenza { background-image: url('/imgs/diligenza.png'); }
-.image.duel { background-image: url('/imgs/duel.png'); }
-.image.dynamite { background-image: url('/imgs/dynamite.png'); }
-.image.emporio { background-image: url('/imgs/emporio.png'); }
-.image.gatling { background-image: url('/imgs/gatling.png'); }
-.image.indians { background-image: url('/imgs/indians.png'); }
-.image.mancato { background-image: url('/imgs/mancato.png'); }
-.image.mirino { background-image: url('/imgs/mirino.png'); }
-.image.mustang { background-image: url('/imgs/mustang.png'); }
-.image.panico { background-image: url('/imgs/panico.png'); }
-.image.prigione { background-image: url('/imgs/prigione.png'); }
-.image.remington { background-image: url('/imgs/remington.png'); }
-.image.saloon { background-image: url('/imgs/saloon.png'); }
-.image.schofield { background-image: url('/imgs/schofield.png'); }
-.image.volcanic { background-image: url('/imgs/volcanic.svg'); }
-.image.wellsfargo { background-image: url('/imgs/wellsfargo.png'); }
-.image.winchester { background-image: url('/imgs/winchester.png'); }
-
-.image.bart-cassidy { background-image: url('/imgs/bart-cassidy.png'); }
-.image.black-jack { background-image: url('/imgs/black-jack.png'); }
-.image.calamity-janet { background-image: url('/imgs/calamity-janet.png'); }
-.image.el-gringo { background-image: url('/imgs/el-gringo.png'); }
-.image.jesse-jones { background-image: url('/imgs/jesse-jones.png'); }
-.image.jourdonnais { background-image: url('/imgs/jourdonnais.png'); }
-.image.kit-carlson { background-image: url('/imgs/kit-carlson.png'); }
-.image.lucky-duke { background-image: url('/imgs/lucky-duke.png'); }
-.image.paul-regret { background-image: url('/imgs/paul-regret.png'); }
-.image.pedro-ramirez { background-image: url('/imgs/pedro-ramirez.png'); }
-.image.rose-doolan { background-image: url('/imgs/rose-doolan.png'); }
-.image.sid-ketchum { background-image: url('/imgs/sid-ketchum.png'); }
-.image.slab-the-killer { background-image: url('/imgs/slab-the-killer.png'); }
-.image.suzy-lafayette { background-image: url('/imgs/suzy-lafayette.png'); }
-.image.vulture-sam { background-image: url('/imgs/vulture-sam.png'); }
-.image.willy-the-kid { background-image: url('/imgs/willy-the-kid.png'); }
-
-.card .content {
-    height: 45%;
-    font-size: 0.4em;
-    line-height: 1.2em;
-    text-align: center;
-}
-.card .content .description {
-    text-align: left;
-}
-.card .content .range,
-.card .content .draw {
-    display: inline-block;
-    vertical-align: middle;
-}
-.card .content .range {
-    width: 1em;
-    height: 1em;
-    line-height: 1em;
-    font-size: 1.5em;
-    border: solid 0.1em #333;
-    border-radius: 100%;
-    padding: 0.25em;
-    margin: 0.25em;
-    position: relative;
-}
-.card .content .range:before,
-.card .content .range:after {
-    content: "";
-    background-color: #333;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    opacity: 0.25;
-}
-.card .content .range:before {
-    margin-left: -1em;
-    margin-top: -0.5px;
-    width: 2em;
-    height: 1px;
-}
-.card .content .range:after {
-    margin-left: -0.5px;
-    margin-top: -1em;
-    width: 1px;
-    height: 2em;
-}
-
-.card .content .draw {
-    padding: 0.25em;
-    margin: 0.25em;
-}
-.card .content .draw:after {
-    display: inline-block;
-    vertical-align: middle;
-    content: "";
-    width: 1.2em;
-    height: 2em;
-    background-color: #ccc;
-    border-radius: 0.25em;
-    border: solid 0.1em #999;
-    margin-left: 0.25em;
-}
-
-.card .type {
-    position: absolute;
-    left: 0.1em;
-    bottom: 0.1em;
-}
-.card .type .suit, .card .type .rank {
-    display: inline-block;
-    height: 0.5em;
-    line-height: 0.5em;
-    vertical-align: middle;
-}
-
-.card .suit {
-    width: 0.5em;
-    height: 0.5em;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-.card .suit.spades { background-image: url("/imgs/spades.svg"); }
-.card .suit.clovers { background-image: url("/imgs/clovers.svg"); }
-.card .suit.hearts { background-image: url("/imgs/hearts.svg"); }
-.card .suit.diamonds { background-image: url("/imgs/diamonds.svg"); }
-
-.card .rank {
-    text-align: center;
-    color: #000;
-}
-.card .rank:after {
-    font-size: 0.5em;
-    font-weight: 800;
-}
-.card .rank.ace:after { content: "A"; }
-.card .rank.two:after { content: "2"; }
-.card .rank.three:after { content: "3"; }
-.card .rank.four:after { content: "4"; }
-.card .rank.five:after { content: "5"; }
-.card .rank.six:after { content: "6"; }
-.card .rank.seven:after { content: "7"; }
-.card .rank.eight:after { content: "8"; }
-.card .rank.nine:after { content: "9"; }
-.card .rank.ten { letter-spacing: -0.05em; }
-.card .rank.ten:after { content: "10"; }
-.card .rank.jack:after { content: "J"; }
-.card .rank.queen:after { content: "Q"; }
-.card .rank.king:after { content: "K"; }
-
-.card-pile .top {
-    transition:
-        left 0s ease-in-out,
-        top 0s ease-in-out,
-        transform 0.5s ease-in-out;
-}
-.card-pile .bottom, .card-pile .size {
-    position: absolute;
-    margin-left: -2.25em;
-    margin-right: -2.25em;
-    width: 4.5em;
-    border-radius: 0.5em;
-}
-.card-pile .bottom {
-    z-index: -1;
-    bottom: 0;
-    height: 7.5em;
-    margin-top: -3.75em;
-    box-shadow: 0 0 0 0.1em rgba(0, 0, 0, 0.3);
-}
-.card-pile .bottom.actionable {
-    animation: bottom-flash 0.5s infinite linear alternate;
-}
-@keyframes bottom-flash {
-    from { box-shadow: 0 0 0 0.1em rgba(0, 0, 0, 0.3); }
-    to { box-shadow: 0 0 0 0.25em #4af; }
-}
-.card-pile .size {
-    /* The negative margin of cards -1 because of padding */
-    margin-top: 2.75em;
-    padding-top: 1em;
-    background-color: #643;
-}
-
-.choice {
-    z-index: 1;
-}
-.choice .card .face {
-    box-shadow: 0.25em 0.75em 0 0 rgba(0, 0, 0, 0.3);
-}
-
-.event {
-    position: absolute;
-    width: 6em;
-    margin: 0.5em;
-    right: 0;
-    bottom: 0;
-    color: white;
-    text-align: center;
-}
-.event .player {
-    line-height: 1.1em;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    font-size: 0.8em;
-    margin-bottom: 0.5em;
-}
-.event .reason {
-    font-size: 0.8em;
-    margin-bottom: 0.5em;
-}
-.event .type {
-    height: 6em;
-    padding: 0.25em;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-    box-sizing: border-box;
-}
-.event .type.draw {
-    background-image: url("/imgs/draw.svg");
-}
-.event .type.choice {
-    background-image: url("/imgs/choose.svg");
-}
-.event .type.target {
-    background-image: url("/imgs/target.svg");
-}
-
-
-.no-transition {
-    transition: none !important;
 }

@@ -12,8 +12,9 @@ module.exports = function(settings, onJoin) {
         tagPreJoin = ui.one(tagPreForm, '[name=join]'),
         tagPlayers = ui.one(tagPreForm, '#joining');
 
-    tagPreJoin.onchange = function(e) {
-        onJoin(e.target.checked);
+    tagPreJoin.onclick = () => {
+        onJoin(tagPreJoin.checked);
+        return false;
     };
 
     return {
@@ -36,7 +37,7 @@ module.exports = function(settings, onJoin) {
 
             tagPlayers.innerHTML =
                 users.length ?
-                    users.reduce((acc, user) =>
+                    users.sort(user => user.name).reduce((acc, user) =>
                         acc + '<div><em>' + user.name + '</em></div>', '') :
                     '<div>No players yet</div>';
         }
