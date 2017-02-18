@@ -15,6 +15,7 @@ function User(name, password) {
         .toString('hex');
     this.name = name;
     this.joining = false;
+    this.disconnectTime = consts.disconnectTimeout;
     this.disconnectTimeout = null;
 }
 
@@ -45,7 +46,7 @@ misc.merge(User.prototype, {
         if (this.sockets.length) return;
         this.disconnectTimeout = setTimeout(() => {
             disconnectCallback();
-        }, consts.disconnectTimeout * 1000);
+        }, consts.disconnectTime * 1000);
     },
     emit: function() {
         this.sockets.forEach(socket => socket.emit.apply(socket, arguments));

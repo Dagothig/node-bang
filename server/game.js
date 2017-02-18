@@ -3,18 +3,21 @@ var log = aReq('server/log'),
     strings = aReq('shared/strings'),
     consts = aReq('server/consts'),
     misc = aReq('server/misc'),
-    Game = aReq('server/game/game');
+    Game = aReq('server/game/game'),
+    Bot = aReq('server/bot');
 
-var gameStartTimer = null, gameStartInterval;
-var game;
+var gameStartTimer = null, gameStartInterval,
+    botAddTimer = null, botAddInterval;
+var game, bots;
 
 var formattedGame = user => game ? game.formatted(user) : null;
 var formattedReason = joining => [
     (joining.length >= consts.maxPlayers ? strings.playerCapped :
     (joining.length < consts.minPlayers ? strings.notEnoughPlayers :
     null)),
+    (botAddTimer !== null ? strings.botTimer(botAddTimer) :
     (gameStartTimer !== null ? strings.startTimer(gameStartTimer) :
-    null)
+    null))
 ].filter(n => n).join('\n');
 var formattedJoining = users => {
     var joining = users
@@ -33,29 +36,52 @@ var canStart = users => misc.bounded(
     users.filter(user => user.joining).length,
     consts.minPlayers, consts.maxPlayers
 );
-
 function startTimer(io, users) {
     if (gameStartInterval) clearInterval(gameStartInterval);
 
     gameStartTimer = consts.gameStartTimer;
-    gameStartInterval = setInterval(function() {
+    gameStartInterval = setInterval(() => {
         if (--gameStartTimer > 0)
             users.emit(msgs.joining, formattedJoining(users));
         else {
             clearInterval(gameStartInterval);
-            gameStartInterval = null;
-            gameStartTimer = null;
+            gameStartInterval = gameStartTimer = null;
             startGame(io, users);
         }
     }, 1000);
 }
-
 function stopTimer(io, users) {
     if (gameStartInterval) {
         clearInterval(gameStartInterval);
         users.emit(msgs.joining, formattedJoining(users));
-        gameStartInterval = null;
-        gameStartTimer = null;
+        gameStartInterval = gameStartTimer = null;
+    }
+}
+
+var shouldAddBots = users => misc.bounded(
+    users.filter(user => user.joining && !user.bot).length,
+    1, consts.minPlayers - 1
+);
+function startAddBotsTimer(io, users) {
+    if (botAddInterval) clearInterval(botAddInterval);
+
+    botAddTimer = consts.gameStartBotTimer;
+    botAddInterval = setInterval(() => {
+        if (--botAddTimer > 0)
+            users.emit(msgs.joining, formattedJoining(users));
+        else {
+            clearInterval(botAddInterval);
+            botAddInterval = botAddTimer = null;
+            adjustBots(users);
+            users.emit(msgs.joining, formattedJoining(users));
+        }
+    }, 1000);
+}
+function stopAddBotsTimer(io, users) {
+    if (botAddInterval) {
+        clearInterval(botAddInterval);
+        users.emit(msgs.joining, formattedJoining(users));
+        botAddInterval = botAddTimer = null;
     }
 }
 
@@ -75,11 +101,23 @@ function startGame(io, users) {
         () => {
             game = null;
             log('Game finished!');
+            adjustBots(users);
             users.emit(msgs.joining, formattedJoining(users));
         }
     );
     users.forEach(user => user.joining = false);
     game.begin();
+}
+
+function adjustBots(users) {
+    let nonbots = users.filter(user => user.joining && !user.bot);
+    bots = bots || [];
+    let botsDiff = nonbots.length ?
+            (consts.minPlayers - nonbots.length - bots.length) :
+            -bots.length;
+    while (botsDiff < 0) { botsDiff++; bots.pop().kill(); }
+    while (botsDiff > 0) { botsDiff--; bots.push(new Bot(users, bots)); }
+    if (!bots.length) bots = null;
 }
 
 function handleGame(io, users, user, socket) {
@@ -98,6 +136,11 @@ function handleJoining(io, users, user, socket, msg) {
         if (user.joining === msg.joining) {
             if (canStart(users)) startTimer(io, users);
             else stopTimer(io, users);
+            if (bots) adjustBots(users);
+            else {
+                if (shouldAddBots(users)) startAddBotsTimer(io, users);
+                else stopAddBotsTimer(io, users);
+            }
         }
         users.emit(msgs.joining, formattedJoining(users));
     } else {
@@ -112,6 +155,11 @@ function handleAction(io, users, user, socket, msg) {
 
 module.exports = (io, users) => ({
     onConnected: (user, socket) => {
+        if (bots) {
+            user.bot = bots.find(bot => bot.name === user.name);
+            user.disconnectTime = 0;
+        }
+
         socket.on(msgs.game, () =>
             handleGame(io, users, user, socket));
 
