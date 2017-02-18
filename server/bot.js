@@ -24,8 +24,8 @@ function Bot(users, bots) {
                 !bots.find(bot => bot.name === name));
     this.name = misc.rand(remaining);
     this.process = childProcess.spawn(
-        'node',
-        ['bot.js',
+        process.argv[0],
+        [__dirname + '/server/bot',
             '--user-name=' + this.name,
             '--delay=500',
             '--server=http://localhost:' + process.env.PORT
