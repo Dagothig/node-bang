@@ -25,7 +25,11 @@ function Bot(users, bots) {
     this.name = misc.rand(remaining);
     this.process = childProcess.spawn(
         'node',
-        ['bot.js', '--user-name=' + this.name, '--delay=500']
+        ['bot.js',
+            '--user-name=' + this.name,
+            '--delay=500',
+            '--server=http://localhost:' + process.env.PORT
+        ]
     );
 }
 Bot.prototype.kill = function() { this.process.kill(); }
