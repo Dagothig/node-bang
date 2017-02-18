@@ -65,7 +65,7 @@ io.use((socket, next) => {
 login.addHandlers(lobby, game);
 
 // Listen on port
-var port = process.env.PORT || 8080;
+var port = process.env.PORT || consts.defaultPort;
 server.listen(port, () => log('Listening on port', port));
 
 // Setup stdin to listen to commands
