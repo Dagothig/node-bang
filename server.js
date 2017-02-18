@@ -9,6 +9,14 @@ var log = aReq('server/log'),
     consts = aReq('server/consts'),
     strs = aReq('shared/strings');
 
+if (process.argv.find(a => a === '--help')) {
+    console.log('Overrideable constants:');
+    Object.entries(consts)
+        .map(c => [misc.spacize(c[0]).toLowerCase().replace(/\ /g, '-'), c[1]])
+        .forEach(c => console.log('  --' + c[0] + ' =', c[1]));
+    return;
+}
+
 misc.parseArgs(process.argv, consts, log, warn);
 
 // Setup the server itself
