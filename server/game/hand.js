@@ -22,7 +22,7 @@ module.exports = function Hand(game, player, cards) {
                     player: player.name,
                     amount: drawn.length
                 }, extra);
-                let visible = p => p === player;
+                if (visible === false) visible = p => p === player;
                 game.onGameEvent(p => visible(p) ? specific : unspecific);
             }
         },

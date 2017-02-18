@@ -12,7 +12,8 @@ module.exports = new Character("El Gringo", {
         target.hand.add(
             source.hand.removeRand(),
             { from: 'hand', target: source.name },
-            p => p === target || p === source
+            p => (p === target || p === source)
         );
+        return onResolved();
     }
 });

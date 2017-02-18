@@ -19,7 +19,7 @@ misc.extend(Card, Panico, {
                 player.hand.discard(this.id);
                 player.hand.add(card,
                     { from: from, target: target.name },
-                    from === 'equipped' || (p => p === target || p === player)
+                    from === 'equipped' || (p => (p === target || p === player))
                 );
                 onResolved();
             },
