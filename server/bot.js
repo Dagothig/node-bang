@@ -27,7 +27,7 @@ function Bot(users, bots) {
     console.log(process, process.env, process.env.PORT);
     this.process = childProcess.spawn(
         process.argv[0],
-        [__dirname + '../bot',
+        [__dirname + '/../bot',
             '--user-name=' + this.name,
             '--delay=500',
             '--server=http://localhost:' + (process.env.PORT || consts.defaultPort)

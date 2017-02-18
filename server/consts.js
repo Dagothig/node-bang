@@ -6,7 +6,7 @@ module.exports = {
     minPlayers: 4,
     maxPlayers: 8,
     gameStartTimer: 10,
-    gameStartBotTimer: 60,
+    gameStartBotTimer: 30,
     characterChoices: 2,
     characterPickMaxTime: 60,
     characterGraceTime: 3,
