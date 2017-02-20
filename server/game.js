@@ -157,7 +157,7 @@ module.exports = (io, users) => ({
     onConnected: (user, socket) => {
         if (bots) {
             user.bot = bots.find(bot => bot.name === user.name);
-            user.disconnectTime = 0;
+            if (user.bot) user.disconnectTime = 0;
         }
 
         socket.on(msgs.game, () =>
