@@ -11,6 +11,7 @@ function Dynamite(suit, rank) {
     this.maxRank = Card.ranks.nine;
 }
 misc.extend(Equipment, Dynamite, {
+    priority: 2,
     format: function() {
         return misc.merge(Equipment.prototype.format.apply(this, arguments), {
             boomSuit: this.boomSuit
