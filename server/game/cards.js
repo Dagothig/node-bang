@@ -67,12 +67,11 @@ var cards = [
     new Mancato(suits.spades, ranks.seven),
     new Mancato(suits.spades, ranks.eight),
 
-    new Mancato(suits.clovers, ranks.three),
+    new Mancato(suits.clovers, ranks.ace),
     new Mancato(suits.clovers, ranks.ten),
     new Mancato(suits.clovers, ranks.jack),
-    new Mancato(suits.clovers, ranks.king),
     new Mancato(suits.clovers, ranks.queen),
-    new Mancato(suits.clovers, ranks.ace),
+    new Mancato(suits.clovers, ranks.king),
 
     new Beer(suits.hearts, ranks.six),
     new Beer(suits.hearts, ranks.seven),
@@ -90,14 +89,13 @@ var cards = [
 
     new Emporio(suits.clovers, ranks.nine),
     new Emporio(suits.spades, ranks.queen),
-    new Emporio(suits.spades, ranks.ace),
 
     new Gatling(suits.hearts, ranks.ten),
 
     new Indians(suits.diamonds, ranks.ace),
     new Indians(suits.diamonds, ranks.king),
 
-    new Panico(suits.spades, ranks.eight),
+    new Panico(suits.diamonds, ranks.eight),
     new Panico(suits.hearts, ranks.jack),
     new Panico(suits.hearts, ranks.queen),
     new Panico(suits.hearts, ranks.ace),
@@ -108,7 +106,7 @@ var cards = [
     new CatBalou(suits.diamonds, ranks.jack),
 
     new Duel(suits.diamonds, ranks.queen),
-    new Duel(suits.diamonds, ranks.jack),
+    new Duel(suits.spades, ranks.jack),
     new Duel(suits.clovers, ranks.eight),
 
     new Volcanic(suits.spades, ranks.ten),
@@ -122,21 +120,15 @@ var cards = [
 
     new Mustang(suits.hearts, ranks.eight),
     new Mustang(suits.hearts, ranks.nine),
-    new Mustang(suits.hearts, ranks.five),
 
     new Mirino(suits.spades, ranks.ace),
 
     new Barile(suits.spades, ranks.king),
     new Barile(suits.spades, ranks.queen),
-    new Barile(suits.spades, ranks.ace),
-    new Barile(suits.spades, ranks.two),
-    new Barile(suits.spades, ranks.three),
-    new Barile(suits.spades, ranks.four),
-    new Barile(suits.spades, ranks.five),
 
     new Prigione(suits.hearts, ranks.four),
+    new Prigione(suits.spades, ranks.ten),
     new Prigione(suits.spades, ranks.jack),
-    new Prigione(suits.spades, ranks.queen),
 
     new Dynamite(suits.hearts, ranks.two)
 ];

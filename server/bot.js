@@ -8,7 +8,7 @@ let names = [
     '3lit3Botter',
     'Botty',
     'Twadobot',
-    'Twadeceptibot',
+    'Twadoceptibot',
     'Botlicious',
     'WildWildBot'
 ];
@@ -31,7 +31,7 @@ function Bot(users, bots) {
             '--user-name=' + this.name,
             '--delay=500',
             '--server=http://localhost:' + (process.env.PORT || consts.defaultPort)
-        ]
+        ], { stdio: ['pipe', process.stdout, process.stderr] }
     );
 }
 Bot.prototype.kill = function() { this.process.kill(); }
