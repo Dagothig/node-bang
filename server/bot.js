@@ -29,7 +29,7 @@ function Bot(users, bots) {
         process.argv[0],
         [__dirname + '/../bot',
             '--user-name=' + this.name,
-            '--delay=500',
+            consts.botArguments,
             '--server=http://localhost:' + (process.env.PORT || consts.defaultPort)
         ], { stdio: ['pipe', process.stdout, process.stderr] }
     );
