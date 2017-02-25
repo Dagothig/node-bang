@@ -197,8 +197,8 @@ Game.prototype = {
                     this.players.findIndex(p =>
                         p.info.name === current.name) : -1;
                 if (shift === -1)
-                    shift = this.players.findIndex(p => p.info.role &&
-                        p.info.role.name === 'Sheriff');
+                    shift = this.players.findIndex(p =>
+                        p.info.role && p.info.role.name === 'Sheriff');
 
                 this.players.forEach((player, i) =>
                     player.computeAngle(game.players, i, shift));
@@ -318,9 +318,7 @@ Game.prototype = {
                 this.players[0].getHeight() * 2.1 +
                     this.pile.tagBottom.offsetHeight * 1.2 + 'px';
         } else
-            this.tagGame.style.minHeight =
-            this.tagGame.style.minWidth =
-                (28 + 2 * count) + 'em';
+            this.tagGame.style.minHeight = this.tagGame.style.minWidth = '0em';
         let halfSize = {
             x: this.tagGame.offsetWidth / 2,
             y: this.tagGame.offsetHeight / 2
@@ -348,7 +346,7 @@ Game.prototype = {
                 Math.pow(dirY * halfSize.y, 2)
             ) - centerSize - height, 0);
 
-            let shift = centerSize + height / 2 + remain * 0.5;
+            let shift = centerSize + height / 2 + remain * 0.75;
 
             p.move(
                 halfSize.x + dirX * shift,

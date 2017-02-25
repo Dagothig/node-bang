@@ -5,9 +5,12 @@ function Decal() {
     this.tagRoot = ui.create('div');
 
     this.tagEvent = ui.create('div', 'event', this.tagRoot);
+    this.eventFrom = ui.create('div', 'player from', this.tagEvent);
     this.eventPlayerName = ui.create('div', 'player', this.tagEvent);
     this.eventReason = ui.create('div', 'reason', this.tagEvent);
     this.eventType = ui.create('div', 'type', this.tagEvent);
+
+    ui.hide(this.eventFrom);
 }
 Decal.depth = 1;
 Decal.prototype = {
@@ -21,7 +24,7 @@ Decal.prototype = {
         let event = game.turn.step.event;
 
         this.eventPlayerName.innerHTML = (event.player instanceof Array) ?
-            event.player.reduce((str, name) => str += '<br/>' + name, '') :
+            event.player.join('<br/>') :
             event.player;
 
         let name = event.name;
@@ -58,8 +61,13 @@ Decal.prototype = {
         else ui.hide(this.eventReason);
         this.eventReason.innerHTML = event.for +
             (event.avoid ?
-                ' ' + event.avoid + ' avoid needed' :
+                '<br/>' + event.avoid + ' avoid needed' :
                 '');
+
+        let from = event.from || event.source;
+        if (from) ui.show(this.eventFrom);
+        else ui.hide(this.eventFrom);
+        this.eventFrom.innerHTML = from;
     },
 
     move: function(z) {

@@ -116,7 +116,10 @@ socket.emit = function(key) {
 }*/
 var on = (key, func) => socket.on(key, func);
 on('connect', () => {});
-on('disconnect', () => updateVisbility(true));
+on('disconnect', () => {
+    ongoing = joining = null;
+    updateVisbility(true);
+});
 on('error', msg => {
     if (user) lobby.handleError(msg);
     else login.handleAuth({ reason: msg });

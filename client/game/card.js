@@ -49,10 +49,8 @@ Card.prototype = {
     },
 
     setInfo: function(card) {
+        this.setType('info');
         if (this.is(card)) return this;
-
-        this.tagRoot.classList.remove('character', 'role');
-        this.tagBack.innerHTML = '';
 
         this.info = card;
         if (this.info && this.info.id) {
@@ -95,16 +93,13 @@ Card.prototype = {
     },
 
     setCharacter: function(char) {
-        if (this.info && char && this.info.name === char.name) return this;
+        this.setType('character');
+        if (this.is(char)) return this;
 
-        this.tagRoot.classList.remove('role');
-        this.tagRoot.classList.add('character');
-        this.tagBack.innerHTML = '';
         ui.hide(this.tagFaceRange, this.tagFaceDraw);
         this.info = char;
-        for (let i = 1; i <= 5; i++) ui.create('div', 'bullet-' + i, this.tagBack);
 
-        if (char && char.name) {
+        if (char && char.name && info.characters[char.name]) {
             let charInfo = info.characters[char.name];
             this.tagFaceName.innerHTML = char.name;
             this.tagFaceDescription.innerHTML = charInfo.description;
@@ -117,29 +112,45 @@ Card.prototype = {
     },
 
     setRole: function(role) {
-        if (this.info && role && this.info.name === role.name) return this;
+        this.setType('role');
+        if (this.is(role)) return this;
 
-        this.tagRoot.classList.remove('character');
-        this.tagRoot.classList.add('role');
-        this.tagBack.innerHTML = '';
         ui.hide(this.tagFaceRange, this.tagFaceDraw);
         this.info = role;
 
-        if (role && role.name) {
+        if (role && role.name && info.roles[role.name]) {
             let roleInfo = info.roles[role.name];
-            if (roleInfo) {
-                this.tagFaceName.innerHTML = roleInfo.name;
-                this.tagFaceDescription.innerHTML = roleInfo.description;
-                this.setImage(role.name);
-                return this;
-            }
+            this.tagFaceName.innerHTML = roleInfo.name;
+            this.tagFaceDescription.innerHTML = roleInfo.description;
+            this.setImage(role.name);
+            return this;
         }
+
         this.setImage();
         return this;
     },
+
     setImage: function(img) {
         let imgName = img ? img.replace(/\s/g, '-').toLowerCase() : '';
         this.tagFaceImage.className = 'image ' + imgName;
+    },
+
+    setType: function(type) {
+        if (this.type === type) return;
+        this.tagRoot.classList.remove('character', 'role');
+        this.tagBack.innerHTML = '';
+        switch (this.type = type) {
+            case 'info':
+                break;
+            case 'character':
+                for (let i = 1; i <= 5; i++)
+                    ui.create('div', 'bullet-' + i, this.tagBack);
+                this.tagRoot.classList.add('character');
+                break;
+            case 'role':
+                this.tagRoot.classList.add('role');
+                break;
+        }
     },
 
     actionable: function(onAction) {
@@ -175,13 +186,16 @@ Card.prototype = {
             return this;
 
         this.tagRoot.classList.add('moving');
-        this.tagRoot.style.left = (this.x = x) + 'px';
-        this.tagRoot.style.top = (this.y = y) + 'px';
-        this.z = z;
-        if (this.tempZ === null) this.tagRoot.style.zIndex = z;
-        this.tagRoot.style.transform =
-            'scale(' + (1/Card.hoverScale) + ') ' +
-            'rotateZ(' + (this.angle = angle) + 'rad) ';
+        if (this.x !== x) this.tagRoot.style.left = (this.x = x) + 'px';
+        if (this.y !== y) this.tagRoot.style.top = (this.y = y) + 'px';
+        if (this.z !== z) {
+            this.z = z;
+            if (this.tempZ === null) this.tagRoot.style.zIndex = z;
+        }
+        if (this.angle !== angle)
+            this.tagRoot.style.transform =
+                'scale(' + (1/Card.hoverScale) + ') ' +
+                'rotateZ(' + (this.angle = angle) + 'rad) ';
         if (this.movingTimeout) clearTimeout(this.movingTimeout);
         this.movingTimeout = setTimeout(this.onMoveFinish, Card.transitionTime);
 

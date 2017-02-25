@@ -84,16 +84,18 @@ Player.prototype = {
             ui.show(this.equipped.tagRoot);
         } else if(!playerInfo.equipped) ui.hide(this.equipped.tagRoot);
 
-        this.infoLife.innerHTML = '';
+        let infoLifeHTML = '';
         if (playerInfo.stats && playerInfo.stats.life) {
             ui.show(this.infoLife);
             this.lifeLevel = playerInfo.life;
             for (let i = 0; i < playerInfo.stats.life; i++)
-                this.infoLife.innerHTML +=
-                    (i < playerInfo.life ? "\uf004" : "\uf08a");
+                infoLifeHTML +=
+                    (i < playerInfo.life ? "\uf004" : "<em>\uf004</em>");
+                    //(i < playerInfo.life ? "\uf004" : "\uf08a");
         } else {
             ui.hide(this.infoLife);
         }
+        this.infoLife.innerHTML = infoLifeHTML;
 
         if (turn && (turn.player === playerInfo.name)) {
             this.infoPlate.classList.add('turn');
@@ -233,7 +235,7 @@ Player.prototype = {
         );
 
         let yEquipShift = cHeight * Player.equippedShift;
-        this.equipped.move(
+        this.equipped.arcMove(
             this.x +
             yDirX * yEquipShift,
 
@@ -242,7 +244,9 @@ Player.prototype = {
 
             this.z + Player.equippedZ,
 
-            rotAngle
+            rotAngle,
+            Math.EIGTH_PI,
+            (1 - this.equipped.cards.length / 60)
         );
 
         let xStatShift =

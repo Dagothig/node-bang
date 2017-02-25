@@ -43,7 +43,7 @@ Pile.prototype = {
             this.setInfo(val);
         else {
             this.info = val - this.pending.length;
-            this._updateToSize();
+            this._updateToInfo()._updateToSize();
         }
         return val;
     },
