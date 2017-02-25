@@ -21,11 +21,14 @@ module.exports = new Phase('Playing', {
     },
 
     getNextTurn: function(game) {
-        var player, alive = game.players.filter(p => p.alive);
-        if (!alive.length) return null;
-        if (!this.turn) player = alive.find(p => p.role === roles.sheriff);
-        else player = alive[(alive.indexOf(this.turn.player) + 1) % alive.length];
-        return new Turn(game, player);
+        if (!this.turn)
+            return new Turn(game, game.players.find(p => p.role === roles.sheriff));
+        let indexOfCurrent = game.players.indexOf(this.turn.player);
+        for (let i = 1; i < game.players.length; i++) {
+            let player = game.players[(indexOfCurrent + i) % game.players.length];
+            if (player.alive) return new Turn(game, player);
+        }
+        return null;
     },
 
     begin: function(game) {
@@ -73,7 +76,6 @@ module.exports = new Phase('Playing', {
                 if (this.role[eventName]) handlers.push(this.role);
                 this.equipped.forEach(e => e[eventName] && handlers.push(e));
                 handlers.sort((handlers, i) => handlers.priority|0);
-
                 return handlers;
             }
         });
