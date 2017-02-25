@@ -1,4 +1,5 @@
 var log = aReq('server/log'),
+    warn = aReq('server/warn'),
     msgs = aReq('shared/messages'),
     strings = aReq('shared/strings'),
     consts = aReq('server/consts'),
@@ -58,7 +59,7 @@ function stopTimer(io, users) {
     }
 }
 
-var shouldAddBots = users => misc.bounded(
+var shouldAddBots = users => consts.gameStartBotTimer !== -1 && misc.bounded(
     users.filter(user => user.joining && !user.bot).length,
     1, consts.minPlayers - 1
 );
@@ -156,7 +157,7 @@ function handleAction(io, users, user, socket, msg) {
 module.exports = (io, users) => ({
     onConnected: (user, socket) => {
         if (bots) {
-            user.bot = bots.find(bot => bot.name === user.name);
+            user.bot = bots.find(bot => user.isName(bot.name));
             if (user.bot) user.disconnectTime = 0;
         }
 
@@ -178,5 +179,8 @@ module.exports = (io, users) => ({
             }
             users.emit(msgs.joining, formattedJoining(users));
         }
+    },
+    exit: () => {
+        if (bots) bots.forEach(bot => bot.kill());
     }
 });

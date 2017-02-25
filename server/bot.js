@@ -1,6 +1,7 @@
 let crypto = require('crypto'),
     consts = aReq('server/consts'),
     misc = aReq('server/misc'),
+    log = aReq('server/log'),
     childProcess = require('child_process');
 
 let names = [
@@ -15,26 +16,35 @@ let names = [
 
 function Bot(users, bots) {
     let remaining = names.filter(name =>
-            !users.find(user => user.name === name) &&
+            !users.find(user => user.isName(name)) &&
             !bots.find(bot => bot.name === name));
-    let iterate = 0;
-    while (!remaining.length)
-        remaining = names.map(name => name + '_copycat' + (++iterate))
+    let iterate = 1;
+    let title = n => '_the_' + n +
+        (n%10 === 1 && n%100 !== 11 ? 'st' :
+        (n%10 === 2 ? 'nd' :
+        (n%10 === 3 ? 'rd' : 'th')));
+    while (!remaining.length) {
+        iterate++;
+        remaining = names.map(name => name + title(iterate))
             .filter(name =>
-                !users.find(user => user.name === name) &&
+                !users.find(user => user.isName(name)) &&
                 !bots.find(bot => bot.name === name));
+    }
     this.name = misc.rand(remaining);
-    console.log(process, process.env, process.env.PORT);
+    log('Spawning', this.name);
     this.process = childProcess.spawn(
         process.argv[0],
         [__dirname + '/../bot',
             '--user-name=' + this.name,
             consts.botArguments,
             '--server=http://localhost:' + (process.env.PORT || consts.defaultPort)
-        ], { stdio: ['pipe', process.stdout, process.stderr] }
+        ]
     );
 }
-Bot.prototype.kill = function() { this.process.kill(); }
+Bot.prototype.kill = function() {
+    log('Shutting down', this.name);
+    this.process.kill();
+}
 
 
 module.exports = Bot;

@@ -77,19 +77,22 @@ var port = process.env.PORT || consts.defaultPort;
 server.listen(port, () => log('Listening on port', port));
 
 // Setup stdin to listen to commands
+let commands = {
+    reload: () => {
+        log('Reload');
+        io.emit(msgs.reload, true);
+    },
+    exit: () => {
+        log('Exiting');
+        game.exit();
+        process.exit();
+    }
+};
+let unknown = cmd => warn('Command unknown', '"' + cmd + '"');
 var stdin = process.openStdin();
 stdin.setEncoding('utf8');
 stdin.on('data', cmd => {
     cmd = cmd.replace(/\s/g, '');
     if (!cmd.length) return;
-    switch(cmd) {
-        case 'reload':
-            log('Relording...');
-            io.emit(msgs.reload, true);
-            break;
-        case 'exit':
-            process.exit();
-        default:
-            warn('Command unknown', '"' + cmd + '"');
-    }
+    (commands[cmd] || unknown)(cmd);
 });

@@ -18,11 +18,7 @@ function errorHandler(prefix) {
 }
 
 gulp.task('server', function(cb) {
-	if (node) {
-		node.kill();
-		log('Server killed');
-	}
-
+	if (node) node.stdin.write('exit\n');
 	log('Starting server...');
 
 	var childProcess = require('child_process');
@@ -97,7 +93,8 @@ gulp.task('sloc', function(cb) {
 		'./shared/**/*.js',
 		'./server/**/*.js',
 		'./client/**/*.js',
-		'./public/**/*.html'
+		'./public/**/*.css',
+		'./pages/**/*.html'
 	]).pipe(require('gulp-sloc')());
 });
 
@@ -107,5 +104,5 @@ gulp.task('default', gulp.parallel(
 ));
 
 process.on("exit", function() {
-	if (node) node.kill();
+	if (node) node.stdin.write('exit\n');
 });

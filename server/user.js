@@ -29,7 +29,7 @@ misc.merge(User.prototype, {
     addSocket: function(socket) {
         // Add the socket if its not already listed
         if (this.sockets.indexOf(socket) === -1) this.sockets.push(socket);
-        else warn('Attempting to add used socket to ', this.name);
+        else warn('Attempting to add used socket to', this.name);
         log(this.name, 'at', this.sockets.length, 'socket(s)');
         // Clear the timeout
         if (this.disconnectTimeout) {

@@ -1,6 +1,6 @@
 module.exports = {
     defaultPort: 8080,
-    disconnectTimeout: 30,
+    disconnectTimeout: 10,
     minPasswordLength: 4,
 
     minPlayers: 4,
