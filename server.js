@@ -18,6 +18,19 @@ if (process.argv.find(a => a === '--help')) {
 }
 
 misc.parseArgs(process.argv, consts, log, warn);
+if (consts.minPlayers > consts.maxPlayers) {
+    warn('The current minimum amount of players is higher than the maximum.',
+        '(' + consts.minPlayers, 'vs', consts.maxPlayers + ')');
+    warn('This makes no sense. Upping the maximum to match the minimum');
+    consts.maxPlayers = consts.minPlayers;
+}
+if (consts.maxPlayers > 8) {
+    warn('Maximum amount of players currently set is',  consts.maxPlayers + '.');
+    warn('The maximum amount of players that is supported by the server is 8.',
+        'Reverting the maximum to that and lowering the minimum accordingly.');
+    consts.maxPlayers = 8;
+    consts.minPlayers = Math.min(consts.minPlayers, consts.maxPlayers);
+}
 
 // Setup the server itself
 var http = require('http'),

@@ -1,5 +1,20 @@
 var misc = require('./misc');
 
+/* Usage of settings:
+<strat> should implement read(key, conf) and write(key, conf)
+(local-storage-strat is an exemple)
+<confs> is an object of configurations. Each configuration is a tuple consisting of:
+the default value, the type of the value and the nature of access of the value.
+the type of the value can be 'str', 'num' or 'bool' and reflects the types
+that should be supported by the strat
+(corresponding to string, numerical and boolean each)
+example of use:
+let settingsEx = settings(strat, {
+    boolEx: [true, 'bool', 'usr'],
+    numEx: [0, 'num', 'sys'],
+    strEx: ['', 'str', 'usr']
+});
+*/
 module.exports = (strat, confs) => Object.keys(confs).reduce((settings, key) => {
     settings.all.push(key);
 
@@ -30,11 +45,10 @@ module.exports = (strat, confs) => Object.keys(confs).reduce((settings, key) => 
         this['_' + key + 'CBs'].push(cb);
         cb(this[key]);
     },
-    _clear: function(key) {
-        this[key] = this['_' + key + 'Conf'][0];
-    },
+    _clear: function(key) { this[key] = this['_' + key + 'Conf'][0]; },
     clear: function() {
-        if (arguments.length) Array.from(arguments).forEach(key => this._clear(key));
+        if (arguments.length)
+            Array.from(arguments).forEach(key => this._clear(key));
         else this.all.forEach(key => this._clear(key))
     }
 });

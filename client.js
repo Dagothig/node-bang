@@ -4,7 +4,7 @@ var msgs = require('./shared/messages'),
     misc = window.misc = require('./client/misc');
 
 var strat = require('./client/local-storage-strat');
-var settings = require('./client/settings')(strat, {
+var settings = window.settings = require('./client/settings')(strat, {
     saveToken: [true, 'bool', 'user'],
     sound: [false, 'bool', 'user'],
     name: ['', 'str', 'sys'],
@@ -44,6 +44,12 @@ var lobby = require('./client/lobby.js')(
         socket.emit(msgs.message, {
             token: user.token,
             message: message
+        });
+    },
+    function onImage(data) {
+        socket.emit(msgs.image, {
+            token: user.token,
+            data: data
         });
     }
 );
@@ -170,6 +176,7 @@ on(msgs.users, msg => {
     lobby.handleUsers(user, users);
 });
 on(msgs.message, m => lobby.handleMessage(m.name, m.message));
+on(msgs.image, m => lobby.handleImage(m.name, m.data));
 on(msgs.joining, msg => {
     if (msg) {
         ongoing = null;

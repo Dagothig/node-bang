@@ -5,6 +5,7 @@ module.exports = {
     user: 'user',
     users: 'users',
     message: 'message',
+    image: 'image',
     joining: 'joining',
     game: 'game',
     action: 'action',
