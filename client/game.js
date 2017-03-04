@@ -14,7 +14,7 @@ function Game(settings, onAction) {
     this.settings = settings;
     this.tagRoot = ui.one('#game');
     this.tagGame = ui.one(this.tagRoot, '.container');
-    this.tagButtons = ui.create('div', 'buttons absolute bottom left');
+    this.tagButtons = ui.create('div', 'buttons absolute bottom left', this.tagRoot);
     this.tagResign = ui.create('input', {
         type: 'button', value: 'Resign', name: 'resign',
         onclick: () => confirm('Are you sure you want to resign?') &&
@@ -27,6 +27,9 @@ function Game(settings, onAction) {
             self.onAction('cancel', self.tagCancel.value);
         }
     }, this.tagButtons);
+
+    this.decal = new Decal();
+    this.tagRoot.appendChild(this.decal.tagRoot);
 
     ui.hide(this.tagResign, this.tagCancel);
 
@@ -51,13 +54,11 @@ Game.prototype = {
 
     clearGame: function() {
         this.tagGame.innerHTML = '';
-        this.tagGame.appendChild(this.tagButtons);
 
         this.game = null;
         this.players = null;
         this.pile = null;
         this.discard = null;
-        this.decal = null;
         this.choice = null;
     },
 
@@ -201,7 +202,7 @@ Game.prototype = {
                         p.info.role && p.info.role.name === 'Sheriff');
 
                 this.players.forEach((player, i) =>
-                    player.computeAngle(game.players, i, shift));
+                    player.computeAnglePortion(game.players, i, shift));
 
             }
         }
@@ -216,10 +217,6 @@ Game.prototype = {
             this.discard.setInfo(game.cards.discard);
         }
 
-        if (!this.decal) {
-            this.decal = new Decal();
-            this.tagGame.appendChild(this.decal.tagRoot);
-        }
         this.decal.setInfo(game);
 
         let what = game.turn
@@ -270,13 +267,14 @@ Game.prototype = {
         this.requestPositions();
     },
     displayEnd: function(game, newGame) {
-        ['pile', 'discard', 'decal', 'choice']
+        ['pile', 'discard', 'choice']
             .filter(k => this[k])
             .forEach(k => {
                 let obj = this[k];
                 this.tagGame.removeChild(obj.tagRoot);
                 this[k] = null;
             });
+        this.decal.clearInfo();
 
         if (game.players) {
             if (this.players) {
@@ -318,10 +316,11 @@ Game.prototype = {
                 this.players[0].getHeight() * 2.1 +
                     this.pile.tagBottom.offsetHeight * 1.2 + 'px';
         } else
-            this.tagGame.style.minHeight = this.tagGame.style.minWidth = '0em';
+            this.tagGame.style.minHeight = this.tagGame.style.minWidth = '40em';
         let halfSize = {
             x: this.tagGame.offsetWidth / 2,
-            y: this.tagGame.offsetHeight / 2
+            y: this.tagGame.offsetHeight / 2,
+            ratio: this.tagGame.offsetWidth / this.tagGame.offsetHeight
         };
         let centerSize = this.pile ? this.pile.tagBottom.offsetHeight * 0.6 : 0;
 
@@ -331,27 +330,34 @@ Game.prototype = {
                 let x = (i%nwidth - (nwidth-1)/2) * 1.25;
                 let y = (Math.floor(i/nwidth) - (nwidth-1)/2) * 1.25;
                 let width = p.character.getWidth() + p.role.getWidth();
-                let height = p.character.getHeight() + p.infoPlate.offsetHeight;
+                let height = p.character.getHeight() * 1.1;
                 p.endPhaseMove(halfSize.x + x * width, halfSize.y + y * height);
                 return;
             }
 
-            let dirX = p.dirX;
-            let dirY = p.dirY;
+            let angle = p.angle(halfSize.ratio);
+            let dirX = Math.cos(angle),
+                dirY = Math.sin(angle),
+                height = p.getHeight();
 
-            let height = p.getHeight();
+            let toH = Math.abs(halfSize.x / dirX),
+                toV = Math.abs(halfSize.y / dirY),
+                rectDiag = toH < toV ?
+                    Math.sqrt(Math.pow(halfSize.x, 2) + Math.pow(dirY * toH, 2)) :
+                    Math.sqrt(Math.pow(halfSize.y, 2) + Math.pow(dirX * toV, 2)),
+                ellipseDiag = halfSize.x * halfSize.y / Math.sqrt(
+                    Math.pow(dirX * halfSize.y, 2) +
+                    Math.pow(dirY * halfSize.x, 2)
+                );
+            let diag = rectDiag * 0.5 + ellipseDiag * 0.5;
 
-            let remain = Math.max(Math.sqrt(
-                Math.pow(dirX * halfSize.x, 2) +
-                Math.pow(dirY * halfSize.y, 2)
-            ) - centerSize - height, 0);
-
+            let remain = Math.max(diag - centerSize - height, 0);
             let shift = centerSize + height / 2 + remain * 0.75;
 
             p.move(
                 halfSize.x + dirX * shift,
                 halfSize.y + dirY * shift,
-                p.z, p.angle
+                p.z, angle, dirX, dirY
             );
         });
         let playersDepth = (this.players ? this.players.length : 0) * Player.depth;

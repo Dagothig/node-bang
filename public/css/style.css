@@ -20,6 +20,10 @@ a:focus, a:hover {
 .hidden {
     display: none !important;
 }
+.no-interaction {
+    pointer-events: none;
+    user-select: none;
+}
 .absolute {
     position: absolute;
 }

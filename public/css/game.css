@@ -1,4 +1,4 @@
-#game { z-index: 0; }
+#game { z-index: 0; user-select: none; }
 #game.new { visibility: hidden; }
 
 .winner .info-plate,
@@ -11,20 +11,23 @@
 }
 
 .info-plate {
-    background-color: #efe8e0;
-    font-size: 0.8em;
-
-    margin-top: -1.75em;
-    padding: 0.25em 0.75em;
     position: absolute;
     transition:
         left 0.5s ease-in-out,
         top 0.5s ease-in-out;
+}
+.info-plate .content {
+    position: absolute;
+    transform: translateX(-50%) translateY(-50%);
+    background-color: #efe8e0;
+    font-size: 0.8em;
+
+    padding: 0.25em 0.75em;
     background-color: #d83;
     border: solid 0.25em #853;
     border-radius: 0.5em;
 }
-.info-plate.turn {
+.info-plate.turn .content {
     background-color: #fff;
     border-color: #4af;
 }
@@ -449,11 +452,8 @@
 }
 
 .event {
-    position: absolute;
     width: 6em;
     margin: 0.5em;
-    right: 0;
-    bottom: 0;
     color: white;
     text-align: center;
     z-index: 5000;

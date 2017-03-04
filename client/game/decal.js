@@ -2,7 +2,7 @@ var ui = require('../ui'),
     misc = require('../misc');
 
 function Decal() {
-    this.tagRoot = ui.create('div');
+    this.tagRoot = ui.create('div', 'absolute bottom right no-interaction');
 
     this.tagEvent = ui.create('div', 'event', this.tagRoot);
     this.eventFrom = ui.create('div', 'player from', this.tagEvent);
@@ -16,6 +16,12 @@ Decal.depth = 1;
 Decal.prototype = {
     constructor: Decal,
 
+    clearInfo: function() {
+        this.eventPlayerName.innerHTML = '';
+        this.eventType.innerHTML = '';
+        this.eventType.className = 'type';
+        ui.hide(this.eventFrom, this.eventReason);
+    },
     setInfo: function(game) {
         if (!game.turn) return;
         if (!game.turn.step) return;

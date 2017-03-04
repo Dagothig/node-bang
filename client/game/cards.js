@@ -108,7 +108,7 @@ Cards.prototype = {
 
         this.cards.forEach((card, cI) => {
             let shiftedI = (cI - (this.cards.length - 1) / 2) * this.density;
-            let offset = shiftedI * card.tagRoot.offsetWidth / Card.hoverScale;
+            let offset = shiftedI * card.getWidth();
             card.move(
                 this.x + this.dirX * offset,
                 this.y + this.dirY * offset,
@@ -131,11 +131,9 @@ Cards.prototype = {
             (0.7 - this.cards.length / 30) / (this.visible ? 1 : 2);
 
         let cardSize = {
-            x: (this.cards[0] && this.cards[0].tagRoot.offsetWidth),
-            y: (this.cards[0] && this.cards[0].tagRoot.offsetHeight),
+            x: (this.cards[0] && this.cards[0].getWidth()),
+            y: (this.cards[0] && this.cards[0].getHeight()),
         };
-        cardSize.x /= Card.hoverScale;
-        cardSize.y /= Card.hoverScale;
 
         let arcLength = cardSize.x * (this.cards.length - 1);
         let arcRadius = arcLength / this.arcAngle;

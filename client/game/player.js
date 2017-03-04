@@ -7,8 +7,9 @@ function Player() {
     this.tagRoot = ui.create('div');
 
     this.infoPlate = ui.create('div', 'info-plate', this.tagRoot);
-    this.infoName = ui.create('div', 'name', this.infoPlate);
-    this.infoLife = ui.create('div', 'life', this.infoPlate);
+    this.infoPlateContent = ui.create('div', 'content', this.infoPlate);
+    this.infoName = ui.create('div', 'name', this.infoPlateContent);
+    this.infoLife = ui.create('div', 'life', this.infoPlateContent);
 
     this.equipped = new Cards('equipped');
     this.tagRoot.appendChild(this.equipped.tagRoot);
@@ -39,24 +40,47 @@ Player.depth = Player.infoPlateZ + 1;
 Player.prototype = {
     constructor: Player,
 
-    computeAngle: function(players, i, shift) {
-        // The angle is shifted by a quarter-circle because we want to
-        // start center-bottom
-        this.angle = (shift !== -1 ?
-                this.angleFor(i - shift, players.length) :
-                i * Math.TWO_PI / players.length
-            ) + Math.HALF_PI;
-        this.dirX = Math.cos(this.angle);
-        this.dirY = Math.sin(this.angle);
+    computeAnglePortion: function(players, i, shift) {
+        if (shift === -1) shift = 0;
+
+        let fullPortion = ((i - shift) / players.length) % 1;
+        while (fullPortion < 0) fullPortion++;
+        fullPortion *= 4
+
+        // We will define the two angles and the final portion as sitting on behind
+        // for integers and approaching ahead when going to the next integer
+        // (angle = ahead * portion + behind * (1 - portion))
+        let ahead = Math.floor(fullPortion) * Math.HALF_PI + Math.PI;
+        let behind = ahead - Math.HALF_PI;
+        let portion = fullPortion % 1;
+
+        // Because we will use the exponential on the ratio of width to height to
+        // calculate a semblance of a distribution and thus we want to approach the
+        // horizontal angles as the ratio rises (and conversely, approach the
+        // vertical as it goes to 0), we need to define accordingly
+
+        // For [0,1[, ahead is left and behind is bottom; the portion needs to be
+        // flipped. Same for [2,3[ with ahead being right and behind being top
+        if (fullPortion < 1 || (fullPortion >= 2 && fullPortion < 3)) {
+            this._angleH = ahead;
+            this._angleV = behind;
+            this._portion = 1 - (portion % 1);
+        } else {
+            this._angleH = behind;
+            this._angleV = ahead;
+            this._portion = portion % 1;
+        }
+
         let dist = Math.abs(shift - i);
         dist = Math.min(dist, players.length - dist);
         this.z = (players.length - dist - 1) * Player.depth;
     },
-    angleFor: function(i, playerCount) {
-        let portion = i / playerCount;
-        while (portion > 0.5) portion = portion - 1;
-        if (portion !== 0) portion = Math.sign(portion) * 0.025 + portion * 0.95;
-        return portion * Math.TWO_PI;
+    angle: function(widthToHeightRatio) {
+        // Because the exponential is much stronger than what we actually want, we
+        // lessen the ratio so that it makes more sense for values around [0.25, 4]
+        widthToHeightRatio = widthToHeightRatio * 0.45 + 0.55;
+        let portion = Math.pow(this._portion, widthToHeightRatio);
+        return this._angleV * portion + this._angleH * (1 - portion);
     },
 
     setInfo: function(playerInfo, turn) {
@@ -89,9 +113,7 @@ Player.prototype = {
             ui.show(this.infoLife);
             this.lifeLevel = playerInfo.life;
             for (let i = 0; i < playerInfo.stats.life; i++)
-                infoLifeHTML +=
-                    (i < playerInfo.life ? "\uf004" : "<em>\uf004</em>");
-                    //(i < playerInfo.life ? "\uf004" : "\uf08a");
+                infoLifeHTML += i < playerInfo.life ? "\uf004" : "<em>\uf004</em>";
         } else {
             ui.hide(this.infoLife);
         }
@@ -163,17 +185,16 @@ Player.prototype = {
     endPhaseMove: function(x, y) {
         this.x = x;
         this.y = y;
-        this.z = this.dirX = this.dirY = this.angle = 0;
+        this.z = 0;
 
         let width = this.character.getWidth();
         let height = this.character.getHeight();
 
         ui.move(this.infoPlate,
             this.x,
-            this.y + height / 2 + this.infoPlate.offsetHeight/2,
+            this.y + height / 2,
             this.z + Player.infoPlateZ
         );
-        this.infoPlate.style.marginLeft = (-this.infoPlate.offsetWidth / 2) + 'px';
         this.infoPlate.style.transform = '';
 
         this.character.move(
@@ -191,13 +212,13 @@ Player.prototype = {
         ).visible();
     },
 
-    move: function(x, y, z, angle) {
+    move: function(x, y, z, angle, dirX, dirY) {
         this.x = x;
         this.y = y;
         this.z = z;
 
-        let yDirX = Math.cos(angle);
-        let yDirY = Math.sin(angle);
+        let yDirX = dirX;
+        let yDirY = dirY;
         let xDirX = -yDirY;
         let xDirY = yDirX;
         let rotAngle = angle - Math.HALF_PI;
@@ -215,7 +236,6 @@ Player.prototype = {
 
             this.z + Player.infoPlateZ
         );
-        this.infoPlate.style.marginLeft = (-this.infoPlate.offsetWidth / 2) + 'px';
         this.infoPlate.style.transform = 'rotateZ(' + rotAngle + 'rad)';
 
         let yHandShift = cHeight * Player.handShift;
@@ -295,9 +315,8 @@ Player.prototype = {
     },
     getHeight: function() {
         // The division per two is roughly the overlap
-        return this.infoPlate.offsetHeight / 2 +
-            this.character.getHeight() *
-                (Player.characterShift - Player.equippedShift + 1);
+        return this.character.getHeight() *
+                (Player.characterShift - Player.equippedShift + 1 + 0.2);
     },
 
     shake: function() {

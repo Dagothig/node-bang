@@ -32,6 +32,7 @@ function Card() {
 }
 Card.hoverScale = 1.5;
 Card.transitionTime = 500;
+Card.clearSizeCache = () => Card.width = Card.height = null;
 Card.prototype = {
     constructor: Card,
 
@@ -224,8 +225,14 @@ Card.prototype = {
         return this;
     },
 
-    getWidth: function() { return this.tagRoot.offsetWidth / Card.hoverScale; },
-    getHeight: function() { return this.tagRoot.offsetHeight / Card.hoverScale; }
+    getWidth: function() {
+        return Card.width ? Card.width :
+            (Card.width = this.tagRoot.offsetWidth / Card.hoverScale);
+        },
+    getHeight: function() {
+        return Card.height ? Card.height :
+            (Card.height = this.tagRoot.offsetHeight / Card.hoverScale);
+    }
 };
 
 module.exports = Card;

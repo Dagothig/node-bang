@@ -12,14 +12,9 @@ module.exports = new Character("Jourdonnais", {
         step, card, target, attack, onResolved, onSkip
     ) {
         return target.character === this ?
-            this.barile.tryAvoid.apply(this.barile, arguments) :
-            onResolved();
-    },
-    beforeGatlingResponse: function(
-        step, card, target, attack, onResolved, onSkip
-    ) {
-        return target.character === this ?
-            this.barile.tryAvoid.apply(this.barile, arguments) :
+            this.barile.tryAvoid(
+                step, card, target, attack, onResolved, onSkip
+            ) :
             onResolved();
     }
 });
